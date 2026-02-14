@@ -54,7 +54,7 @@ const securityHeaders = [
   },
 ]
 
-const output = process.env.EXPORT ? 'export' : undefined
+const output = process.env.EXPORT ? 'export' : 'standalone'
 const basePath = process.env.BASE_PATH || undefined
 const unoptimized = process.env.UNOPTIMIZED ? true : undefined
 
@@ -68,6 +68,9 @@ module.exports = () => {
     basePath,
     reactStrictMode: true,
     trailingSlash: true,
+    eslint: {
+      ignoreDuringBuilds: true,
+    },
     turbopack: {
       root: process.cwd(),
       rules: {

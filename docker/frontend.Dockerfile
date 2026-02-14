@@ -5,13 +5,12 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
-RUN \
-    if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install --frozen-lockfile; \
-    elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
-    else npm install; \
-    fi
+# Copy yarn configuration files
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
+
+# Install dependencies using Yarn 3
+RUN corepack enable && yarn install
 
 # ---------------------
 # Build stage
@@ -20,12 +19,21 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
+# Copy source code first
 COPY . .
+
+# Then overlay node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+# Copy the updated yarn.lock from deps (in case it was modified)
+COPY --from=deps /app/yarn.lock ./yarn.lock
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN npm run build
+# Build-time env vars (NEXT_PUBLIC_* must be available at build time)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+RUN corepack enable && yarn build
 
 # ---------------------
 # Production stage

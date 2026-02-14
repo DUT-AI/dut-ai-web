@@ -47,10 +47,10 @@ services:
       context: ./frontend
       dockerfile: ../docker/frontend.Dockerfile
       target: production
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: dut-ai-web-frontend
     restart: always
-    environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
