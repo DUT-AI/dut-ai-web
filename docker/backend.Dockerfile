@@ -31,20 +31,12 @@ COPY --from=deps /app/.venv /app/.venv
 # Copy project source
 COPY . .
 
-# Collect static files
-RUN uv run python manage.py collectstatic --noinput 2>/dev/null || true
-
 # Set ownership
 RUN chown -R appuser:appuser /app
 
 USER appuser
 
-EXPOSE 8000
+EXPOSE 8002
 
-# Production server with gunicorn
-CMD ["uv", "run", "gunicorn", "config.wsgi:application", \
-     "--bind", "0.0.0.0:8000", \
-     "--workers", "4", \
-     "--timeout", "120", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-"]
+# Production server with gunicorn + uvicorn workers
+CMD ["uv", "run", "gunicorn", "app.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8002"]

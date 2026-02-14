@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: dut-ai-db
+    container_name: dut-ai-web-db
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-wagtail}
@@ -14,6 +14,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - internal
 
@@ -22,16 +24,16 @@ services:
       context: ./backend
       dockerfile: ../docker/backend.Dockerfile
       target: production
-    container_name: dut-ai-backend
+    container_name: dut-ai-web-backend
     restart: always
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-wagtail}:${POSTGRES_PASSWORD:-wagtail}@db:5432/${POSTGRES_DB:-wagtail}
-      DJANGO_SETTINGS_MODULE: config.settings.production
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
-      SECRET_KEY: ${SECRET_KEY}
+      POSTGRES_USER: ${POSTGRES_USER:-wagtail}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wagtail}
+      POSTGRES_DB: ${POSTGRES_DB:-wagtail}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
     ports:
-      - "${BACKEND_PORT:-8000}:8000"
+      - "${BACKEND_PORT:-8002}:8002"
     depends_on:
       db:
         condition: service_healthy
@@ -43,7 +45,7 @@ services:
       context: ./frontend
       dockerfile: ../docker/frontend.Dockerfile
       target: production
-    container_name: dut-ai-frontend
+    container_name: dut-ai-web-frontend
     restart: always
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
