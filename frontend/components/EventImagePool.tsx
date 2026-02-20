@@ -46,11 +46,11 @@ export default function EventImagePool({ posts }: { posts: CoreContent<Blog>[] }
     if (displayImages.length === 0) return null
 
     return (
-        <div className="py-10">
-            <h2 className="text-2xl font-bold mb-6">Khoảnh khắc DUT AI</h2>
+        <div>
+            <h2 className="mb-6 text-2xl font-bold text-primary-900 dark:text-white">Khoảnh khắc DUT AI</h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {displayImages.map((img, index) => (
-                    <div key={index} className="relative h-40 overflow-hidden rounded-lg shadow-sm group">
+                    <div key={index} className="relative h-40 overflow-hidden rounded-2xl shadow-sm group">
                         <Image
                             src={img}
                             alt={`DUT AI Event ${index}`}
