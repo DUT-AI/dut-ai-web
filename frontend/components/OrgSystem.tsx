@@ -1,80 +1,183 @@
-'use client' // Đảm bảo có dòng này ở đầu file vì có dùng useState
+'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
+import { Card, CardContent } from './ui/card'
 
-const memberData = {
-    BCN: [
-        { name: 'Huỳnh Phước Nguyên', role: 'Chủ nhiệm', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Phạm Thị Thảo Nguyên', role: 'Phó chủ nhiệm', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Vương Ngọc Hậu', role: 'Phó chủ nhiệm', img: '/static/images/chiikawa.jpeg' },
-    ],
-    Leader: [
-        { name: 'Biện Cao Cường', role: 'Leader team 1', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Trần Hữu Dũng', role: 'Leader team 2', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Lê Xuân Hòa', role: 'Leader team 3', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Trương Minh Hiển', role: 'Leader team 4', img: '/static/images/chiikawa.jpeg' },
-    ],
-    Teammate: [
-        { name: 'Trương Bùi Diễn', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Lương Duy Toàn', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Trần Thị Hoài Như', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Trần Thị Tuyết Trinh', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Phan Tấn Sơn', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Trương Thị Ngọc Huyền', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Quế Đình Anh Tú', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Lương Duy Toàn', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Phan Vũ Long', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-        { name: 'Nguyễn Đỗ Khánh Linh', role: 'Member', img: '/static/images/chiikawa.jpeg' },
-    ],
+interface Member {
+    id: number
+    name: string
+    email: string
+    phone_number: string
+    status: string
+    role_id: number
+    role_name: string
+    avatar_url: string | null
+    discord_id: string | null
 }
 
-type RoleType = 'BCN' | 'Leader' | 'Teammate'
+type FilterRole = 'BCN' | 'Leader' | 'Teammate'
+
+function getRoleFilter(roleName: string): FilterRole {
+    if (roleName === 'admin') return 'BCN'
+    if (roleName === 'leader') return 'Leader'
+    return 'Teammate'
+}
+
+const DEFAULT_AVATAR = '/static/images/chiikawa.jpeg'
 
 export default function OrganizationSystem() {
-    const [activeRole, setActiveRole] = useState<RoleType>('BCN')
+    const [activeRole, setActiveRole] = useState<FilterRole>('BCN')
+    const [members, setMembers] = useState<Member[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    // Ref để xử lý cuộn ngang bằng phím giữa/con trỏ chuột
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        async function fetchMembers() {
+            try {
+                const res = await fetch('/api/members')
+                if (!res.ok) throw new Error('Failed to fetch members')
+                const data: Member[] = await res.json()
+                // Chỉ hiển thị thành viên active
+                setMembers(data.filter((m) => m.status === 'active'))
+            } catch (err) {
+                setError('Không thể tải danh sách thành viên.')
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchMembers()
+    }, [])
+
+    // Logic tách biệt cuộn: Khi di chuột vào vùng này, lăn chuột chỉ cuộn ngang, không cuộn trang
+    // Logic tách biệt cuộn: Khi di chuột vào vùng này, lăn chuột chỉ cuộn ngang, không cuộn trang
+    // Sử dụng useEffect để add event listener non-passive, giúp preventDefault hoạt động tốt hơn
+    useEffect(() => {
+        const container = scrollRef.current
+        if (!container) return
+
+        const handleWheel = (e: WheelEvent) => {
+            // Kiểm tra xem danh sách có đủ dài để cuộn ngang không
+            // const isScrollable = container.scrollWidth > container.clientWidth
+
+            // Luôn chặn cuộn dọc trang khi đang ở trong vùng này và chuyển thành cuộn ngang
+            if (e.deltaY !== 0) {
+                // Ngăn chặn hành vi mặc định (cuộn trang)
+                e.preventDefault()
+                // Chuyển lực cuộn dọc thành cuộn ngang, nhân 3 để nhanh hơn
+                container.scrollLeft += e.deltaY * 3
+            }
+        }
+
+        // Add event listener với passive: false để có thể gọi preventDefault
+        container.addEventListener('wheel', handleWheel, { passive: false })
+
+        return () => {
+            container.removeEventListener('wheel', handleWheel)
+        }
+    }, [members, activeRole]) // Re-run khi data thay đổi để đảm bảo ref đã có content
+
+    const filteredMembers = members.filter(
+        (m) => getRoleFilter(m.role_name) === activeRole
+    )
+
+    const getRoleLabel = (filter: FilterRole) => {
+        if (filter === 'BCN') return 'Ban Chấp Hành'
+        if (filter === 'Leader') return 'Trưởng ban'
+        return 'Thành viên'
+    }
+
+    const getMemberRoleLabel = (roleName: string) => {
+        if (roleName === 'admin') return 'Ban Chấp Hành'
+        if (roleName === 'leader') return 'Leader'
+        return 'Thành viên'
+    }
 
     return (
-        <div className="py-10">
-            <h2 className="text-2xl font-bold mb-6">Hệ thống tổ chức</h2>
+        <div className="py-4">
+            <h2 className="mb-6 text-2xl font-bold text-primary-900 dark:text-white">Hệ thống tổ chức</h2>
 
-            {/* Nút bấm chuyển đổi */}
+            {/* Bộ lọc vai trò */}
             <div className="flex flex-wrap gap-4 mb-8">
-                {(['BCN', 'Leader', 'Teammate'] as RoleType[]).map((role) => (
+                {(['BCN', 'Leader', 'Teammate'] as FilterRole[]).map((role) => (
                     <button
                         key={role}
                         onClick={() => setActiveRole(role)}
                         className={`px-6 py-2 rounded-full font-semibold transition-all ${activeRole === role
-                            ? 'bg-primary-500 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
+                                ? 'bg-rose-500 text-white shadow-md dark:bg-rose-600'
+                                : 'bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                             }`}
                     >
-                        {role === 'BCN' ? 'Ban Chấp Hành' : role}
+                        {getRoleLabel(role)}
                     </button>
                 ))}
             </div>
 
-            {/* Danh sách thẻ thành viên */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                {memberData[activeRole].map((member, index) => (
-                    <div key={index} className="flex flex-col items-center group">
-                        <div className="relative w-32 h-32 mb-3 overflow-hidden rounded-xl border-2 border-transparent group-hover:border-primary-500 transition-all">
-                            <Image
-                                src={member.img}
-                                alt={member.name}
-                                fill
-                                className="object-cover transition-transform duration-300 group-hover:scale-110"
-                            />
+            {loading && (
+                <p className="text-gray-500 dark:text-gray-400 animate-pulse">Đang tải thành viên...</p>
+            )}
+
+            {error && (
+                <p className="text-red-500 font-medium">{error}</p>
+            )}
+
+            {!loading && !error && (
+                <div
+                    ref={scrollRef}
+                    className="flex flex-row gap-6 overflow-x-auto pb-8 h-[300px] scrollbar-hide select-none cursor-grab active:cursor-grabbing snap-x snap-mandatory"
+                    style={{
+                        scrollBehavior: 'smooth',
+                        WebkitOverflowScrolling: 'touch',
+                        touchAction: 'pan-x'
+                    }}
+                >
+                    {filteredMembers.map((member) => (
+                        <Card
+                            key={member.id}
+                            className="flex-shrink-0 w-[180px] h-[250px] flex flex-col items-center p-4 group hover:shadow-xl transition-all snap-start border border-primary-100 bg-white dark:border-gray-700 dark:bg-gray-800"
+                        >
+                            <CardContent className="flex flex-col items-center p-0 w-full justify-center h-full">
+                                <div className="relative w-24 h-24 mb-4 overflow-hidden rounded-2xl border-2 border-primary-100 transition-all shadow-sm dark:border-gray-700">
+                                    <Image
+                                        src={member.avatar_url || DEFAULT_AVATAR}
+                                        alt={member.name}
+                                        fill
+                                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                        unoptimized={!!member.avatar_url}
+                                    />
+                                </div>
+                                <h4 className="font-bold text-sm text-center uppercase leading-tight line-clamp-2 px-2 text-primary-900 dark:text-white">
+                                    {member.name}
+                                </h4>
+                                <p className="text-[10px] uppercase tracking-widest text-center mt-3 font-bold text-rose-500 dark:text-rose-400">
+                                    {getMemberRoleLabel(member.role_name)}
+                                </p>
+                            </CardContent>
+                        </Card>
+                    ))}
+
+                    {!loading && filteredMembers.length === 0 && (
+                        <div className="flex items-center justify-center w-full h-full border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
+                            <p className="text-gray-500 dark:text-gray-400">Không có thành viên trong nhóm này.</p>
                         </div>
-                        <h4 className="font-bold text-sm text-center text-gray-900 dark:text-gray-100 uppercase">
-                            {member.name}
-                        </h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                            {member.role}
-                        </p>
-                    </div>
-                ))}
-            </div>
+
+                    )}
+                </div>
+            )}
+
+            {/* CSS để ẩn thanh cuộn nhưng vẫn giữ tính năng cuộn mượt */}
+            <style jsx global>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
         </div>
     )
 }

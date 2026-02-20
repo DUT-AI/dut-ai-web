@@ -13,6 +13,7 @@ import PostBanner from '@/layouts/PostBanner'
 import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { notFound } from 'next/navigation'
+import { BASE_KEYWORDS } from 'app/seo'
 
 const defaultLayout = 'PostLayout'
 const layouts = {
@@ -52,11 +53,12 @@ export async function generateMetadata(props: {
   return {
     title: post.title,
     description: post.summary,
+    keywords: [...BASE_KEYWORDS, ...(post.tags ?? [])],
     openGraph: {
       title: post.title,
       description: post.summary,
       siteName: siteMetadata.title,
-      locale: 'en_US',
+      locale: 'vi_VN',
       type: 'article',
       publishedTime: publishedAt,
       modifiedTime: modifiedAt,
