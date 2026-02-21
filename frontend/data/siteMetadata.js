@@ -1,6 +1,6 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'DUT AI Club - Cộng đồng học thuật Trí tuệ nhân tạo Đà Nẵng',
+  title: 'DUT AI Club',
   author: 'DUT AI Club',
   headerTitle: 'DUT AI',
   description: 'Câu lạc bộ AI hàng đầu tại Đại học Bách Khoa - ĐHĐN (DUT), nơi kết nối đam mê nghiên cứu và ứng dụng Artificial Intelligence tại Đà Nẵng.',
@@ -9,7 +9,7 @@ const siteMetadata = {
   siteUrl: 'https://clb.dutai.site/',
   siteRepo: 'https://github.com/dutai-club',
   locale: 'vi-VN',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
+  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.jpg`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   mastodon: '',
   email: 'contact@dutai.site',
@@ -27,7 +27,7 @@ const siteMetadata = {
   address: '54 Nguyễn Lương Bằng, Liên Chiểu, Đà Nẵng',
   slogan: 'Dreams Never Need Half Hearts',
   // set to true if you want a navbar fixed to the top
-  stickyNav: false,
+  stickyNav: true,
   analytics: {
     // If you want to use an analytics provider you have to add it to the
     // content security policy in the `next.config.js` file.

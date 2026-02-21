@@ -109,6 +109,19 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* ── Hide browser scrollbar globally (keep scroll active) ── */
+  html {
+    overflow-y: scroll;
+    /* prevent layout shift */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+    /* Chrome / Safari / Edge */
+  }
 }
 
 @layer utilities {
@@ -178,11 +191,13 @@
   @apply my-5;
 }
 
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-.no-scrollbar {
+.no-scrollbar,
+.scrollbar-hide {
   -ms-overflow-style: none;
   /* IE and Edge */
   scrollbar-width: none;

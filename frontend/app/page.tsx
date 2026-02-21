@@ -48,7 +48,7 @@ export default async function Page() {
         <Sparkle size={22} className="text-primary-600 absolute opacity-40 dark:opacity-20" style={{ top: 160, right: '12%' }} />
         <Sparkle size={10} className="text-primary-400 absolute opacity-35 dark:opacity-20" style={{ bottom: 80, left: '35%' }} />
 
-        <div className="relative z-10 mx-auto max-w-5xl px-6">
+        <div className="relative z-10 px-6 md:px-12">
           <div className="flex flex-col items-start gap-10 md:flex-row md:items-center md:justify-between">
 
             {/* Text */}
@@ -129,54 +129,48 @@ export default async function Page() {
       {/* ═══════════════════════════════════════════
           GIỚI THIỆU
       ═══════════════════════════════════════════ */}
-      <section className="px-6 py-3">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-primary-100 bg-white px-6 py-10 shadow-sm md:px-12 dark:border-gray-800 dark:bg-gray-900">
-          <SectionLabel label="Giới thiệu" colorClass="bg-primary-400 text-primary-600 dark:text-primary-400" />
-          <AboutUs />
-        </div>
+      <section className="px-6 py-8 md:px-12 border-t border-primary-100 dark:border-gray-800">
+        <SectionLabel label="Giới thiệu" colorClass="bg-primary-400 text-primary-600 dark:text-primary-400" />
+        <AboutUs />
       </section>
 
       {/* ═══════════════════════════════════════════
           ĐỘI NGŨ
       ═══════════════════════════════════════════ */}
-      <section className="px-6 py-3">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-rose-200 bg-rose-50 px-6 py-10 shadow-sm md:px-12 dark:border-gray-800 dark:bg-gray-900">
+      <section className="py-8 bg-rose-50 dark:bg-gray-900 border-t border-rose-100 dark:border-gray-800">
+        <div className="px-6 md:px-12">
           <SectionLabel label="Đội ngũ" colorClass="bg-rose-400 text-rose-600 dark:text-rose-400" />
-          <OrgSystem />
         </div>
+        <OrgSystem />
       </section>
 
       {/* ═══════════════════════════════════════════
           KHOẢNH KHẮC
       ═══════════════════════════════════════════ */}
-      <section className="px-6 py-3">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-primary-100 bg-white px-6 py-10 shadow-sm md:px-12 dark:border-gray-800 dark:bg-gray-900">
-          <SectionLabel label="Khoảnh khắc" colorClass="bg-primary-400 text-primary-600 dark:text-primary-400" />
-          <EventImagePool posts={posts} />
-        </div>
+      <section className="px-6 py-8 md:px-12 border-t border-primary-100 dark:border-gray-800">
+        <SectionLabel label="Khoảnh khắc" colorClass="bg-primary-400 text-primary-600 dark:text-primary-400" />
+        <EventImagePool posts={posts} />
       </section>
 
       {/* ═══════════════════════════════════════════
           TIN TỨC
       ═══════════════════════════════════════════ */}
-      <section className="px-6 py-3">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-primary-200 bg-primary-50 px-6 py-10 shadow-sm md:px-12 dark:border-gray-800 dark:bg-gray-900">
-          <div className="mb-6 flex items-start justify-between gap-4">
-            <div>
-              <SectionLabel label="Tin tức" colorClass="bg-primary-400 text-primary-600 dark:text-primary-400" />
-              <h2 className="mt-1 text-2xl font-bold text-primary-900 dark:text-white">
-                Sự kiện &amp; Bài viết mới nhất
-              </h2>
-            </div>
-            <Link
-              href="/blog"
-              className="mt-1 hidden shrink-0 items-center gap-1 rounded-full bg-primary-900 px-5 py-2 text-sm font-bold text-white shadow-sm sm:flex dark:bg-primary-700"
-            >
-              Tất cả →
-            </Link>
+      <section className="px-6 py-8 md:px-12 bg-primary-50 dark:bg-gray-900 border-t border-primary-100 dark:border-gray-800">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <SectionLabel label="Tin tức" colorClass="bg-primary-400 text-primary-600 dark:text-primary-400" />
+            <h2 className="mt-1 text-2xl font-bold text-primary-900 dark:text-white">
+              Sự kiện &amp; Bài viết mới nhất
+            </h2>
           </div>
-          <Main posts={posts.slice(0, 3)} />
+          <Link
+            href="/blog"
+            className="mt-1 hidden shrink-0 items-center gap-1 rounded-full bg-primary-900 px-5 py-2 text-sm font-bold text-white shadow-sm sm:flex dark:bg-primary-700"
+          >
+            Tất cả →
+          </Link>
         </div>
+        <Main posts={posts.slice(0, 3)} />
       </section>
     </div>
   )
