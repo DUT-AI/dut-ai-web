@@ -3,8 +3,10 @@
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react'
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import { Fragment, useState, useEffect, useRef } from 'react'
+import NextImage from 'next/image'
 import Link from './Link'
 import headerNavLinks from '@/data/headerNavLinks'
+import siteMetadata from '@/data/siteMetadata'
 
 const MobileNav = () => {
   const [navShow, setNavShow] = useState(false)
@@ -94,6 +96,20 @@ const MobileNav = () => {
                 ref={navRef}
                 className="mt-8 flex h-full basis-0 flex-col items-start overflow-y-auto pt-2 pl-12 text-left"
               >
+                {/* Brand in drawer */}
+                <div className="mb-8 flex items-center gap-3">
+                  <NextImage
+                    src={siteMetadata.siteLogo}
+                    alt={siteMetadata.headerTitle as string}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-lg object-contain"
+                    priority
+                  />
+                  <span className="text-xl font-bold tracking-tight text-primary-900 dark:text-white">
+                    {siteMetadata.headerTitle}
+                  </span>
+                </div>
                 {headerNavLinks.map((link) => (
                   <Link
                     key={link.title}

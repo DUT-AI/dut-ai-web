@@ -87,6 +87,10 @@ module.exports = () => {
           protocol: 'https',
           hostname: 'picsum.photos',
         },
+        {
+          protocol: 'https',
+          hostname: 'minio.dutai.site',
+        },
       ],
       unoptimized,
     },
