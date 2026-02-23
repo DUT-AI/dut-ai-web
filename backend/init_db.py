@@ -1,15 +1,15 @@
 from app.core.database import engine, Base
 
-# Import all models so Base.metadata knows about them
-from app.v1.projects.models import Project  # noqa: F401
-from app.v1.introductions.models import Introduction  # noqa: F401
-
+from app.v1.projects.models import Project # noqa: F401
+from app.v1.introductions.models import Introduction # noqa: F401
+from app.v1.blogs.models import Blog # noqa: F401
+from app.v1.events.models import Event # noqa: F401
+from sqlalchemy import text
 
 def init():
-    print("Creating tables...")
+    print("Đang kiểm tra và tạo các bảng...")
     Base.metadata.create_all(bind=engine)
     print("Tables created!")
-
 
 if __name__ == "__main__":
     init()
