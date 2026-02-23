@@ -1,7 +1,7 @@
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
-
+from sqlalchemy import Column, String
 
 class Project(Base):
     __tablename__ = "projects"
@@ -11,3 +11,4 @@ class Project(Base):
     description: Mapped[str] = mapped_column(Text, nullable=True)
     product_link: Mapped[str] = mapped_column(nullable=True)
     image_url: Mapped[str] = mapped_column(nullable=True)
+    project_url = Column(String(500), nullable=True)

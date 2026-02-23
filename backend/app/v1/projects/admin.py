@@ -8,8 +8,8 @@ from .models import Project
 
 
 class ProjectAdmin(BaseAdmin, model=Project):
-    column_list = [Project.id, Project.title, Project.description, Project.image_url]
-    form_excluded_columns = [Project.id, Project.image_url]
+    column_list = [Project.id, Project.title, Project.description, Project.image_url,Project.project_url]
+    form_excluded_columns = [Project.id, Project.image_url,Project.project_url]
 
     async def scaffold_form(self, form_rules=None):
         """Override để thêm FileField upload ảnh vào form."""
