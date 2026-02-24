@@ -5,12 +5,11 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-# Copy yarn configuration files
-COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn ./.yarn
+    # Copy package files
+COPY package.json package-lock.json ./
 
-# Install dependencies using Yarn 3
-RUN corepack enable && yarn install
+# Install dependencies using npm
+RUN npm ci
 
 # ---------------------
 # Build stage
@@ -24,8 +23,8 @@ COPY . .
 
 # Then overlay node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-# Copy the updated yarn.lock from deps (in case it was modified)
-COPY --from=deps /app/yarn.lock ./yarn.lock
+# Copy the updated package-lock.json from deps (in case it was modified)
+COPY --from=deps /app/package-lock.json ./package-lock.json
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -33,7 +32,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
-RUN corepack enable && yarn build
+RUN npm run build
 
 # ---------------------
 # Production stage
