@@ -281,20 +281,20 @@ export default async function Page() {
       {/* ═══════════════════════════════════════════
           GIỚI THIỆU
       ═══════════════════════════════════════════ */}
-      <section className="px-6 py-8 md:px-12 border-t border-primary-100 dark:border-gray-800">
+      {/* <section className="px-6 py-8 md:px-12 border-t border-primary-100 dark:border-gray-800">
         <SectionLabel label="Giới thiệu" colorClass="bg-primary-400 text-primary-600 dark:text-primary-400" />
         <AboutUs />
-      </section>
+      </section> */}
 
       {/* ═══════════════════════════════════════════
           ĐỘI NGŨ
       ═══════════════════════════════════════════ */}
-      <section className="py-8 bg-rose-50 dark:bg-gray-900 border-t border-rose-100 dark:border-gray-800">
+      {/* <section className="py-8 bg-rose-50 dark:bg-gray-900 border-t border-rose-100 dark:border-gray-800">
         <div className="px-6 md:px-12">
           <SectionLabel label="Đội ngũ" colorClass="bg-rose-400 text-rose-600 dark:text-rose-400" />
         </div>
         <OrgSystem />
-      </section>
+      </section> */}
 
       {/* ═══════════════════════════════════════════
           DUT AI MOMENTS
