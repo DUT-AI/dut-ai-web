@@ -9,6 +9,7 @@ class ProjectBase(BaseModel):
     description: Optional[str] = None
     product_link: Optional[str] = None
     image_url: Optional[str] = None
+    project_url: Optional[str] = None
 
 
 class ProjectCreate(ProjectBase):
@@ -22,7 +23,7 @@ class ProjectUpdate(BaseModel):
     description: Optional[str] = None
     product_link: Optional[str] = None
     image_url: Optional[str] = None
-
+    project_url: Optional[str] = None
 
 class ProjectResponse(ProjectBase):
     """Response: thêm id, kế thừa toàn bộ fields từ Base."""
