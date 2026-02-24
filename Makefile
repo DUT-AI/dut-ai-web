@@ -19,10 +19,7 @@ stop:
 	docker compose down
 
 api:
-	cd backend && uv run python manage.py runserver 0.0.0.0:8001
-
-api-fastapi:
-	cd backend_fastapi && uv run uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
+	cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
 
 frontend:
 	cd frontend && npm run dev
