@@ -71,9 +71,8 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
             {projects.slice(0, Math.min(5, total)).map((_, i) => (
               <div
                 key={i}
-                className={`h-2.5 rounded-full transition-all ${
-                  i === selected ? 'w-8 bg-orange-500' : 'w-2.5 bg-white/20'
-                }`}
+                className={`h-2.5 rounded-full transition-all ${i === selected ? 'w-8 bg-orange-500' : 'w-2.5 bg-white/20'
+                  }`}
               />
             ))}
           </div>

@@ -23,9 +23,8 @@ export default function CategoryTabs({ activeTab, onTabChange }: CategoryTabsPro
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className={`group flex items-center gap-3 overflow-hidden rounded-[40px] px-6 py-6 text-left transition-all duration-300 hover:scale-[1.02] sm:gap-4 sm:px-8 sm:py-7 ${
-              isActive ? 'ring-2 ring-white/40' : ''
-            }`}
+            className={`group flex items-center gap-3 overflow-hidden rounded-[40px] px-6 py-6 text-left transition-all duration-300 hover:scale-[1.02] sm:gap-4 sm:px-8 sm:py-7 ${isActive ? 'ring-2 ring-white/40' : ''
+              }`}
             style={{
               ...glass,
               background: isActive ? 'rgba(255,255,255,0.25)' : glass.background,

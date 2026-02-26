@@ -15,11 +15,10 @@ export default function ThumbCard({ project, active, onClick, cardW = 280 }: Thu
   return (
     <button
       onClick={onClick}
-      className={`group relative flex-shrink-0 overflow-hidden rounded-[40px] transition-all duration-500 focus:outline-none ${
-        active
+      className={`group relative flex-shrink-0 overflow-hidden rounded-[40px] transition-all duration-500 focus:outline-none ${active
           ? 'ring-2 ring-white/50 ring-offset-2 ring-offset-transparent'
           : 'opacity-75 hover:opacity-100'
-      }`}
+        }`}
       style={{ width: cardW, height: Math.round(cardW * (213 / 280)) }}
     >
       {/* BG */}

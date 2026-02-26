@@ -37,9 +37,8 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
                   />
                 ) : (
                   <div
-                    className={`h-full w-full ${
-                      ['bg-slate-700', 'bg-emerald-700', 'bg-amber-600'][i % 3]
-                    }`}
+                    className={`h-full w-full ${['bg-slate-700', 'bg-emerald-700', 'bg-amber-600'][i % 3]
+                      }`}
                   />
                 )}
               </div>
