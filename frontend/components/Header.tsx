@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
 import NextImage from 'next/image'
@@ -5,13 +8,28 @@ import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
+import { usePathname } from 'next/navigation'
 
 const Header = () => {
-  let headerClass =
-    'mx-auto w-[calc(100%-2rem)] max-w-[1400px] mt-4 sm:mt-6 flex items-center justify-between py-2.5 px-3 sm:px-6 rounded-full border border-gray-200/50 dark:border-gray-800/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-sm transition-all'
+  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  let headerClass = `mx-auto flex items-center justify-between transition-all duration-300 z-50 ${scrolled
+    ? 'w-full max-w-full py-3 px-4 sm:px-8 bg-white/75 dark:bg-gray-950/75 backdrop-blur-lg border-b border-gray-200/50 dark:border-white/10 shadow-sm rounded-none'
+    : 'w-[calc(100%-2rem)] max-w-[1400px] mt-4 sm:mt-6 py-2.5 px-3 sm:px-6 bg-transparent border border-transparent rounded-full'
+    }`
 
   if (siteMetadata.stickyNav) {
-    headerClass += ' sticky top-4 sm:top-6 z-50'
+    headerClass += scrolled ? ' fixed top-0 left-0 right-0' : ' absolute top-0 left-0 right-0'
   }
 
   return (
@@ -43,15 +61,27 @@ const Header = () => {
       <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-x-8">
         {headerNavLinks
           .filter((link) => link.href !== '/')
-          .map((link) => (
-            <Link
-              key={link.title}
-              href={link.href}
-              className="font-medium text-[#64748B] hover:text-[#1C1F3B] dark:text-gray-300 dark:hover:text-white text-[15px] transition-colors"
-            >
-              {link.title}
-            </Link>
-          ))}
+          .map((link) => {
+            const isActive = pathname === link.href || pathname?.startsWith(link.href + '/')
+            return (
+              <Link
+                key={link.title}
+                href={link.href}
+                className="relative group font-medium text-[15px] transition-colors py-2"
+              >
+                <span className={`${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400'}`}>
+                  {link.title}
+                </span>
+
+                {/* Hover/Active Underline Animation */}
+                <span
+                  className={`absolute -bottom-1 left-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-300 rounded-full
+                    ${isActive ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'}
+                  `}
+                />
+              </Link>
+            )
+          })}
       </div>
 
       <div className="flex items-center space-x-2 sm:space-x-3">

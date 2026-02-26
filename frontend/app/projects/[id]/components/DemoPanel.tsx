@@ -15,11 +15,11 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
 
   return (
     <div
-      className="flex flex-col gap-0 overflow-hidden rounded-[40px] lg:flex-row"
-      style={{ ...glass, minHeight: 360 }}
+      className="flex flex-col gap-0 overflow-hidden rounded-[40px] lg:flex-row h-[700px] lg:h-[800px]"
+      style={{ ...glass }}
     >
       {/* Left — Text info */}
-      <div className="flex flex-col justify-between p-8 sm:p-10 lg:w-[45%]">
+      <div className="flex flex-col p-8 sm:p-10 lg:w-[45%] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
         <div>
           {/* Mini avatars */}
           <div className="mb-4 flex -space-x-2">

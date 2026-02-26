@@ -7,9 +7,9 @@ interface FeaturesPanelProps {
 
 export default function FeaturesPanel({ project }: FeaturesPanelProps) {
   return (
-    <div className="overflow-hidden rounded-[40px] p-8 sm:p-10" style={glass}>
+    <div className="overflow-y-auto h-[700px] lg:h-[800px] rounded-[40px] p-8 sm:p-10 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent" style={glass}>
       {/* Badge row */}
-      <div className="mb-6 flex items-center justify-between">
+      {/* <div className="mb-6 flex items-center justify-between">
         <span className="text-3xl">🚀</span>
         <span
           className="text-xs font-bold uppercase tracking-[0.1em]"
@@ -17,7 +17,7 @@ export default function FeaturesPanel({ project }: FeaturesPanelProps) {
         >
           Innovation Hub
         </span>
-      </div>
+      </div> */}
 
       <h3
         className="mb-6 text-2xl font-bold text-white sm:text-3xl"

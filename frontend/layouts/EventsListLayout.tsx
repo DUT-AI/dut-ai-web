@@ -6,6 +6,7 @@ import type { Blog } from 'contentlayer/generated'
 import Link from '@/components/Link'
 import Image from 'next/image'
 import siteMetadata from '@/data/siteMetadata'
+import Footer from '@/components/Footer'
 
 interface EventsListLayoutProps {
     posts: CoreContent<Blog>[]
@@ -150,11 +151,10 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
                         <button
                             key={n}
                             onClick={() => setPage(n)}
-                            className={`h-8 w-8 rounded-full text-sm font-bold transition-colors ${
-                                n === page
-                                    ? 'bg-[#5c6bc0] text-white'
-                                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                            }`}>
+                            className={`h-8 w-8 rounded-full text-sm font-bold transition-colors ${n === page
+                                ? 'bg-[#5c6bc0] text-white'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                }`}>
                             {n}
                         </button>
                     ))}
@@ -195,7 +195,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
         <div className="min-h-screen pb-16">
 
             {/* ── Hero + Workshop section ───────────────────────────────────────── */}
-            <div className="relative bg-[#e8edf7] dark:bg-gray-900 px-6 py-10 md:px-12">
+            <div className="relative bg-[#e8edf7] dark:bg-gray-900 px-6 py-10 md:px-12 pt-40">
                 <div className="pointer-events-none absolute -top-20 right-0 h-64 w-64 rounded-full bg-blue-200 dark:bg-blue-900 opacity-30 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-0 left-0 h-48 w-48 rounded-full bg-purple-200 dark:bg-purple-900 opacity-20 blur-3xl" />
 
@@ -322,11 +322,10 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${
-                                        activeTab === tab
-                                            ? 'bg-white dark:bg-gray-700 text-[#1a1a3a] dark:text-white shadow'
-                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                                    }`}>
+                                    className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${activeTab === tab
+                                        ? 'bg-white dark:bg-gray-700 text-[#1a1a3a] dark:text-white shadow'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                                        }`}>
                                     {tab === 'photo' ? 'Thư viện ảnh' : tab === 'video' ? 'Videos' : 'Hồi ức'}
                                 </button>
                             ))}
@@ -426,62 +425,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
             </div>
 
             {/* ── Footer card ──────────────────────────────────────────────────── */}
-            <div className="bg-[#dce7f5] dark:bg-gray-950 px-6 py-12 md:px-12">
-                <div className="mx-auto max-w-5xl">
-                    <div className="rounded-3xl bg-white dark:bg-gray-800 px-8 py-10 shadow-sm border border-transparent dark:border-gray-700/50">
-                        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-                            {/* Left: Logo + description */}
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-3">
-                                    {/* Black square with logo.jpg */}
-                                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[#1a1a3a]">
-                                        <Image
-                                            src="/static/images/logo.jpg"
-                                            alt="DUT AI Club logo"
-                                            width={40}
-                                            height={40}
-                                            className="h-full w-full object-cover"
-                                            unoptimized
-                                        />
-                                    </div>
-                                    <span className="text-sm font-bold uppercase tracking-widest text-[#1a1a3a] dark:text-white">
-                                        DUT AI CLUB
-                                    </span>
-                                </div>
-                                <div className="max-w-xs space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                                    <p>Câu lạc bộ trí tuệ nhân tạo DUT</p>
-                                    <p>Trường Đại học Bách Khoa – Đại học Đà Nẵng.</p>
-                                    <p className="mt-3 font-medium text-[#5c6bc0] dark:text-indigo-400">
-                                        Nơi khởi nguồn đam mê, kiến tạo tương lai.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Right: Navigation */}
-                            <div>
-                                <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
-                                    Navigation
-                                </p>
-                                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                                    {[
-                                        { label: 'About Us', href: '/about' },
-                                        { label: 'Projects', href: '/projects' },
-                                        { label: 'Events', href: '/events' },
-                                        { label: 'Blogs', href: '/blog' },
-                                    ].map((link) => (
-                                        <li key={link.href}>
-                                            <Link href={link.href}
-                                                className="transition-colors hover:text-[#5c6bc0] dark:hover:text-indigo-400">
-                                                {link.label}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Footer />
         </div>
     )
 }

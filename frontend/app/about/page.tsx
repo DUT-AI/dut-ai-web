@@ -6,6 +6,7 @@ import Link from '@/components/Link'
 import { Suspense } from 'react'
 import MembersGrid from '@/components/MembersGrid'
 import type React from 'react'
+import Footer from '@/components/Footer'
 
 export const metadata = genPageMetadata({
   title: 'Về chúng mình | DUT AI Club',
@@ -431,6 +432,8 @@ export default function AboutPage() {
             <MembersGrid />
           </Suspense>
         </section>
+
+        <Footer />
 
       </div>
     </div>

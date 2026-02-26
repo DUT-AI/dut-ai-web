@@ -7,7 +7,7 @@ interface TechStackPanelProps {
 
 export default function TechStackPanel({ project }: TechStackPanelProps) {
   return (
-    <div className="relative overflow-hidden rounded-[40px] p-8 sm:p-10" style={glass}>
+    <div className="relative overflow-y-auto h-[700px] lg:h-[800px] rounded-[40px] p-8 sm:p-10 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent" style={glass}>
       {/* Left gradient accent */}
       <div
         className="absolute inset-y-0 left-0 w-1.5"

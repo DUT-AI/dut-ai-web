@@ -14,13 +14,33 @@ import TeamPanel from './components/TeamPanel'
 export default function ProjectsClient({
   projects,
   members,
+  initialProjectId,
 }: {
   projects: Project[]
   members: Member[]
+  initialProjectId?: number
 }) {
-  const [selected, setSelected] = useState(0)
+  const initialIndex = initialProjectId ? projects.findIndex((p) => p.id === initialProjectId) : 0
+  const [selected, setSelected] = useState(initialIndex >= 0 ? initialIndex : 0)
   const [activeTab, setActiveTab] = useState<TabKey>('features')
   const current = projects[selected]
+
+  const MOCK_MEMBERS: Member[] = [
+    { id: 101, name: 'Phước Nguyên', role_name: 'Project Manager', avatar_url: 'https://i.pravatar.cc/150?u=1' },
+    { id: 102, name: 'Bảo Trâm', role_name: 'Business Analyst', avatar_url: 'https://i.pravatar.cc/150?u=2' },
+    { id: 103, name: 'Anh Quân', role_name: 'Designer', avatar_url: 'https://i.pravatar.cc/150?u=3' },
+    { id: 104, name: 'Minh Tuấn', role_name: 'Frontend Developer', avatar_url: 'https://i.pravatar.cc/150?u=4' },
+    { id: 105, name: 'Hải Đăng', role_name: 'Backend Developer', avatar_url: 'https://i.pravatar.cc/150?u=5' },
+    { id: 106, name: 'Hoàng Long', role_name: 'AI Developer', avatar_url: 'https://i.pravatar.cc/150?u=6' },
+    { id: 107, name: 'Đức Huy', role_name: 'Frontend Developer', avatar_url: 'https://i.pravatar.cc/150?u=7' },
+  ]
+
+  const groupedMembers = MOCK_MEMBERS.reduce((acc, m) => {
+    const role = m.role_name || 'Khác'
+    if (!acc[role]) acc[role] = []
+    acc[role].push(m)
+    return acc
+  }, {} as Record<string, Member[]>)
 
   /* ── Panel transition state ── */
   const [visible, setVisible] = useState(true)
@@ -67,7 +87,7 @@ export default function ProjectsClient({
           />
         )}
         {activeTab === 'tech' && <TechStackPanel project={current} />}
-        {activeTab === 'team' && <TeamPanel members={members} />}
+        {activeTab === 'team' && <TeamPanel members={groupedMembers} />}
       </div>
     </div>
   )

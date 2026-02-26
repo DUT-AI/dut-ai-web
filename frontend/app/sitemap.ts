@@ -12,10 +12,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Static routes with priorities
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, lastModified: now, changeFrequency: 'daily', priority: 1.0 },
-    { url: `${siteUrl}/blog`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${siteUrl}/events`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${siteUrl}/tags`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${siteUrl}/projects`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${siteUrl}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/projects`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/events`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${siteUrl}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
   ]
 
