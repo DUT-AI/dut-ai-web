@@ -70,99 +70,53 @@ export default function TableOfContents({
     const progress = headings.length > 1 ? Math.max(0, activeIndex) / (headings.length - 1) : 0
 
     return (
-        <aside
-            aria-label="Mục lục bài viết"
-            className="hidden xl:block sticky top-24 self-start"
-        >
-            {/* ── Collapsed: minimal lines view ── */}
-            {!expanded && (
-                <button
-                    onClick={() => setExpanded(true)}
-                    aria-label="Mở mục lục"
-                    className="group flex flex-col items-start gap-1.5 w-12 p-2 rounded-xl
-                               hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                    {/* Progress indicator label */}
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-300 dark:text-gray-600 group-hover:text-gray-400 transition-colors">
-                        nội dung
-                    </span>
+        <div className="hidden lg:block w-full lg:w-[300px] xl:w-[320px] shrink-0">
+            <aside
+                aria-label="Mục lục bài viết"
+                className="sticky top-24 self-start bg-white dark:bg-gray-900 rounded-[24px] p-6 sm:p-8 shadow-sm ring-1 ring-gray-100 dark:ring-gray-800"
+            >
+                {/* Header row */}
+                <div className="mb-6 flex items-center gap-3">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-blue-600 dark:text-blue-400">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <h3 className="text-sm font-extrabold uppercase tracking-widest text-gray-900 dark:text-gray-100">
+                        MỤC LỤC
+                    </h3>
+                </div>
 
-                    {/* Line map — one thin bar per heading */}
-                    <div className="flex flex-col gap-[3px] w-full">
-                        {headings.map((h, i) => (
-                            <div
-                                key={h.id}
-                                className={cn(
-                                    'rounded-full transition-all duration-300',
-                                    // indent by level
-                                    h.level === 2 ? 'w-full' : h.level === 3 ? 'w-[72%]' : 'w-[50%]',
-                                    // height: active = taller
-                                    h.id === activeId ? 'h-[3px]' : 'h-[2px]',
-                                    // color
-                                    h.id === activeId
-                                        ? 'bg-primary-500'
-                                        : i <= activeIndex
-                                            ? 'bg-gray-300 dark:bg-gray-600'
-                                            : 'bg-gray-200 dark:bg-gray-700'
-                                )}
-                            />
-                        ))}
-                    </div>
+                <nav>
+                    <ul className="space-y-4">
+                        {headings.map(({ id, text, level }, index) => {
+                            const isActive = activeId === id || (activeId === '' && index === 0);
 
-                    {/* Progress fraction */}
-                    <span className="text-[9px] tabular-nums text-gray-300 dark:text-gray-600 group-hover:text-gray-400 transition-colors">
-                        {activeIndex + 1}/{headings.length}
-                    </span>
-                </button>
-            )}
-
-            {/* ── Expanded: full text sidebar ── */}
-            {expanded && (
-                <div className="max-h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar">
-                    {/* Header row with collapse button */}
-                    <div className="mb-3 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                            <span className="h-0.5 w-5 rounded-full bg-primary-400" />
-                            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-                                Nội dung
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => setExpanded(false)}
-                            aria-label="Thu gọn mục lục"
-                            className="rounded-md p-1 text-gray-300 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        >
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                                <path d="M9.5 3L6 6.5 2.5 3 2 3.5 6 7.5l4-4z" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <nav>
-                        <ul className="space-y-0.5">
-                            {headings.map(({ id, text, level }) => (
+                            return (
                                 <li key={id}>
                                     <button
                                         onClick={() => handleClick(id)}
                                         className={cn(
-                                            'block w-full text-left rounded-md px-2 py-1 transition-all duration-150',
-                                            level === 2 && 'pl-2 text-sm',
-                                            level === 3 && 'pl-5 text-xs',
-                                            level === 4 && 'pl-8 text-xs',
-                                            activeId === id
-                                                ? 'bg-primary-50 font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
-                                                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
+                                            'relative block w-full text-left transition-all duration-150 py-1 pl-4',
+                                            level === 2 && 'text-[15px] font-bold',
+                                            level === 3 && 'ml-4 text-[14px] font-semibold text-gray-600 dark:text-gray-400',
+                                            level === 4 && 'ml-8 text-[13px] font-medium text-gray-500 dark:text-gray-500',
+                                            isActive
+                                                ? 'text-blue-600 dark:text-blue-400'
+                                                : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
                                         )}
-                                        aria-current={activeId === id ? 'location' : undefined}
+                                        aria-current={isActive ? 'location' : undefined}
                                     >
+                                        {/* Active Highlight Line */}
+                                        {isActive && (
+                                            <span className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
+                                        )}
                                         <span className="line-clamp-2 leading-snug">{text}</span>
                                     </button>
                                 </li>
-                            ))}
-                        </ul>
-                    </nav>
-                </div>
-            )}
-        </aside>
+                            )
+                        })}
+                    </ul>
+                </nav>
+            </aside>
+        </div>
     )
 }

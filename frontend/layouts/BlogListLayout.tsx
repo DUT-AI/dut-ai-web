@@ -12,6 +12,7 @@ import tagData from 'app/tag-data.json'
 import { useState, Suspense } from 'react'
 import { Search } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
+import Footer from '@/components/Footer'
 
 interface PaginationProps {
     totalPages: number
@@ -290,6 +291,7 @@ export default function BlogListLayout(props: ListLayoutProps) {
     return (
         <Suspense fallback={<div className="min-h-screen bg-[#FDFBFB] dark:bg-gray-950 pb-12 pt-8 sm:pt-16 flex items-center justify-center"><p>Đang tải dữ liệu...</p></div>}>
             <BlogListLayoutInner {...props} />
+            <Footer />
         </Suspense>
     )
 }
