@@ -8,7 +8,7 @@ class BlogBase(BaseModel):
     content: str
     authors: Optional[str] = None
     keywords: Optional[str] = None
-
+    image_url: Optional[str] = None
 # Schema để tạo mới
 class BlogCreate(BlogBase):
     pass
@@ -23,6 +23,9 @@ class BlogResponse(BlogBase):
     views: int
     created_at: datetime
     updated_at: datetime
-
+class AuthorStatsResponse(BaseModel):
+    author: str
+    total_views: int
+    
     class Config:
         from_attributes = True
