@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { genPageMetadata } from 'app/seo'
 import BlogListLayout from '@/layouts/BlogListLayout'
 
-const POSTS_PER_PAGE = 5
+const POSTS_PER_PAGE = 10
 
 export const metadata = genPageMetadata({
   title: 'Blog',

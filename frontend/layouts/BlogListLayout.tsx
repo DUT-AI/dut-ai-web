@@ -7,12 +7,15 @@ import { CoreContent } from 'pliny/utils/contentlayer'
 import type { Blog } from 'contentlayer/generated'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
+import Image from '@/components/Image'
 import siteMetadata from '@/data/siteMetadata'
 import tagData from 'app/tag-data.json'
 import { useState, Suspense } from 'react'
 import { Search } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import Footer from '@/components/Footer'
+import { allAuthors } from 'contentlayer/generated'
+import RelatedPosts from '@/components/RelatedPosts'
 
 interface PaginationProps {
     totalPages: number
@@ -90,10 +93,10 @@ function Pagination(props: PaginationProps) {
 
 // Các màu nền Card lấy cảm hứng từ Figma
 const gradients = [
-    'bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE] dark:from-purple-900/10 dark:to-pink-900/10',
-    'bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8] dark:from-lime-900/10 dark:to-yellow-900/10',
-    'bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF] dark:from-blue-900/10 dark:to-sky-900/10',
-    'bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED] dark:from-red-900/10 dark:to-orange-900/10',
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#22c55e1a] dark:to-[#eab3081a] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#64748b1a] dark:to-[#14b8a61a] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#f973161a] dark:to-[#ec48991a] bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED]', // Orange to Pink
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#8b5cf61a] dark:to-[#d946ef1a] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
 ]
 
 function BlogListLayoutInner({
@@ -117,7 +120,7 @@ function BlogListLayoutInner({
 
     // Lấy ra danh sách mặc định tương ứng với biến phân trang (lưu ý: initialDisplayPosts sẽ k đúng nếu dùng query filter nên ta xử lý Client side filter cho query params)
     const queryPaginatedPosts = activeTagParam
-        ? basePosts.slice((pagination?.currentPage ? pagination.currentPage - 1 : 0) * 5, (pagination?.currentPage || 1) * 5)
+        ? basePosts.slice((pagination?.currentPage ? pagination.currentPage - 1 : 0) * 10, (pagination?.currentPage || 1) * 10)
         : initialDisplayPosts
 
     const filteredBlogPosts = basePosts.filter((post) => {
@@ -129,15 +132,18 @@ function BlogListLayoutInner({
         queryPaginatedPosts.length > 0 && !searchValue ? queryPaginatedPosts : filteredBlogPosts
 
     // Nếu có activeTag, cần tính toán lại Pagination
-    const totalPagesForTag = activeTagParam ? Math.ceil(basePosts.length / 5) : pagination?.totalPages
+    const totalPagesForTag = activeTagParam ? Math.ceil(basePosts.length / 10) : pagination?.totalPages
     const adjustedPagination = pagination && totalPagesForTag ? { ...pagination, totalPages: totalPagesForTag } : pagination
+
+    const featuredPosts = posts.slice(0, 5)
+    const featuredAuthors = allAuthors.slice(0, 5)
 
 
     return (
-        <div className="min-h-screen bg-[#FDFBFB] dark:bg-gray-950 pb-12 pt-8 sm:pt-16">
+        <div className="min-h-screen bg-[#FDFBFB] dark:bg-[#0B0F19] pb-12 pt-8 sm:pt-16 relative z-0">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header Section */}
-                <div className="max-w-3xl mx-auto text-center mb-16">
+                <div className="max-w-3xl mx-auto text-center mb-16 mt-28">
                     <h1 className="text-4xl leading-tight font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl dark:text-gray-100 uppercase mb-4">
                         AI KNOWLEDGE HUB
                     </h1>
@@ -209,13 +215,50 @@ function BlogListLayoutInner({
                                     })}
                                 </div>
                             </div>
+
+                            {/* Featured Authors */}
+                            <div className="pt-10">
+                                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.15em] mb-5 pl-1">
+                                    TÁC GIẢ NỔI BẬT
+                                </h3>
+                                <div className="flex flex-col space-y-4">
+                                    {featuredAuthors.map(author => (
+                                        <div key={author.name} className="flex items-center gap-3 bg-white dark:bg-gray-900/50 p-3 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-800 hover:ring-blue-100 dark:hover:ring-gray-700 transition-all">
+                                            {author.avatar && (
+                                                <Image src={author.avatar} width={40} height={40} className="rounded-full w-10 h-10 object-cover" alt={author.name} />
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-bold text-[14px] text-gray-900 dark:text-white truncate">{author.name}</h4>
+                                                <p className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{author.occupation}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Post Content */}
                     <div className="flex-1 w-full min-w-0">
+
+                        {/* Featured Posts Carousel */}
+                        {!activeTagParam && !searchValue && (!pagination || pagination.currentPage === 1) && featuredPosts.length > 0 && (
+                            <div className="mb-16 -mx-4 sm:mx-0">
+                                <div className="px-4 sm:px-0 mb-6">
+                                    <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">Bài viết nổi bật</h2>
+                                </div>
+                                <div className="relative">
+                                    <RelatedPosts posts={featuredPosts} hideTitle />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">Danh sách bài viết</h2>
+                        </div>
+
                         {!filteredBlogPosts.length && (
-                            <div className="text-center py-20">
+                            <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-[32px] ring-1 ring-gray-100 dark:ring-gray-800">
                                 <p className="text-gray-500 dark:text-gray-400 text-lg">Không tìm thấy bài viết nào phù hợp.</p>
                             </div>
                         )}
@@ -282,6 +325,8 @@ function BlogListLayoutInner({
                         )}
                     </div>
                 </div>
+
+                <Footer />
             </div>
         </div>
     )
@@ -291,7 +336,6 @@ export default function BlogListLayout(props: ListLayoutProps) {
     return (
         <Suspense fallback={<div className="min-h-screen bg-[#FDFBFB] dark:bg-gray-950 pb-12 pt-8 sm:pt-16 flex items-center justify-center"><p>Đang tải dữ liệu...</p></div>}>
             <BlogListLayoutInner {...props} />
-            <Footer />
         </Suspense>
     )
 }

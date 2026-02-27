@@ -10,15 +10,8 @@ import TableOfContents from '@/components/TableOfContents'
 import { slug } from 'github-slugger'
 import { allBlogs } from 'contentlayer/generated'
 import { sortPosts } from 'pliny/utils/contentlayer'
-import { formatDate } from 'pliny/utils/formatDate'
 import Footer from '@/components/Footer'
-
-const gradients = [
-  'bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE] dark:from-purple-900/10 dark:to-pink-900/10',
-  'bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8] dark:from-lime-900/10 dark:to-yellow-900/10',
-  'bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF] dark:from-blue-900/10 dark:to-sky-900/10',
-  'bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED] dark:from-red-900/10 dark:to-orange-900/10',
-]
+import RelatedPosts from '@/components/RelatedPosts'
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -38,16 +31,19 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
   const { slug: postSlug, date, lastmod, title, tags } = content
   const basePath = 'blog'
 
-  const relatedPosts = sortPosts(allBlogs).filter(p => p.slug !== postSlug).slice(0, 3)
+  const relatedPosts = sortPosts(allBlogs).filter(p => p.slug !== postSlug).slice(0, 7)
 
   return (
-    <div className="min-h-screen flex flex-col bg-linear-to-br from-[#E6EFFF] via-[#F4F1FF] to-[#FFEBEA] dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen flex flex-col bg-[#FDFBFB] dark:bg-gray-950 relative z-0">
+      {/* Gradient Blob for Header Area */}
+      <div className="absolute top-0 left-0 right-0 h-[800px] bg-linear-to-br from-[#E6EFFF] via-[#F4F1FF] to-[#FFEBEA] dark:from-purple-900/20 dark:via-gray-950 dark:to-gray-950 -z-10 mask-[linear-gradient(to_bottom,white_20%,transparent)]" />
+
       <div className="flex-1 pb-12 pt-8 sm:pt-16">
         <ScrollTopAndComment />
         <article className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
           {/* ── Cấu trúc Header Mới ── */}
-          <header className="mb-12">
+          <header className="mb-12 mt-28">
             <h1 className="text-4xl leading-tight font-extrabold tracking-tight text-[#111827] sm:text-5xl md:text-[56px] dark:text-gray-100 mb-8 max-w-5xl">
               {title}
             </h1>
@@ -201,65 +197,9 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
         </article>
 
         {/* Bài viết liên quan */}
-        {relatedPosts.length > 0 && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-24 mb-12 w-full">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Bài viết liên quan</h2>
-              <div className="flex gap-2">
-                <button className="flex items-center justify-center bg-white hover:bg-gray-50 transition-colors w-10 h-10 rounded-full border border-gray-200 shadow-sm" aria-label="Previous">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-700">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button className="flex items-center justify-center bg-white hover:bg-gray-50 transition-colors w-10 h-10 rounded-full border border-gray-200 shadow-sm" aria-label="Next">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-700">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedPosts.map((post, index) => {
-                const backgroundClass = gradients[index % gradients.length]
-                const maxTagsDisplay = post.tags ? post.tags.slice(0, 1) : []
-
-                return (
-                  <article
-                    key={post.path}
-                    className={`rounded-[32px] p-8 ${backgroundClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group flex flex-col h-full ring-1 ring-gray-100 dark:ring-white/10`}
-                  >
-                    <div className="flex flex-col h-full relative z-10">
-                      {/* Top Row: Date & Tag */}
-                      <div className="flex flex-wrap items-center gap-3 mb-4">
-                        <time dateTime={post.date} className="text-xs font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
-                          {formatDate(post.date, siteMetadata.locale)}
-                        </time>
-                        {maxTagsDisplay.map((tag) => (
-                          <Link key={tag} href={`/blog?tag=${slug(tag)}`} className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors">
-                            <span className="opacity-60 mr-0.5">#</span>{tag}
-                          </Link>
-                        ))}
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-[20px] leading-snug font-extrabold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-3">
-                        <Link href={`/${post.path}`} className="focus:outline-none rounded-lg">
-                          <span className="absolute inset-0 z-0" aria-hidden="true" />
-                          {post.title}
-                        </Link>
-                      </h3>
-
-                      {/* Summary */}
-                      <p className="text-[14px] text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2 mt-auto">
-                        {post.summary}
-                      </p>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          </div>
-        )}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-24 mb-12 w-full">
+          <RelatedPosts posts={relatedPosts} />
+        </div>
       </div>
 
       <Footer />

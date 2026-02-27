@@ -2,6 +2,7 @@ import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
 import { allBlogs } from 'contentlayer/generated'
 import { genPageMetadata } from 'app/seo'
 import EventsListLayout from '@/layouts/EventsListLayout'
+import Footer from '@/components/Footer'
 
 const POSTS_PER_PAGE = 9
 

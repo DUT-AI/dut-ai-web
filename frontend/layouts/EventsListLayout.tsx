@@ -192,10 +192,10 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
     const [activeTab, setActiveTab] = useState<'photo' | 'video' | 'memory'>('photo')
 
     return (
-        <div className="min-h-screen pb-16">
+        <div className="min-h-screen pb-16 bg-[#e8edf7] dark:bg-gray-900">
 
             {/* ── Hero + Workshop section ───────────────────────────────────────── */}
-            <div className="relative bg-[#e8edf7] dark:bg-gray-900 px-6 py-10 md:px-12 pt-40">
+            <div className="relative  px-6 py-10 md:px-12 pt-40">
                 <div className="pointer-events-none absolute -top-20 right-0 h-64 w-64 rounded-full bg-blue-200 dark:bg-blue-900 opacity-30 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-0 left-0 h-48 w-48 rounded-full bg-purple-200 dark:bg-purple-900 opacity-20 blur-3xl" />
 
@@ -306,7 +306,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
             </div>
 
             {/* ── Sự kiện đáng nhớ ────────────────────────────────────────────────── */}
-            <div className="relative bg-[#dce7f5] dark:bg-gray-950 px-6 py-14 md:px-12">
+            <div className="relative  px-6 py-14 md:px-12">
                 <div className="mx-auto max-w-5xl">
                     {/* Section header */}
                     <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -408,7 +408,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
             </div>
 
             {/* ── Danh sách sự kiện đã qua ─────────────────────────────────────── */}
-            <div className="bg-[#e8edf7] dark:bg-gray-900 px-6 py-12 md:px-12">
+            <div className=" px-6 py-12 md:px-12">
                 <div className="mx-auto max-w-5xl">
                     <h2 className="mb-6 text-center text-xs font-bold uppercase tracking-[0.25em] text-[#5c6bc0] dark:text-indigo-400">
                         Danh sách sự kiện đã qua
@@ -424,7 +424,6 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                 </div>
             </div>
 
-            {/* ── Footer card ──────────────────────────────────────────────────── */}
             <Footer />
         </div>
     )
