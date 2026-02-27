@@ -3,6 +3,7 @@ from .repository import BlogRepository
 from .models import Blog
 from .schemas import BlogCreate, BlogUpdate
 from fastapi import HTTPException
+from typing import Optional
 
 class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
     def __init__(self, repo: BlogRepository):
@@ -19,3 +20,11 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         self.repo.db.refresh(blog) 
         
         return blog
+    def get_all_blogs(self, title: Optional[str] = None, keyword: Optional[str] = None):
+        return self.repo.get_all_blogs(title=title, keyword=keyword)
+
+    def get_top_viewed(self, limit: int = 5):
+        return self.repo.get_top_viewed(limit)
+
+    def get_top_authors(self, limit: int = 5):
+        return self.repo.get_top_authors(limit)

@@ -6,11 +6,16 @@ class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
-    description = Column(Text, nullable=False)
-    location = Column(String(255), nullable=True)
-    event_date = Column(DateTime, default=datetime.datetime.utcnow)
-    image_url = Column(String(500), nullable=True)
+    title = Column(String, index=True, nullable=False)
+    description = Column(Text, nullable=True)
+    image_url = Column(Text, nullable=True)
 
-    def __str__(self):
-        return self.title
+    event_type = Column(String, default="workshop")
+
+    event_date = Column(String, nullable=True) 
+    location = Column(String, nullable=True)
+    registration_link = Column(String, nullable=True)
+
+    hashtags = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
