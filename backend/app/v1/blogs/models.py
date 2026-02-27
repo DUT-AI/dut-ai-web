@@ -13,6 +13,7 @@ class Blog(Base):
     keywords = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    image_url = Column(String(1000), nullable=True)
 
     def __str__(self):
         return self.title
