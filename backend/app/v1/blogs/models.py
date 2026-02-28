@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime, Index
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from app.core.database import Base
 import datetime
 
@@ -14,6 +15,11 @@ class Blog(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     image_url = Column(String(1000), nullable=True)
+    search_vector = Column(TSVECTOR)
+
+    __table_args__ = (
+        Index("ix_blogs_search_vector", "search_vector", postgresql_using="gin"),
+    )
 
     def __str__(self):
         return self.title
