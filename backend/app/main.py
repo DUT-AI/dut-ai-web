@@ -6,6 +6,7 @@ from app.core.database import engine
 from app.v1.v1_admin import register_admin_views
 from app.v1.v1_router import v1_router
 
+
 app = FastAPI(title="DUT-AI FastAPI Backend")
 
 # Static files
