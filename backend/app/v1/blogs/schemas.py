@@ -23,6 +23,14 @@ class BlogResponse(BlogBase):
     views: int
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Schema chi tiết với bài viết liên quan
+class BlogDetailResponse(BlogResponse):
+    related_blogs: list[BlogResponse] = []
+
 class AuthorStatsResponse(BaseModel):
     author: str
     total_views: int

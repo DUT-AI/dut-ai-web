@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from .schemas import BlogResponse
+from .schemas import BlogResponse, AuthorStatsResponse, BlogDetailResponse
 from .repository import BlogRepository
 from .service import BlogService
 from fastapi import Query
@@ -49,13 +49,13 @@ def get_blogs(
     return service.get_all_blogs(title=title, keyword=keyword)
 
 @router.get("/top-viewed", response_model=list[BlogResponse])
-def get_top_viewed_blogs(limit: int = Query(5, description="Số lượng bài muốn lấy"), service: BlogService = Depends(get_blog_service)):
-    return service.get_top_viewed(limit)
+def get_most_viewed_in_latest_month(limit: int = Query(5, description="Số lượng bài muốn lấy"), service: BlogService = Depends(get_blog_service)):
+    return service.get_most_viewed_in_latest_month(limit)
 
 @router.get("/top-authors", response_model=list[AuthorStatsResponse])
 def get_top_authors(limit: int = Query(5, description="Số lượng tác giả muốn lấy"), service: BlogService = Depends(get_blog_service)):
     return service.get_top_authors(limit)
 
-@router.get("/{id}", response_model=BlogResponse)
+@router.get("/{id}", response_model=BlogDetailResponse)
 def get_blog(id: int, service: BlogService = Depends(get_blog_service)):
-    return service.get_by_id(id)
+    return service.get_detail_with_related(id)
