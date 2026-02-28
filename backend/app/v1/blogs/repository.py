@@ -44,7 +44,8 @@ class BlogRepository(BaseRepository[Blog]):
         return (
             self.db.query(
                 Blog.authors.label("author"),
-                func.sum(Blog.views).label("total_views")
+                func.sum(Blog.views).label("total_views"),
+                func.count(Blog.id).label("post_count")
             )
             .filter(Blog.authors.isnot(None))
             .group_by(Blog.authors)

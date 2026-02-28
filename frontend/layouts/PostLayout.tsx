@@ -31,7 +31,9 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
   const { slug: postSlug, date, lastmod, title, tags } = content
   const basePath = 'blog'
 
-  const relatedPosts = sortPosts(allBlogs).filter(p => p.slug !== postSlug).slice(0, 7)
+  const relatedPosts = sortPosts(allBlogs)
+    .filter(p => p.slug !== postSlug && !p.tags?.includes('event'))
+    .slice(0, 7)
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FDFBFB] dark:bg-gray-950 relative z-0">
@@ -54,7 +56,7 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
               {authorDetails.map((author) => (
                 <div className="flex items-center gap-3" key={author.name}>
                   {author.avatar ? (
-                    <div className="p-1 rounded-full border border-gray-200 shadow-sm bg-white">
+                    <div className="p-1 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
                       <Image
                         src={author.avatar}
                         width={36}
@@ -64,14 +66,14 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
                       />
                     </div>
                   ) : (
-                    <div className="flex bg-white items-center justify-center w-11 h-11 rounded-full border border-gray-200">
+                    <div className="flex bg-white dark:bg-gray-800 items-center justify-center w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                   )}
                   <div>
-                    <span className="block text-[11px] text-gray-500 font-bold mb-0.5 tracking-wider uppercase">Tác giả</span>
+                    <span className="block text-[11px] text-gray-500 dark:text-gray-400 font-bold mb-0.5 tracking-wider uppercase">Tác giả</span>
                     <span className="text-[15px] text-gray-900 dark:text-white font-extrabold">{author.name}</span>
                   </div>
                 </div>
@@ -79,7 +81,7 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
 
               {/* Ngày đăng */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center bg-white w-11 h-11 rounded-full border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-center bg-white dark:bg-gray-800 w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
@@ -88,14 +90,14 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
                   </svg>
                 </div>
                 <div>
-                  <span className="block text-[11px] text-gray-500 font-bold mb-0.5 tracking-wider uppercase">Ngày đăng</span>
+                  <span className="block text-[11px] text-gray-500 dark:text-gray-400 font-bold mb-0.5 tracking-wider uppercase">Ngày đăng</span>
                   <time dateTime={date} className="text-[15px] text-gray-900 dark:text-white font-extrabold">{new Date(date).toLocaleDateString('en-GB')}</time>
                 </div>
               </div>
 
               {/* Ngày cập nhật */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center bg-white w-11 h-11 rounded-full border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-center bg-white dark:bg-gray-800 w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
@@ -104,41 +106,23 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
                   </svg>
                 </div>
                 <div>
-                  <span className="block text-[11px] text-gray-500 font-bold mb-0.5 tracking-wider uppercase">Ngày cập nhật</span>
+                  <span className="block text-[11px] text-gray-500 dark:text-gray-400 font-bold mb-0.5 tracking-wider uppercase">Ngày cập nhật</span>
                   <time dateTime={lastmod || date} className="text-[15px] text-gray-900 dark:text-white font-extrabold">{new Date(lastmod || date).toLocaleDateString('en-GB')}</time>
                 </div>
               </div>
 
               {/* Lượt xem (Mock static tạm thời hoặc tính năng tương lai) */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center bg-white w-11 h-11 rounded-full border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-center bg-white dark:bg-gray-800 w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
                 <div>
-                  <span className="block text-[11px] text-gray-500 font-bold mb-0.5 tracking-wider uppercase">Lượt xem</span>
+                  <span className="block text-[11px] text-gray-500 dark:text-gray-400 font-bold mb-0.5 tracking-wider uppercase">Lượt xem</span>
                   <span className="text-[15px] text-gray-900 dark:text-white font-extrabold">120.000</span>
                 </div>
-              </div>
-
-              {/* Group Actions */}
-              <div className="flex items-center gap-2 ml-auto">
-                <button className="flex items-center justify-center bg-white hover:bg-gray-50 transition-colors w-11 h-11 rounded-full border border-gray-200 shadow-sm" aria-label="Share">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-700">
-                    <circle cx="18" cy="5" r="3"></circle>
-                    <circle cx="6" cy="12" r="3"></circle>
-                    <circle cx="18" cy="19" r="3"></circle>
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                  </svg>
-                </button>
-                <button className="flex items-center justify-center bg-white hover:bg-gray-50 transition-colors w-11 h-11 rounded-full border border-gray-200 shadow-sm" aria-label="Save">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-700">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                </button>
               </div>
             </div>
           </header>
