@@ -1,5 +1,6 @@
 import Link from '@/components/Link'
 import SparkleIcon from '@/components/SparkleIcon'
+import Image from 'next/image'
 import StatCounter from '@/components/home/StatCounter'
 import { Alfa_Slab_One } from 'next/font/google'
 
@@ -9,27 +10,17 @@ const alfaSlabOne = Alfa_Slab_One({
     display: 'swap',
 })
 
-const Robot = () => {
+const Mascot = () => {
     return (
-        <div className="relative flex flex-col items-center z-10 w-[260px] sm:w-[320px]">
-            {/* The neck/stand */}
-            <div className="absolute -bottom-24 w-[200px] sm:w-[240px] h-[180px] rounded-b-[70px] bg-[#f8f9fa] shadow-[inset_0_-10px_20px_rgba(0,0,0,0.05)] ring-1 ring-black/5 dark:bg-gray-800 dark:ring-white/10 z-0"></div>
-
-            {/* The head */}
-            <div className="relative z-10 w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] rounded-[70px] bg-white shadow-[0_30px_80px_-15px_rgb(0,0,0,0.15)] ring-1 ring-black/5 flex items-center justify-center p-8 dark:bg-gray-800 dark:ring-white/10">
-                {/* Screen */}
-                <div className="w-full h-full rounded-[45px] bg-[#191970] flex flex-col items-center justify-center pt-8 border-[12px] border-[#f0f2f5] shadow-inner dark:border-gray-700">
-                    {/* Eyes container */}
-                    <div className="flex gap-10 w-full justify-center">
-                        {/* Left Eye */}
-                        <div className="w-[35px] h-[50px] sm:w-[45px] sm:h-[65px] rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.8)] animate-pulse"></div>
-                        {/* Right Eye */}
-                        <div className="w-[35px] h-[50px] sm:w-[45px] sm:h-[65px] rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.8)] animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
-                    {/* Mouth */}
-                    <div className="w-[70px] sm:w-[90px] h-[8px] sm:h-[10px] rounded-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] mt-12 opacity-90"></div>
-                </div>
-            </div>
+        <div className="relative flex items-center justify-center z-10 w-[364px] sm:w-[494px] lg:w-[546px]">
+            <Image
+                src="/static/images/linh_vat_tach_nen.png"
+                alt="DUT AI Mascot"
+                width={546}
+                height={546}
+                className="w-full h-auto object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
+                priority
+            />
         </div>
     )
 }
@@ -93,7 +84,7 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* ── Right: Robot Illustration ── */}
+                    {/* ── Right: Mascot Illustration ── */}
                     <div className="w-full lg:w-[45%] relative flex justify-center py-10 mt-10 lg:mt-0">
                         {/* Decorative icons */}
                         <div className="absolute top-[-10%] right-[100%] sm:right-[85%] flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 dark:bg-gray-800/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md">
@@ -105,8 +96,8 @@ export default function HeroSection() {
                             </svg>
                         </div>
 
-                        {/* Robot Construct */}
-                        <Robot />
+                        {/* Mascot */}
+                        <Mascot />
 
                     </div>
                 </div>
