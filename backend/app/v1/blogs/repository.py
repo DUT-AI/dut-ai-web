@@ -57,14 +57,15 @@ class BlogRepository(BaseRepository[Blog]):
 
         return (
             self.db.query(
-                func.unnest(func.cast(Blog.authors_rel, String)).label(
-                    "author"
-                ),  # This is likely wrong now
+                Blog.authors.label("author"),
                 func.sum(Blog.views).label("total_views"),
+                func.count(Blog.id).label("post_count")
             )
-            # This needs refactoring if authors is now a relationship
-            # But the user only asked for keywords. I'll focus on keywords for now.
-            .limit(limit).all()  # Placeholder
+            .filter(Blog.authors.isnot(None))
+            .group_by(Blog.authors)
+            .order_by(func.sum(Blog.views).desc())
+            .limit(limit)
+            .all()
         )
 
     def get_related_blogs(self, blog_id: int, limit: int = 5):

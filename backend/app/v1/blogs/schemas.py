@@ -43,6 +43,7 @@ class BlogDetailResponse(BlogResponse):
 class AuthorStatsResponse(BaseModel):
     author: str
     total_views: int
-
+    post_count: int
+    
     class Config:
         from_attributes = True

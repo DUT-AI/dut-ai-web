@@ -93,10 +93,10 @@ function Pagination(props: PaginationProps) {
 
 // Các màu nền Card lấy cảm hứng từ Figma
 const gradients = [
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#22c55e1a] dark:to-[#eab3081a] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#64748b1a] dark:to-[#14b8a61a] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#f973161a] dark:to-[#ec48991a] bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED]', // Orange to Pink
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#8b5cf61a] dark:to-[#d946ef1a] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#22c55e40] dark:to-[#eab30840] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#64748b40] dark:to-[#14b8a640] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#f9731640] dark:to-[#ec489940] bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED]', // Orange to Pink
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#8b5cf640] dark:to-[#d946ef40] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
 ]
 
 function BlogListLayoutInner({
@@ -110,7 +110,7 @@ function BlogListLayoutInner({
     const searchParams = useSearchParams()
     const activeTagParam = searchParams.get('tag')
     const tagCounts = tagData as Record<string, number>
-    const tagKeys = Object.keys(tagCounts)
+    const tagKeys = Object.keys(tagCounts).filter((t) => t.toLowerCase() !== 'event')
     const sortedTags = tagKeys.sort((a, b) => tagCounts[b] - tagCounts[a])
 
     // Lọc bài viết nếu có tham số tag trên URL
@@ -211,7 +211,7 @@ function BlogListLayoutInner({
                                 )}
 
                                 {/* Tag Pills */}
-                                <div className="flex flex-col space-y-2">
+                                <div className="flex flex-wrap gap-2">
                                     {sortedTags.map((t) => {
                                         const tagSlug = slug(t)
                                         const isActive = activeTagParam === tagSlug
