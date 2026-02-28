@@ -7,6 +7,7 @@ import Link from '@/components/Link'
 import Image from 'next/image'
 import siteMetadata from '@/data/siteMetadata'
 import Footer from '@/components/Footer'
+import { useTheme } from 'next-themes'
 
 interface EventsListLayoutProps {
     posts: CoreContent<Blog>[]
@@ -239,51 +240,56 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
 
     const [activeTab, setActiveTab] = useState<'photo' | 'video' | 'memory'>('photo')
 
+    const { resolvedTheme } = useTheme()
+    const isDark = resolvedTheme !== 'light'
+    const pageBg = isDark
+        ? 'radial-gradient(circle at 0% 0%, #1E293B 0%, #334155 25%, #701A75 75%, #4C1D95 100%)'
+        : 'linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8)'
+
     return (
-        <div
-            className="dark min-h-screen pb-16"
-            style={{
-                background: 'linear-gradient(135deg, #1a0a4a 0%, #3b0f8e 25%, #7c1fbf 50%, #c2185b 75%, #e91e8c 100%)',
-            }}
-        >
+        <div className="min-h-screen pb-16" style={{ background: pageBg }}>
             {/* ── Hero + Workshop section ───────────────────────────────────────── */}
             <div className="relative px-6 py-10 md:px-12 pt-40">
-                {/* Decorative blobs */}
-                <div
-                    className="pointer-events-none absolute -top-20 right-0 h-96 w-96 rounded-full opacity-40 blur-3xl"
-                    style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
-                />
-                <div
-                    className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full opacity-30 blur-3xl"
-                    style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
-                />
+                {/* Decorative blobs — visible in dark mode only */}
+                {isDark && (
+                    <>
+                        <div
+                            className="pointer-events-none absolute -top-20 right-0 h-96 w-96 rounded-full opacity-40 blur-3xl"
+                            style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
+                        />
+                        <div
+                            className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full opacity-30 blur-3xl"
+                            style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
+                        />
+                    </>
+                )}
 
                 <div className="relative mx-auto max-w-5xl">
                     {/* Pill */}
                     <div className="mb-4 flex items-center gap-2">
-                        <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
-                        <span className="text-xs font-bold uppercase tracking-widest text-white/70">
+                        <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-white/70">
                             Sự kiện sắp diễn ra
                         </span>
                     </div>
 
                     {/* Title */}
                     <h1
-                        className="mb-6 font-extrabold uppercase text-white"
+                        className="mb-6 font-extrabold uppercase text-slate-900 dark:text-white"
                         style={{
                             fontSize: 'clamp(2rem, 6vw, 3.5rem)',
                             letterSpacing: '-0.02em',
-                            textShadow: '0 2px 20px rgba(0,0,0,0.3)',
+                            textShadow: isDark ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
                         }}
                     >
                         DUT AI MOMENTS
                     </h1>
 
                     {/* Divider */}
-                    <div className="mb-6 border-t border-dashed" style={{ borderColor: 'rgba(255,255,255,0.25)' }} />
+                    <div className="mb-6 border-t border-dashed" style={{ borderColor: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(100,80,200,0.25)' }} />
 
                     {/* Workshops & Seminar label */}
-                    <h2 className="mb-5 text-xl font-extrabold italic text-white/90">
+                    <h2 className="mb-5 text-xl font-extrabold italic text-slate-800 dark:text-white/90">
                         Workshops &amp; Seminar
                     </h2>
 
@@ -409,15 +415,18 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                     {/* Section header */}
                     <div className="mb-12 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                         <div>
-                            <h2 className="text-2xl font-extrabold text-white">Sự kiện đáng nhớ</h2>
-                            <p className="mt-1 text-sm text-white/60">
+                            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Sự kiện đáng nhớ</h2>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-white/60">
                                 Lưu giữ những khoảnh khắc tuyệt vời nhất của DUT AI Club.
                             </p>
                         </div>
                         {/* Tab bar */}
                         <div
                             className="flex gap-1 rounded-xl p-1"
-                            style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}
+                            style={isDark
+                                ? { background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }
+                                : { background: 'rgba(100,80,200,0.10)', backdropFilter: 'blur(10px)', border: '1px solid rgba(100,80,200,0.2)' }
+                            }
                         >
                             {(['photo', 'video', 'memory'] as const).map((tab) => (
                                 <button
@@ -425,7 +434,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                     onClick={() => setActiveTab(tab)}
                                     className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${activeTab === tab
                                         ? 'bg-white text-[#1a1a3a] shadow'
-                                        : 'text-white/60 hover:text-white'
+                                        : isDark ? 'text-white/60 hover:text-white' : 'text-slate-500 hover:text-slate-800'
                                         }`}
                                 >
                                     {tab === 'photo' ? 'Thư viện ảnh' : tab === 'video' ? 'Videos' : 'Hồi ức'}
@@ -448,25 +457,29 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                         {year && (
                                             <span
                                                 className="mb-3 inline-block w-fit rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
-                                                style={{
+                                                style={isDark ? {
                                                     background: 'rgba(255,255,255,0.15)',
                                                     color: 'rgba(255,255,255,0.9)',
                                                     border: '1px solid rgba(255,255,255,0.25)',
+                                                } : {
+                                                    background: 'rgba(100,80,200,0.12)',
+                                                    color: '#4338ca',
+                                                    border: '1px solid rgba(100,80,200,0.25)',
                                                 }}
                                             >
                                                 Kỷ niệm {year}
                                             </span>
                                         )}
-                                        <h3 className="mb-3 text-3xl font-extrabold text-white leading-tight">{ev.title}</h3>
+                                        <h3 className="mb-3 text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">{ev.title}</h3>
                                         {ev.summary && (
-                                            <p className="mb-4 text-sm leading-relaxed text-white/70 line-clamp-3">
+                                            <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-white/70 line-clamp-3">
                                                 {ev.summary}
                                             </p>
                                         )}
                                         <div className="flex items-center gap-3">
                                             <Link
                                                 href={`/${ev.path}`}
-                                                className="text-sm font-bold text-pink-300 hover:text-pink-200 hover:underline"
+                                                className="text-sm font-bold text-pink-600 dark:text-pink-300 hover:underline"
                                             >
                                                 Xem tất cả {photoCount} ảnh
                                             </Link>
@@ -475,7 +488,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                                     href={fbLink}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-1 text-blue-300 transition-opacity hover:opacity-75"
+                                                    className="flex items-center gap-1 text-blue-500 dark:text-blue-300 transition-opacity hover:opacity-75"
                                                     title="Xem album trên Facebook"
                                                 >
                                                     <FacebookIcon className="h-5 w-5" />
@@ -509,7 +522,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                             })}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center py-16 text-white/40">
+                        <div className="flex flex-col items-center py-16 text-slate-400 dark:text-white/40">
                             <span className="mb-4 text-5xl">🖼️</span>
                             <p className="font-semibold">Chưa có sự kiện đáng nhớ nào.</p>
                         </div>
@@ -520,13 +533,13 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
             {/* ── Danh sách sự kiện đã qua ─────────────────────────────────────── */}
             <div className="px-6 py-12 md:px-12">
                 <div className="mx-auto max-w-5xl">
-                    <h2 className="mb-6 text-center text-xs font-bold uppercase tracking-[0.25em] text-white/70">
+                    <h2 className="mb-6 text-center text-xs font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/70">
                         Danh sách sự kiện đã qua
                     </h2>
                     {past.length > 0 ? (
                         <PastEventsList events={past} />
                     ) : (
-                        <div className="flex flex-col items-center py-16 text-white/40">
+                        <div className="flex flex-col items-center py-16 text-slate-400 dark:text-white/40">
                             <span className="mb-4 text-5xl">📭</span>
                             <p className="font-semibold">Chưa có sự kiện đã qua.</p>
                         </div>

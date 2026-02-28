@@ -85,19 +85,9 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
 
 // ── Glass card style helpers ──────────────────────────────────────────────────
 
-const glassCard = {
-  background: 'rgba(255,255,255,0.10)',
-  backdropFilter: 'blur(14px)',
-  WebkitBackdropFilter: 'blur(14px)',
-  border: '1px solid rgba(255,255,255,0.18)',
-} as React.CSSProperties
-
-const glassCardLight = {
-  background: 'rgba(255,255,255,0.14)',
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  border: '1px solid rgba(255,255,255,0.22)',
-} as React.CSSProperties
+// These are now CSS classes — see the <style> tag in the component
+const glassCard = {} as React.CSSProperties
+const glassCardLight = {} as React.CSSProperties
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -117,8 +107,7 @@ function LeadershipCard({
 
   return (
     <div
-      className="flex flex-col items-center rounded-3xl p-7 text-center transition-all hover:scale-[1.02]"
-      style={glassCardLight}
+      className="glass-card-light flex flex-col items-center rounded-3xl p-7 text-center transition-all hover:scale-[1.02]"
     >
       {/* Avatar */}
       <div className="relative mb-4 h-24 w-24 overflow-hidden rounded-full border-4 border-white/30 shadow-xl">
@@ -186,14 +175,56 @@ export default function AboutPage() {
   const pctSkien = allAuthors.find((p) => p.slug === 'pct-skien') as Authors
 
   return (
-    <div
-      className="dark min-h-screen pb-16"
-      style={{
-        background: 'linear-gradient(135deg, #1a0a4a 0%, #3b0f8e 25%, #7c1fbf 50%, #c2185b 75%, #e91e8c 100%)',
-      }}
-    >
+    <div className="about-page min-h-screen pb-16">
+      <style>{`
+        .about-page {
+          background: linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8);
+        }
+        .dark .about-page {
+          background: radial-gradient(circle at 0% 0%, #1E293B 0%, #334155 25%, #701A75 75%, #4C1D95 100%);
+        }
+        .glass-card {
+          background: rgba(255,255,255,0.72);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(148,130,252,0.22);
+        }
+        .dark .glass-card {
+          background: rgba(255,255,255,0.10);
+          border: 1px solid rgba(255,255,255,0.18);
+        }
+        .glass-card-light {
+          background: rgba(255,255,255,0.82);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(148,130,252,0.25);
+        }
+        .dark .glass-card-light {
+          background: rgba(255,255,255,0.14);
+          border: 1px solid rgba(255,255,255,0.22);
+        }
+        .value-tag {
+          background: rgba(100,80,200,0.12);
+          border: 1px solid rgba(100,80,200,0.22);
+          backdrop-filter: blur(8px);
+        }
+        .dark .value-tag {
+          background: rgba(255,255,255,0.16);
+          border: 1px solid rgba(255,255,255,0.28);
+        }
+        .member-skeleton {
+          background: rgba(100,80,200,0.08);
+          border: 1px solid rgba(100,80,200,0.12);
+        }
+        .dark .member-skeleton {
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.12);
+        }
+        .about-blobs { display: none; }
+        .dark .about-blobs { display: block; }
+      `}</style>
       {/* ── Decorative background blobs ── */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      <div className="about-blobs pointer-events-none fixed inset-0 overflow-hidden">
         <div
           className="absolute -top-40 left-1/3 h-[600px] w-[600px] rounded-full opacity-30 blur-3xl"
           style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
@@ -212,7 +243,7 @@ export default function AboutPage() {
       <section className="relative px-6 pt-44 pb-20 text-center md:px-12">
         <div className="relative mx-auto max-w-3xl">
           {/* Breadcrumb */}
-          <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.3em] text-white/50">
+          <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-white/50">
             ✦ Câu chuyện của chúng mình ✦
           </p>
 
@@ -227,11 +258,11 @@ export default function AboutPage() {
           >
             ABOUT
             <br />
-            <span style={{ color: '#c084fc' }}>DUT AI CLUB</span>
+            <span className="text-purple-500 dark:text-[#c084fc]">DUT AI CLUB</span>
           </h1>
 
           {/* Description */}
-          <p className="mx-auto max-w-xl text-base leading-relaxed text-white/65">
+          <p className="mx-auto max-w-xl text-base leading-relaxed text-slate-600 dark:text-white/65">
             Nơi hội tụ của những sinh viên đam mê Trí tuệ Nhân tạo — chúng mình học hỏi, sáng tạo và lan toả sức mạnh của Trí tuệ Nhân tạo.
           </p>
         </div>
@@ -242,7 +273,7 @@ export default function AboutPage() {
         {/* ── Chúng tôi là ai? / Tại sao tồn tại? ── */}
         <section className="grid gap-5 md:grid-cols-2">
           {/* Card 1 */}
-          <div className="rounded-3xl p-8 transition-all hover:scale-[1.01]" style={glassCard}>
+          <div className="glass-card rounded-3xl p-8 transition-all hover:scale-[1.01]">
             <div
               className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-white"
               style={{ background: 'rgba(192,132,252,0.3)', border: '1px solid rgba(192,132,252,0.4)' }}
@@ -251,14 +282,14 @@ export default function AboutPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-extrabold text-white">Chúng tôi là ai?</h3>
-            <p className="text-sm leading-relaxed text-white/65">
+            <h3 className="mb-3 text-xl font-extrabold text-slate-900 dark:text-white">Chúng tôi là ai?</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
               DUT AI là Câu lạc bộ trực thuộc Trường Đại học Bách khoa — ĐHĐN. Chúng tôi tập hợp những sinh viên đam mê AI từ các khóa, cùng nhau khám phá và ứng dụng AI để giải quyết các vấn đề thực trong cuộc sống.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="rounded-3xl p-8 transition-all hover:scale-[1.01]" style={glassCard}>
+          <div className="glass-card rounded-3xl p-8 transition-all hover:scale-[1.01]">
             <div
               className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-white"
               style={{ background: 'rgba(244,114,182,0.3)', border: '1px solid rgba(244,114,182,0.4)' }}
@@ -267,8 +298,8 @@ export default function AboutPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-extrabold text-white">Tại sao chúng tôi tồn tại?</h3>
-            <p className="text-sm leading-relaxed text-white/65">
+            <h3 className="mb-3 text-xl font-extrabold text-slate-900 dark:text-white">Tại sao chúng tôi tồn tại?</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
               Chúng tôi tin rằng AI không chỉ là công cụ mà là chìa khoá giải quyết những bài toán thực tiễn của xã hội. Chúng tôi tạo ra môi trường học tập, nghiên cứu và ứng dụng AI sát với thực tế, nơi thành viên đều có thể tỏa sáng theo cách riêng.
             </p>
           </div>
@@ -277,27 +308,26 @@ export default function AboutPage() {
         {/* ── Hoạt động tiêu biểu ── */}
         <section>
           <div className="mb-10 text-center">
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/50">
               Những gì chúng mình làm
             </p>
-            <h2 className="text-3xl font-extrabold text-white">Hoạt động tiêu biểu</h2>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Hoạt động tiêu biểu</h2>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {ACTIVITIES.map((act) => (
               <div
                 key={act.title}
-                className="flex flex-col items-center rounded-3xl p-7 text-center transition-all hover:scale-[1.03] hover:shadow-xl"
-                style={glassCard}
+                className="glass-card flex flex-col items-center rounded-3xl p-7 text-center transition-all hover:scale-[1.03] hover:shadow-xl"
               >
                 <div
                   className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
-                  style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}
+                  style={{ background: 'rgba(100,80,200,0.12)', border: '1px solid rgba(100,80,200,0.2)' }}
                 >
                   {act.emoji}
                 </div>
-                <h4 className="mb-2 font-extrabold text-white">{act.title}</h4>
-                <p className="text-xs leading-relaxed text-white/60">{act.desc}</p>
+                <h4 className="mb-2 font-extrabold text-slate-900 dark:text-white">{act.title}</h4>
+                <p className="text-xs leading-relaxed text-slate-600 dark:text-white/60">{act.desc}</p>
               </div>
             ))}
           </div>
@@ -306,23 +336,23 @@ export default function AboutPage() {
         {/* ── Tầm nhìn & Sứ mệnh ── */}
         <section className="grid gap-5 md:grid-cols-2">
           {/* Tầm nhìn */}
-          <div className="rounded-3xl p-8 transition-all hover:scale-[1.01]" style={glassCard}>
-            <h3 className="mb-4 text-2xl font-extrabold text-white">Tầm nhìn</h3>
-            <p className="text-sm leading-relaxed text-white/65">
+          <div className="glass-card rounded-3xl p-8 transition-all hover:scale-[1.01]">
+            <h3 className="mb-4 text-2xl font-extrabold text-slate-900 dark:text-white">Tầm nhìn</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
               Trở thành cộng đồng sinh viên AI hàng đầu miền Trung, nơi kiến thức, đam mê và ứng dụng thực tế gặp nhau để kiến tạo tương lai. Chúng mình hướng tới việc đưa DUT AI vươn ra tầm quốc tế và kết nối với mạng lưới AI toàn cầu.
             </p>
           </div>
           {/* Sứ mệnh */}
-          <div className="rounded-3xl p-8 transition-all hover:scale-[1.01]" style={glassCard}>
-            <h3 className="mb-4 text-2xl font-extrabold text-white">Sứ mệnh</h3>
-            <p className="text-sm leading-relaxed text-white/65">
+          <div className="rounded-3xl p-8 transition-all hover:scale-[1.01] glass-card">
+            <h3 className="mb-4 text-2xl font-extrabold text-slate-900 dark:text-white">Sứ mệnh</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
               Xây dựng môi trường học tập hiện đại, kết nối sinh viên với doanh nghiệp, và thúc đẩy ứng dụng AI vì sự phát triển của cộng đồng. Kết nối — Phát triển — Chia sẻ là slogan cốt lõi của chúng mình.
             </p>
           </div>
         </section>
 
         {/* ── Giá trị cốt lõi ── */}
-        <section className="rounded-3xl px-8 py-12 text-center" style={glassCard}>
+        <section className="glass-card rounded-3xl px-8 py-12 text-center">
           <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
             Những điều chúng mình trân trọng
           </p>
@@ -331,12 +361,7 @@ export default function AboutPage() {
             {CORE_VALUES.map((v) => (
               <span
                 key={v.label}
-                className="rounded-full px-6 py-2.5 text-sm font-bold tracking-wide text-white transition-all hover:scale-105"
-                style={{
-                  background: 'rgba(255,255,255,0.16)',
-                  border: '1px solid rgba(255,255,255,0.28)',
-                  backdropFilter: 'blur(8px)',
-                }}
+                className="value-tag rounded-full px-6 py-2.5 text-sm font-bold tracking-wide text-slate-700 dark:text-white transition-all hover:scale-105"
               >
                 {v.label}
               </span>
@@ -347,10 +372,10 @@ export default function AboutPage() {
         {/* ── Ban chủ nhiệm ── */}
         <section>
           <div className="mb-10 text-center">
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/50">
               Lãnh đạo câu lạc bộ
             </p>
-            <h2 className="text-3xl font-extrabold text-white">Ban chủ nhiệm</h2>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Ban chủ nhiệm</h2>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {president && <LeadershipCard author={president} badge="Chủ nhiệm" />}
@@ -362,10 +387,10 @@ export default function AboutPage() {
         {/* ── Thành viên (dynamic) ── */}
         <section>
           <div className="mb-10 text-center">
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/50">
               Những người tạo nên DUT AI
             </p>
-            <h2 className="text-3xl font-extrabold text-white">Thành viên</h2>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Thành viên</h2>
           </div>
           <Suspense fallback={<MembersGridSkeleton />}>
             <MembersGrid />

@@ -26,15 +26,11 @@ const AVATAR_GRADIENTS = [
 function SkeletonCard() {
     return (
         <div
-            className="flex flex-col items-center gap-2 rounded-2xl p-4 animate-pulse"
-            style={{
-                background: 'rgba(255,255,255,0.12)',
-                border: '1px solid rgba(255,255,255,0.2)',
-            }}
+            className="flex flex-col items-center gap-2 rounded-2xl border p-4 animate-pulse bg-white/10 border-white/20 dark:bg-white/10 dark:border-white/20 bg-indigo-100/40 border-indigo-200/40"
         >
-            <div className="w-14 h-14 rounded-full bg-white/30" />
-            <div className="h-2.5 w-16 rounded bg-white/20" />
-            <div className="h-2 w-12 rounded bg-white/15" />
+            <div className="w-14 h-14 rounded-full bg-indigo-200 dark:bg-white/30" />
+            <div className="h-2.5 w-16 rounded bg-indigo-200 dark:bg-white/20" />
+            <div className="h-2 w-12 rounded bg-indigo-100 dark:bg-white/15" />
         </div>
     )
 }
@@ -87,30 +83,11 @@ export default function MembersGrid() {
 
     if (error || members.length === 0) {
         return (
-            <div
-                className="flex flex-col items-center justify-center rounded-3xl py-16 text-center"
-                style={{
-                    background: 'rgba(255,255,255,0.10)',
-                    border: '1px solid rgba(255,255,255,0.18)',
-                }}
-            >
-                <svg
-                    className="mb-4 h-12 w-12 text-white/30"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
+            <div className="flex flex-col items-center justify-center rounded-3xl py-16 text-center border bg-white/70 border-indigo-200/40 dark:bg-white/10 dark:border-white/18">
+                <svg className="mb-4 h-12 w-12 text-indigo-300 dark:text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <p className="text-sm font-semibold text-white/40">
-                    {error ?? 'Chưa có thành viên.'}
-                </p>
+                <p className="text-sm font-semibold text-indigo-400 dark:text-white/40">{error ?? 'Chưa có thành viên.'}</p>
             </div>
         )
     }
@@ -123,35 +100,23 @@ export default function MembersGrid() {
                 return (
                     <div
                         key={m.id}
-                        className="group flex flex-col items-center gap-2 rounded-2xl p-4 text-center transition-all hover:scale-105 hover:shadow-xl"
-                        style={{
-                            background: 'rgba(255,255,255,0.12)',
-                            border: '1px solid rgba(255,255,255,0.22)',
-                            backdropFilter: 'blur(10px)',
-                        }}
+                        className="group flex flex-col items-center gap-2 rounded-2xl p-4 text-center transition-all hover:scale-105 hover:shadow-xl border bg-white/60 border-indigo-200/30 dark:bg-white/10 dark:border-white/20"
+                        style={{ backdropFilter: 'blur(10px)' }}
                     >
-                        {/* Avatar — green gradient placeholder OR real photo */}
-                        <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-white/40 shadow-md">
+                        {/* Avatar */}
+                        <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-indigo-200/50 dark:border-white/40 shadow-md">
                             {m.avatar_url ? (
-                                <Image
-                                    src={m.avatar_url}
-                                    alt={m.name}
-                                    fill
-                                    sizes="56px"
-                                    className="object-cover"
-                                    unoptimized
-                                />
+                                <Image src={m.avatar_url} alt={m.name} fill sizes="56px" className="object-cover" unoptimized />
                             ) : (
                                 <AvatarPlaceholder gradient={avatarGradient} />
                             )}
                         </div>
 
-                        <p className="line-clamp-2 text-[11px] font-semibold leading-snug text-white">
+                        <p className="line-clamp-2 text-[11px] font-semibold leading-snug text-slate-800 dark:text-white">
                             {m.name}
                         </p>
                         <span
-                            className="rounded-full px-2 py-0.5 text-[9px] font-medium uppercase tracking-wide text-white/80"
-                            style={{ background: 'rgba(255,255,255,0.18)' }}
+                            className="rounded-full px-2 py-0.5 text-[9px] font-medium uppercase tracking-wide text-indigo-700 dark:text-white/80 bg-indigo-100/60 dark:bg-white/18"
                         >
                             {m.role_name}
                         </span>
