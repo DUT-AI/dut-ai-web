@@ -1,6 +1,7 @@
 from app.v1.projects.service import ProjectService
 from app.v1.introductions.service import IntroductionService
 from app.v1.members.service import MemberService
+from app.v1.users.service import UserService
 from app.v1.media.service import MinioService
 from .repository_factory import RepositoryFactory
 
@@ -30,8 +31,14 @@ class ServiceFactory:
     @property
     def member(self) -> MemberService:
         if "member" not in self._cache:
-            self._cache["member"] = MemberService()
+            self._cache["member"] = MemberService(self._repo.db)
         return self._cache["member"]
+
+    @property
+    def user(self) -> UserService:
+        if "user" not in self._cache:
+            self._cache["user"] = UserService(self._repo.db)
+        return self._cache["user"]
 
     @property
     def media(self) -> MinioService:

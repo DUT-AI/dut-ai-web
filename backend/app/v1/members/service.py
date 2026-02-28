@@ -8,13 +8,25 @@ class MemberService:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self):
-        # Lấy toàn bộ thành viên từ bảng users
-        return self.db.query(Member).all()
+    def get_all(self) -> list[MemberResponse]:
+        users = self.db.query(User).all()
+        return [self._map_user_to_member(user) for user in users]
 
-    def get_by_id(self, member_id: int):
-        # Tìm 1 thành viên theo ID
-        member = self.db.query(Member).filter(Member.id == member_id).first()
-        if not member:
-            raise HTTPException(status_code=404, detail="Không tìm thấy Thành viên này trong hệ thống!")
-        return member
+    def get_by_id(self, member_id: int) -> MemberResponse:
+        user = self.db.query(User).filter(User.id == member_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="Member not found")
+        return self._map_user_to_member(user)
+
+    def _map_user_to_member(self, user: User) -> MemberResponse:
+        return MemberResponse(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            phone_number=user.phone_number,
+            status=user.status,
+            role_id=user.role_id,
+            role_name=user.role_name,
+            avatar_url=user.avatar_url,
+            discord_id=user.discord_id,
+        )

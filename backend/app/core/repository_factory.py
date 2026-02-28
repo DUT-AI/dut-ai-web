@@ -15,6 +15,10 @@ class RepositoryFactory:
         self._cache: dict = {}
 
     @property
+    def db(self) -> Session:
+        return self._db
+
+    @property
     def project(self) -> ProjectRepository:
         if "project" not in self._cache:
             self._cache["project"] = ProjectRepository(self._db)

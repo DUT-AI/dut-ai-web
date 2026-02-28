@@ -9,7 +9,7 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 
 # Install dependencies using npm
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # ---------------------
 # Build stage

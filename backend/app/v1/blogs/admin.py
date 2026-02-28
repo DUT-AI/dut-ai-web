@@ -9,12 +9,23 @@ import os
 from sqlalchemy import select
 from app.v1.members.models import Member
 
+from .models import Blog, Keyword
+from app.v1.users.models import User
+from wtforms import (
+    MultipleFileField,
+    widgets,
+    TextAreaField,
+)  # <--- Nhớ import TextAreaField
+from markupsafe import Markup
+
+
+# --- 1. CHẾ TẠO NÚT BẤM CÓ GẮN BỘ NÃO JAVASCRIPT ---
 class AutoUploadWidget(widgets.FileInput):
     def __call__(self, field, **kwargs):
-        kwargs.setdefault('id', field.id)
-        kwargs.setdefault('multiple', True)
+        kwargs.setdefault("id", field.id)
+        kwargs.setdefault("multiple", True)
         html = super().__call__(field, **kwargs)
-        
+
         # Đã đổi toàn bộ dấu phẩy ',' thành ký tự xuống dòng '\n'
         script = f"""
         <script>
@@ -72,10 +83,23 @@ class BlogAdmin(BaseAdmin, model=Blog):
     name = "Bài viết"
     name_plural = "Blogs"
     icon = "fa-solid fa-file-pen"
-    
-    column_list = [Blog.id, Blog.title, Blog.views, Blog.created_at]
-    form_columns = [Blog.title, Blog.content, Blog.authors, Blog.keywords, Blog.image_url] 
-    column_searchable_list = [Blog.title, Blog.keywords]
+
+    column_list = [
+        Blog.id,
+        Blog.title,
+        Blog.authors_rel,
+        Blog.keywords_rel,
+        Blog.views,
+        Blog.created_at,
+    ]
+    form_columns = [
+        Blog.title,
+        Blog.content,
+        Blog.authors_rel,
+        Blog.keywords_rel,
+        Blog.image_url,
+    ]
+    column_searchable_list = [Blog.title]
 
     form_overrides = {
         "image_url": TextAreaField,
@@ -84,9 +108,9 @@ class BlogAdmin(BaseAdmin, model=Blog):
     form_args = {
         "image_url": {
             "render_kw": {
-                "rows": 6, 
+                "rows": 6,
                 "class": "form-control",
-                "placeholder": "link ảnh..."
+                "placeholder": "link ảnh...",
             }
         }
     }
@@ -124,3 +148,13 @@ class BlogAdmin(BaseAdmin, model=Blog):
             data["authors"] = ""
 
         await super().on_model_change(data, model, is_created, request)
+        await super().on_model_change(data, model, is_created, request)
+
+
+class KeywordAdmin(BaseAdmin, model=Keyword):
+    name = "Từ khóa"
+    name_plural = "Keywords"
+    icon = "fa-solid fa-tags"
+    column_list = [Keyword.id, Keyword.keyword_name, Keyword.number_blog_contain]
+    form_columns = [Keyword.keyword_name]
+    column_searchable_list = [Keyword.keyword_name]
