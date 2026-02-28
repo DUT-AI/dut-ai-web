@@ -2,8 +2,10 @@ from sqlalchemy import Text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 from sqlalchemy import Column, String
+from app.core.mixins import HasImageUpload
 
-class Project(Base):
+
+class Project(Base, HasImageUpload):
     __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(primary_key=True)
