@@ -3,13 +3,17 @@ from datetime import datetime
 from typing import Optional, Any
 
 class EventBase(BaseModel):
+
+    event_type: str
     title: str
     description: Optional[str] = None
+    img_url: Optional[str] = None
+ 
+    events_date: Optional[datetime] = None
     location: Optional[str] = None
-    event_date: Optional[str] = None
-    event_type: Optional[str] = "workshop"
-    registration_link: Optional[str] = None
-    hashtags: Optional[str] = None
+    register_link: Optional[str] = None
+
+    hashtag: Optional[str] = None
 
 class EventCreate(EventBase):
     image_url: Optional[str] = None

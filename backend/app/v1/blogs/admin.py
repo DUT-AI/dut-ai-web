@@ -1,9 +1,14 @@
 from app.core.admin import BaseAdmin
 from .models import Blog
-from wtforms import MultipleFileField, widgets, TextAreaField # <--- Nhớ import TextAreaField
+from wtforms import MultipleFileField, widgets, TextAreaField, SelectMultipleField
 from markupsafe import Markup
 
-# --- 1. CHẾ TẠO NÚT BẤM CÓ GẮN BỘ NÃO JAVASCRIPT ---
+import httpx
+import os
+
+from sqlalchemy import select
+from app.v1.members.models import Member
+
 class AutoUploadWidget(widgets.FileInput):
     def __call__(self, field, **kwargs):
         kwargs.setdefault('id', field.id)
@@ -63,7 +68,6 @@ class AutoUploadWidget(widgets.FileInput):
         """
         return html + Markup(script)
 
-# --- 2. GIAO DIỆN ADMIN CHÍNH ---
 class BlogAdmin(BaseAdmin, model=Blog):
     name = "Bài viết"
     name_plural = "Blogs"
@@ -73,9 +77,9 @@ class BlogAdmin(BaseAdmin, model=Blog):
     form_columns = [Blog.title, Blog.content, Blog.authors, Blog.keywords, Blog.image_url] 
     column_searchable_list = [Blog.title, Blog.keywords]
 
-    # --- ÉP Ô IMAGE_URL PHÌNH TO RA THÀNH 6 DÒNG ---
     form_overrides = {
-        "image_url": TextAreaField
+        "image_url": TextAreaField,
+        "authors": SelectMultipleField
     }
     form_args = {
         "image_url": {
@@ -89,12 +93,34 @@ class BlogAdmin(BaseAdmin, model=Blog):
 
     async def scaffold_form(self, *args, **kwargs):
         form_class = await super().scaffold_form(*args, **kwargs)
+
+        try:
+            with self.session_maker() as session:
+                result = session.execute(select(Member))
+                members = result.scalars().all()
+                
+                choices = [(m.name, m.name) for m in members if getattr(m, 'name', None)]
+                
+                if choices:
+                    form_class.authors.kwargs['choices'] = choices
+                else:
+                    form_class.authors.kwargs['choices'] = [("", "Chưa có ai (Vào mục Members thêm mới nhé)")]
+                    
+        except Exception as e:
+            form_class.authors.kwargs['choices'] = [(f"Lỗi DB", f"Lỗi DB: {str(e)}")]
+
         form_class.upload_new_images = MultipleFileField(
-            "Tải ảnh từ thiết bị", 
+            "Tải thêm ảnh mới (Tự động up và nhả link ngay lập tức)", 
             widget=AutoUploadWidget()
         )
         return form_class
-
     async def on_model_change(self, data: dict, model: any, is_created: bool, request):
         data.pop("upload_new_images", None)
+
+        authors_list = data.get("authors")
+        if authors_list and isinstance(authors_list, list):
+            data["authors"] = ", ".join(authors_list)
+        elif not authors_list:
+            data["authors"] = ""
+
         await super().on_model_change(data, model, is_created, request)

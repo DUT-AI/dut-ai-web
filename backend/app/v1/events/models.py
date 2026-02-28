@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Text
 from app.core.database import Base
 from app.core.mixins import HasImageUpload
 import datetime
@@ -8,16 +8,32 @@ class Event(Base, HasImageUpload):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True, nullable=False)
+    
+    event_type = Column(String, nullable=False) 
+
+    title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
-    image_url = Column(Text, nullable=True)
+    img_url = Column(String, nullable=True)
 
-    event_type = Column(String, default="workshop")
-
-    event_date = Column(String, nullable=True)
+    events_date = Column(DateTime, nullable=True)
     location = Column(String, nullable=True)
-    registration_link = Column(String, nullable=True)
+    register_link = Column(String, nullable=True)
 
+    hashtag = Column(String, nullable=True)
+    __mapper_args__ = {
+        "polymorphic_on": event_type,
+        "polymorphic_identity": "base_event",
+    }
+
+class Workshop(Event):
+    __mapper_args__ = {
+        "polymorphic_identity": "workshop", 
+    }
+
+class MemorableEvent(Event):
+    __mapper_args__ = {
+        "polymorphic_identity": "memorable",
+    }
     hashtags = Column(String, nullable=True)
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
