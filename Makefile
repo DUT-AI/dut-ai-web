@@ -19,7 +19,7 @@ stop:
 	docker compose down
 
 api:
-	cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
+	cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8031 --reload
 
 frontend:
 	cd frontend && npm run dev
@@ -29,6 +29,13 @@ setup:
 	cd frontend && npm install
 	cd backend && uv run python manage.py migrate
 
+migrate-revision:
+	@read -p "Enter migration message: " msg; \
+	cd backend && uv run alembic revision --autogenerate -m "$$msg"
 
-migrate-fastapi:
-	cd backend_fastapi && uv run python init_db.py
+migrate-upgrade:
+	cd backend && uv run alembic upgrade head
+
+migrate-downgrade:
+	@read -p "Enter revision to downgrade to (e.g., -1): " rev; \
+	cd backend && uv run alembic downgrade "$$rev"

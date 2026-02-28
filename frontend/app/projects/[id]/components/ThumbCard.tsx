@@ -16,8 +16,8 @@ export default function ThumbCard({ project, active, onClick, cardW = 280 }: Thu
     <button
       onClick={onClick}
       className={`group relative flex-shrink-0 overflow-hidden rounded-[40px] transition-all duration-500 focus:outline-none ${active
-          ? 'ring-2 ring-white/50 ring-offset-2 ring-offset-transparent'
-          : 'opacity-75 hover:opacity-100'
+        ? 'ring-2 ring-white/50 ring-offset-2 ring-offset-transparent'
+        : 'opacity-75 hover:opacity-100'
         }`}
       style={{ width: cardW, height: Math.round(cardW * (213 / 280)) }}
     >
@@ -34,12 +34,12 @@ export default function ThumbCard({ project, active, onClick, cardW = 280 }: Thu
         <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
       )}
 
-      {/* Gradient overlay */}
+      {/* Gradient overlay — stronger at bottom for text legibility */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(0deg, rgba(30,41,59,0.8) 0%, rgba(30,41,59,0.2) 50%, rgba(30,41,59,0) 100%)',
+            'linear-gradient(0deg, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.55) 45%, rgba(2,6,23,0.15) 70%, rgba(2,6,23,0) 100%)',
         }}
       />
 

@@ -84,14 +84,12 @@ export default function ThumbCarousel({ projects, selected, onSelect }: ThumbCar
       >
         <p style={jakarta}>
           <span
-            className="text-[48px] font-bold leading-none sm:text-[60px] lg:text-[72px]"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
+            className="proj-counter text-[48px] font-bold leading-none sm:text-[60px] lg:text-[72px]"
           >
             {String(selected + 1).padStart(2, '0')}
           </span>
           <span
-            className="ml-1 text-lg font-bold sm:text-2xl lg:text-[30px]"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
+            className="proj-counter ml-1 text-lg font-bold sm:text-2xl lg:text-[30px]"
           >
             /{total}
           </span>
@@ -100,7 +98,7 @@ export default function ThumbCarousel({ projects, selected, onSelect }: ThumbCar
         <div className="flex gap-4">
           <button
             onClick={() => nav(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/70 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white sm:h-12 sm:w-12"
+            className="proj-nav-prev flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:opacity-90 sm:h-12 sm:w-12"
             aria-label="Previous project"
           >
             ←

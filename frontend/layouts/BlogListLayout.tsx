@@ -140,7 +140,24 @@ function BlogListLayoutInner({
 
 
     return (
-        <div className="min-h-screen bg-[#FDFBFB] dark:bg-[#0B0F19] pb-12 pt-8 sm:pt-16 relative z-0">
+        <div className="min-h-screen blog-list-page dark:bg-[#0B0F19] pb-12 pt-8 sm:pt-16 relative z-0">
+            <style>{`
+              .blog-list-page {
+                background: #f8fafc;
+              }
+              .dark .blog-list-page {
+                background: #0B0F19;
+              }
+            `}</style>
+            {/* Light-mode decorative blobs */}
+            <div className="pointer-events-none fixed inset-0 overflow-hidden dark:hidden">
+                <div className="absolute top-[-80px] left-[10%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]"
+                    style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }} />
+                <div className="absolute top-[30%] right-[5%] h-[320px] w-[320px] rounded-full opacity-30 blur-[80px]"
+                    style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
+                <div className="absolute bottom-[10%] left-[20%] h-[260px] w-[260px] rounded-full opacity-25 blur-[70px]"
+                    style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }} />
+            </div>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header Section */}
                 <div className="max-w-3xl mx-auto text-center mb-16 mt-28">
@@ -334,7 +351,7 @@ function BlogListLayoutInner({
 
 export default function BlogListLayout(props: ListLayoutProps) {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-[#FDFBFB] dark:bg-gray-950 pb-12 pt-8 sm:pt-16 flex items-center justify-center"><p>Đang tải dữ liệu...</p></div>}>
+        <Suspense fallback={<div className="min-h-screen blog-list-page dark:bg-gray-950 pb-12 pt-8 sm:pt-16 flex items-center justify-center"><p>Đang tải dữ liệu...</p></div>}>
             <BlogListLayoutInner {...props} />
         </Suspense>
     )

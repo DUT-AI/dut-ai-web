@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
 import NextImage from 'next/image'
@@ -13,6 +14,7 @@ import { usePathname } from 'next/navigation'
 const Header = () => {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +25,11 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const isDark = resolvedTheme === 'dark'
+  const isEventsPage = pathname?.startsWith('/events')
+  // Only force white text when on events/about page, in dark mode, and not scrolled
+  const forceWhite = (isEventsPage) && !scrolled && isDark
+
   let headerClass = `mx-auto flex items-center justify-between transition-all duration-300 z-50 ${scrolled
     ? 'w-full max-w-full py-3 px-4 sm:px-8 bg-white/75 dark:bg-gray-950/75 backdrop-blur-lg border-b border-gray-200/50 dark:border-white/10 shadow-sm rounded-none'
     : 'w-[calc(100%-2rem)] max-w-[1400px] mt-4 sm:mt-6 py-2.5 px-3 sm:px-6 bg-transparent border border-transparent rounded-full'
@@ -31,6 +38,10 @@ const Header = () => {
   if (siteMetadata.stickyNav) {
     headerClass += scrolled ? ' fixed top-0 left-0 right-0' : ' absolute top-0 left-0 right-0'
   }
+
+  // Determine text colors based on forceWhite state
+  const logoTextColor = forceWhite ? 'text-white' : 'text-[#0F172A] dark:text-white'
+  const iconGroupColor = forceWhite ? 'text-white' : 'text-gray-900 dark:text-gray-100'
 
   return (
     <header className={headerClass}>
@@ -48,7 +59,7 @@ const Header = () => {
           </div>
 
           {typeof siteMetadata.headerTitle === 'string' ? (
-            <span className="hidden text-[20px] font-black tracking-wide text-[#0F172A] dark:text-white sm:block">
+            <span className={`hidden text-[20px] font-black tracking-wide sm:block ${logoTextColor}`}>
               {siteMetadata.headerTitle}
             </span>
           ) : (
@@ -69,7 +80,11 @@ const Header = () => {
                 href={link.href}
                 className="relative group font-medium text-[15px] transition-colors py-2"
               >
-                <span className={`${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400'}`}>
+                <span className={
+                  forceWhite
+                    ? isActive ? 'text-blue-300' : 'text-white/90 hover:text-white'
+                    : isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400'
+                }>
                   {link.title}
                 </span>
 
@@ -84,7 +99,7 @@ const Header = () => {
           })}
       </div>
 
-      <div className="flex items-center space-x-2 sm:space-x-3">
+      <div className={`flex items-center space-x-2 sm:space-x-3 ${iconGroupColor}`}>
         <ThemeSwitch />
         <SearchButton />
         <MobileNav />
