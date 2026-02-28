@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
 import NextImage from 'next/image'
@@ -13,6 +14,7 @@ import { usePathname } from 'next/navigation'
 const Header = () => {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,8 +25,10 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const isDark = resolvedTheme === 'dark'
   const isEventsPage = pathname?.startsWith('/events')
-  const forceWhite = isEventsPage && !scrolled
+  // Only force white text when on events/about page, in dark mode, and not scrolled
+  const forceWhite = (isEventsPage) && !scrolled && isDark
 
   let headerClass = `mx-auto flex items-center justify-between transition-all duration-300 z-50 ${scrolled
     ? 'w-full max-w-full py-3 px-4 sm:px-8 bg-white/75 dark:bg-gray-950/75 backdrop-blur-lg border-b border-gray-200/50 dark:border-white/10 shadow-sm rounded-none'

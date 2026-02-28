@@ -140,7 +140,15 @@ function BlogListLayoutInner({
 
 
     return (
-        <div className="min-h-screen bg-[#FDFBFB] dark:bg-[#0B0F19] pb-12 pt-8 sm:pt-16 relative z-0">
+        <div className="min-h-screen blog-list-page dark:bg-[#0B0F19] pb-12 pt-8 sm:pt-16 relative z-0">
+            <style>{`
+              .blog-list-page {
+                background: linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8);
+              }
+              .dark .blog-list-page {
+                background: #0B0F19;
+              }
+            `}</style>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header Section */}
                 <div className="max-w-3xl mx-auto text-center mb-16 mt-28">
@@ -334,7 +342,7 @@ function BlogListLayoutInner({
 
 export default function BlogListLayout(props: ListLayoutProps) {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-[#FDFBFB] dark:bg-gray-950 pb-12 pt-8 sm:pt-16 flex items-center justify-center"><p>Đang tải dữ liệu...</p></div>}>
+        <Suspense fallback={<div className="min-h-screen blog-list-page dark:bg-gray-950 pb-12 pt-8 sm:pt-16 flex items-center justify-center"><p>Đang tải dữ liệu...</p></div>}>
             <BlogListLayoutInner {...props} />
         </Suspense>
     )

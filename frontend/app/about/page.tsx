@@ -181,7 +181,7 @@ export default function AboutPage() {
           background: linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8);
         }
         .dark .about-page {
-          background: radial-gradient(circle at 0% 0%, #1E293B 0%, #334155 25%, #701A75 75%, #4C1D95 100%);
+          background: #020617;
         }
         .glass-card {
           background: rgba(255,255,255,0.72);

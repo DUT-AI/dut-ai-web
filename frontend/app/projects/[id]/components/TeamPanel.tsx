@@ -1,6 +1,6 @@
 import type { Member } from 'app/api-client'
 import Image from '@/components/Image'
-import { jakarta, glass } from './styles'
+import { jakarta, glassClass } from './styles'
 
 interface TeamPanelProps {
   members: Record<string, Member[]>
@@ -22,11 +22,11 @@ export default function TeamPanel({ members }: TeamPanelProps) {
   const allRows = [row1, row2, row3, row4].filter(row => row.length > 0)
 
   return (
-    <div className="py-8 px-8 sm:px-10 rounded-[40px] h-[700px] lg:h-[800px] flex flex-col" style={glass}>
+    <div className={`${glassClass} py-8 px-8 sm:px-10 rounded-[40px] h-[700px] lg:h-[800px] flex flex-col`}>
       {/* Section heading */}
       <div className="mb-8 flex items-center gap-4 flex-shrink-0">
         <h2
-          className="text-3xl font-bold text-white sm:text-4xl lg:text-[42px]"
+          className="text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl lg:text-[42px]"
           style={{ ...jakarta, lineHeight: '1.1em' }}
         >
           Thành viên dự án
@@ -53,8 +53,8 @@ export default function TeamPanel({ members }: TeamPanelProps) {
 function MemberCard({ member }: { member: Member }) {
   return (
     <div
-      className="relative aspect-[4/5] w-[110px] sm:w-[130px] lg:w-[140px] overflow-hidden rounded-3xl border border-white/10 bg-white/5"
-      style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}
+      className="relative aspect-[4/5] w-[110px] sm:w-[130px] lg:w-[140px] overflow-hidden rounded-3xl border border-indigo-200/30 dark:border-white/10 bg-indigo-50/60 dark:bg-white/5"
+      style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}
     >
       {member.avatar_url ? (
         <Image
@@ -70,8 +70,8 @@ function MemberCard({ member }: { member: Member }) {
         </div>
       )}
 
-      {/* Gradient overlay to make text highly legible */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent pointer-events-none" />
 
       <div className="absolute bottom-0 left-0 right-0 p-3 pb-4 text-left flex flex-col items-start">
         <p className="text-[13px] sm:text-[15px] font-bold text-white leading-tight drop-shadow-md whitespace-normal" style={jakarta}>

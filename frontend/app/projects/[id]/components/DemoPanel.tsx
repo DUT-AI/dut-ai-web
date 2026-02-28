@@ -1,6 +1,6 @@
 import type { Project, Member } from 'app/api-client'
 import Image from '@/components/Image'
-import { glass, jakarta } from './styles'
+import { glassClass, jakarta } from './styles'
 
 interface DemoPanelProps {
   project: Project
@@ -14,10 +14,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
   const total = projects.length
 
   return (
-    <div
-      className="flex flex-col gap-0 overflow-hidden rounded-[40px] lg:flex-row h-[700px] lg:h-[800px]"
-      style={{ ...glass }}
-    >
+    <div className={`${glassClass} flex flex-col gap-0 overflow-hidden rounded-[40px] lg:flex-row h-[700px] lg:h-[800px]`}>
       {/* Left — Text info */}
       <div className="flex flex-col p-8 sm:p-10 lg:w-[45%] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
         <div>
@@ -26,7 +23,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
             {members.slice(0, 4).map((m) => (
               <div
                 key={m.id}
-                className="h-8 w-8 overflow-hidden rounded-full border-2 border-white/20"
+                className="h-8 w-8 overflow-hidden rounded-full border-2 border-indigo-200/30 dark:border-white/20"
               >
                 {m.avatar_url ? (
                   <Image
@@ -45,7 +42,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
           </div>
 
           <h3
-            className="text-2xl font-bold text-white sm:text-3xl lg:text-[36px]"
+            className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl lg:text-[36px]"
             style={{ ...jakarta, lineHeight: '1.111em' }}
           >
             Demo
@@ -60,7 +57,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
 
         <div className="mt-6">
           <p
-            className="text-sm leading-relaxed text-[#F1F5F9] sm:text-base"
+            className="text-sm leading-relaxed text-slate-600 dark:text-[#F1F5F9] sm:text-base"
             style={{ ...jakarta, lineHeight: '1.8em' }}
           >
             {project.description || 'Xem trước giao diện và trải nghiệm thực tế của dự án.'}
@@ -71,7 +68,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
             {projects.slice(0, Math.min(5, total)).map((_, i) => (
               <div
                 key={i}
-                className={`h-2.5 rounded-full transition-all ${i === selected ? 'w-8 bg-orange-500' : 'w-2.5 bg-white/20'
+                className={`h-2.5 rounded-full transition-all ${i === selected ? 'w-8 bg-orange-500' : 'w-2.5 bg-indigo-200/50 dark:bg-white/20'
                   }`}
               />
             ))}

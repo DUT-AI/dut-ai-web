@@ -1,5 +1,5 @@
 import type { Project } from 'app/api-client'
-import { glass, jakarta } from './styles'
+import { glassClass, jakarta } from './styles'
 
 interface TechStackPanelProps {
   project: Project
@@ -7,10 +7,10 @@ interface TechStackPanelProps {
 
 export default function TechStackPanel({ project }: TechStackPanelProps) {
   return (
-    <div className="relative overflow-y-auto h-[700px] lg:h-[800px] rounded-[40px] p-8 sm:p-10 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent" style={glass}>
+    <div className={`${glassClass} relative overflow-y-auto h-[700px] lg:h-[800px] rounded-[40px] p-8 sm:p-10 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent`}>
       {/* Left gradient accent */}
       <div
-        className="absolute inset-y-0 left-0 w-1.5"
+        className="absolute inset-y-0 left-0 w-1.5 rounded-l-[40px]"
         style={{
           background: 'linear-gradient(180deg, #7C3AED 0%, #EC4899 50%, #F97316 100%)',
         }}
@@ -21,7 +21,7 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
       </div>
 
       <h3
-        className="mb-6 text-2xl font-bold text-white sm:text-3xl"
+        className="mb-6 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl"
         style={{ ...jakarta, lineHeight: '1.111em' }}
       >
         Tech Stack – Công nghệ sử dụng
@@ -29,10 +29,10 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <h4 className="mb-3 text-lg font-bold text-white sm:text-xl" style={jakarta}>
+          <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl" style={jakarta}>
             01. FrontEnd
           </h4>
-          <ul className="list-inside list-disc space-y-1.5 text-[#F1F5F9]" style={jakarta}>
+          <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]" style={jakarta}>
             <li className="text-sm sm:text-base">React / Next.js – Xây dựng giao diện web</li>
             <li className="text-sm sm:text-base">
               TailwindCSS / Prisma – UI hiển thị, responsive
@@ -44,10 +44,10 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
         </div>
 
         <div>
-          <h4 className="mb-3 text-lg font-bold text-white sm:text-xl" style={jakarta}>
+          <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl" style={jakarta}>
             02. BackEnd
           </h4>
-          <ul className="list-inside list-disc space-y-1.5 text-[#F1F5F9]" style={jakarta}>
+          <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]" style={jakarta}>
             <li className="text-sm sm:text-base">FastAPI / Django Flask Python – Xây API</li>
             <li className="text-sm sm:text-base">PostgreSQL – Hệ CSDL/Frontend à server</li>
             <li className="text-sm sm:text-base">JWT Authentication – Bảo mật người dùng</li>
@@ -61,7 +61,7 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm"
+              className="proj-tag rounded-full px-4 py-1.5 text-xs font-medium backdrop-blur-sm"
               style={jakarta}
             >
               {tag}

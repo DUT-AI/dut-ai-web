@@ -243,7 +243,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
     const { resolvedTheme } = useTheme()
     const isDark = resolvedTheme !== 'light'
     const pageBg = isDark
-        ? 'radial-gradient(circle at 0% 0%, #1E293B 0%, #334155 25%, #701A75 75%, #4C1D95 100%)'
+        ? '#020617'
         : 'linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8)'
 
     return (
