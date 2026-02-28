@@ -95,10 +95,10 @@ export default function HeroSection() {
                     {/* ── Right: Robot Illustration ── */}
                     <div className="w-full lg:w-[45%] relative flex justify-center py-10 mt-10 lg:mt-0">
                         {/* Decorative icons */}
-                        <div className="absolute top-[-10%] right-[100%] sm:right-[85%] flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md">
+                        <div className="absolute top-[-10%] right-[100%] sm:right-[85%] flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 dark:bg-gray-800/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md">
                             <SparkleIcon className="w-6 h-6 text-blue-500" />
                         </div>
-                        <div className="absolute bottom-[-15%] right-[5%] sm:right-[0%] flex h-14 w-14 items-center justify-center rounded-2xl bg-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md">
+                        <div className="absolute bottom-[-15%] right-[5%] sm:right-[0%] flex h-14 w-14 items-center justify-center rounded-2xl bg-white/80 dark:bg-gray-800/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6 text-[#191970]">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-1.18.208l1.282 5.36a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L4.982 20.54a.562.562 0 01-.84-.61l1.282-5.36a.563.563 0 00-.164-.53l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                             </svg>
