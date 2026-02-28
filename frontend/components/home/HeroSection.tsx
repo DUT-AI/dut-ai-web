@@ -1,5 +1,6 @@
 import Link from '@/components/Link'
 import SparkleIcon from '@/components/SparkleIcon'
+import StatCounter from '@/components/home/StatCounter'
 import { Alfa_Slab_One } from 'next/font/google'
 
 const alfaSlabOne = Alfa_Slab_One({
@@ -112,15 +113,9 @@ export default function HeroSection() {
 
                 {/* ── Stats row ── */}
                 <div className="mt-20 md:mt-32 w-full max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
-                    <h3 className="text-[36px] sm:text-[44px] lg:text-[50px] font-bold text-[#DF7DC8] tracking-[0.012em] whitespace-nowrap">
-                        25+ Members
-                    </h3>
-                    <h3 className="text-[36px] sm:text-[44px] lg:text-[50px] font-bold text-[#DF7DC8] tracking-[0.012em] whitespace-nowrap">
-                        10+ Projects
-                    </h3>
-                    <h3 className="text-[36px] sm:text-[44px] lg:text-[50px] font-bold text-[#DF7DC8] tracking-[0.012em] whitespace-nowrap">
-                        5+ Events
-                    </h3>
+                    <StatCounter target={25} suffix="+" label="Members" delay={0} />
+                    <StatCounter target={10} suffix="+" label="Projects" delay={200} />
+                    <StatCounter target={5} suffix="+" label="Events" delay={400} />
                 </div>
             </div>
         </section>
