@@ -17,19 +17,19 @@ export default function PortfolioSection() {
         <section className={`px-6 py-16 md:px-12 max-w-[1400px] mx-auto ${plusJakartaSans.className}`}>
             {/* Header */}
             <div className="mb-16 text-center flex flex-col items-center">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] dark:bg-gray-800 dark:border-blue-900/50">
                     <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
                     <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600">Our Portfolio</span>
                 </div>
 
-                <h2 className={`text-[48px] md:text-[72px] font-extrabold leading-[1] text-[#1E293B] drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] ${inter.className}`}>
+                <h2 className={`text-[48px] md:text-[72px] font-extrabold leading-[1] text-[#1E293B] dark:text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] ${inter.className}`}>
                     Next-Gen
                 </h2>
                 <h2 className={`text-[48px] md:text-[72px] font-extrabold leading-[1.1] bg-gradient-to-r from-blue-600 via-indigo-500 to-fuchsia-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] ${inter.className}`}>
                     AI Innovations
                 </h2>
 
-                <p className="mx-auto mt-6 max-w-[700px] text-[18px] md:text-[20px] font-medium leading-[1.4] text-[#475569]">
+                <p className="mx-auto mt-6 max-w-[700px] text-[18px] md:text-[20px] font-medium leading-[1.4] text-[#475569] dark:text-gray-400">
                     Khám phá những giới hạn giao thoa giữa học máy và sáng tạo con người.<br className="hidden md:block" />
                     Triển lãm những dự án được phát triển bởi Câu lạc bộ DUT AI.
                 </p>

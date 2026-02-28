@@ -67,7 +67,7 @@ class EventAdmin(BaseAdmin, model=Event):
     name_plural = "Events"
     icon = "fa-solid fa-calendar-days"
 
-    column_list = [Event.id, Event.title, Event.event_type, Event.event_date, Event.created_at]
+    column_list = [Event.id, Event.title, Event.event_type, Event.event_date, Event.updated_at]
 
     form_columns = [
         Event.event_type, 

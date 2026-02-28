@@ -4,7 +4,10 @@
  * so the real backend URL is kept server-side only.
  */
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1'
+// Use internal Docker network URL for server-side fetch, public URL for client-side
+const BASE = typeof window === 'undefined' 
+  ? (process.env.INTERNAL_API_URL || 'http://backend:8002/api/v1')
+  : (process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1')
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
