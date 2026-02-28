@@ -1,7 +1,7 @@
 import type { Project, Member } from 'app/api-client'
 import Image from '@/components/Image'
 import Link from '@/components/Link'
-import { glass, jakarta } from './styles'
+import { glassClass, jakarta } from './styles'
 
 interface FeaturedDetailProps {
   project: Project
@@ -15,8 +15,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
     <div className="flex flex-col gap-0 lg:flex-row" style={{ minHeight: 420 }}>
       {/* Left — Glassmorphism info */}
       <div
-        className="relative flex flex-col justify-between overflow-hidden rounded-t-[40px] p-8 sm:p-10 lg:w-[46%] lg:rounded-l-[40px] lg:rounded-tr-none"
-        style={glass}
+        className={`${glassClass} relative flex flex-col justify-between overflow-hidden rounded-t-[40px] p-8 sm:p-10 lg:w-[46%] lg:rounded-l-[40px] lg:rounded-tr-none`}
       >
         <div>
           {/* Avatars */}
@@ -24,7 +23,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
             {members.slice(0, 3).map((m, i) => (
               <div
                 key={m.id}
-                className="h-10 w-10 overflow-hidden rounded-full border-2 border-white/20"
+                className="h-10 w-10 overflow-hidden rounded-full border-2 border-indigo-200/40 dark:border-white/20"
               >
                 {m.avatar_url ? (
                   <Image
@@ -47,7 +46,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
 
           {/* Title */}
           <h2
-            className="text-2xl font-bold text-white sm:text-3xl lg:text-[36px]"
+            className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl lg:text-[36px]"
             style={{ ...jakarta, lineHeight: '1.1em' }}
           >
             {project.href ? (
@@ -66,7 +65,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
 
         {/* Description */}
         <p
-          className="mt-8 text-base text-[#F1F5F9] sm:text-lg lg:mt-auto lg:text-[20px]"
+          className="mt-8 text-base text-slate-600 dark:text-[#F1F5F9] sm:text-lg lg:mt-auto lg:text-[20px]"
           style={{ ...jakarta, lineHeight: '2em' }}
         >
           {project.description}
@@ -74,7 +73,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
       </div>
 
       {/* Right — Image card */}
-      <div className="relative min-h-[260px] flex-1 overflow-hidden rounded-b-[40px] border border-black/40 lg:rounded-r-[40px] lg:rounded-bl-none">
+      <div className="relative min-h-[260px] flex-1 overflow-hidden rounded-b-[40px] border border-black/20 dark:border-black/40 lg:rounded-r-[40px] lg:rounded-bl-none">
         {imgSrc ? (
           <Image alt={project.title} src={imgSrc} fill className="object-cover" unoptimized />
         ) : (
