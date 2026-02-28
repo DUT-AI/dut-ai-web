@@ -16,9 +16,9 @@ export const metadata = genPageMetadata({
 
 export const revalidate = 600
 
-export default async function Projects({ params }: { params: { id: string } | Promise<{ id: string }> }) {
-  const resolvedParams = await params
-  const initialProjectId = parseInt(resolvedParams.id, 10)
+export default async function Projects(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const initialProjectId = parseInt(params.id, 10)
 
   let projects: Project[] = []
   let members: Member[] = []
