@@ -20,11 +20,21 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         self.repo.db.refresh(blog) 
         
         return blog
+
+    def get_detail_with_related(self, id: int, related_limit: int = 5):
+        """Lấy blog detail kèm danh sách bài viết liên quan."""
+        blog = self.get_by_id(id)
+        related = self.repo.get_related_blogs(id, related_limit)
+        return {
+            **{c.name: getattr(blog, c.name) for c in blog.__table__.columns if c.name != "search_vector"},
+            "related_blogs": related,
+        }
+
     def get_all_blogs(self, title: Optional[str] = None, keyword: Optional[str] = None):
         return self.repo.get_all_blogs(title=title, keyword=keyword)
 
-    def get_top_viewed(self, limit: int = 5):
-        return self.repo.get_top_viewed(limit)
+    def get_most_viewed_in_latest_month(self, limit: int = 5):
+        return self.repo.get_most_viewed_in_latest_month(limit)
 
     def get_top_authors(self, limit: int = 5):
         return self.repo.get_top_authors(limit)

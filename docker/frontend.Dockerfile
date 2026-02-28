@@ -5,12 +5,11 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-# Copy yarn configuration files
-COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn ./.yarn
+# Copy package files
+COPY frontend/package.json frontend/package-lock.json ./
 
-# Install dependencies using Yarn 3
-RUN corepack enable && yarn install
+# Install dependencies using npm
+RUN npm ci
 
 # ---------------------
 # Build stage
@@ -19,21 +18,19 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy source code first
-COPY . .
+# Copy source code first, including .env from parent directory
+# Since context is ./ (root), we can copy frontend and .env
+COPY frontend ./
+COPY .env ../.env
 
 # Then overlay node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-# Copy the updated yarn.lock from deps (in case it was modified)
-COPY --from=deps /app/yarn.lock ./yarn.lock
+# Copy the updated package-lock.json from deps (in case it was modified)
+COPY --from=deps /app/package-lock.json ./package-lock.json
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build-time env vars (NEXT_PUBLIC_* must be available at build time)
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-
-RUN corepack enable && yarn build
+RUN npm run build
 
 # ---------------------
 # Production stage
@@ -43,11 +40,9 @@ FROM node:20-alpine AS production
 WORKDIR /app
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs &&     adduser --system --uid 1001 nextjs
 
-ENV NODE_ENV=production \
-    NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production     NEXT_TELEMETRY_DISABLED=1
 
 # Copy only necessary files for standalone output
 COPY --from=builder /app/public ./public
@@ -58,7 +53,6 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT=3000 \
-    HOSTNAME="0.0.0.0"
+ENV PORT=3000     HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]

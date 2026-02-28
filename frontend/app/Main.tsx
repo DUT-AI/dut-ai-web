@@ -14,7 +14,7 @@ export default function Home({ posts }) {
         return (
           <article
             key={slug}
-            className="group flex flex-col rounded-2xl border border-primary-100 bg-white p-6 transition-all hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
+            className="group flex flex-col rounded-[2rem] border border-white dark:border-gray-700/50 bg-white/70 dark:bg-gray-800/80 backdrop-blur-md p-6 shadow-[0_15px_40px_-10px_rgb(0,0,0,0.05)] transition-transform duration-300 hover:-translate-y-1 relative overflow-hidden"
           >
             {/* Date */}
             <time

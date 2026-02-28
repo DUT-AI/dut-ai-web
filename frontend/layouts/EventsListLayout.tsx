@@ -6,6 +6,8 @@ import type { Blog } from 'contentlayer/generated'
 import Link from '@/components/Link'
 import Image from 'next/image'
 import siteMetadata from '@/data/siteMetadata'
+import Footer from '@/components/Footer'
+import { useTheme } from 'next-themes'
 
 interface EventsListLayoutProps {
     posts: CoreContent<Blog>[]
@@ -35,27 +37,70 @@ const LocIcon = () => (
     </svg>
 )
 
-// ── Stacked photo cards visual ─────────────────────────────────────────────────
+// ── Member card placeholder (shown when no image) ──────────────────────────────
+const MemberCard = ({ bg }: { bg: string }) => (
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4" style={{ background: bg }}>
+        <svg className="h-10 w-10 text-white/70" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+        </svg>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">MEMBER</span>
+        <div className="w-10 border-t border-white/35" />
+        <p className="mt-1 text-center text-[9px] leading-relaxed text-white/55 line-clamp-3">
+            Lorem ipsum dolor sit amet consectetur
+        </p>
+    </div>
+)
+
+// ── Scattered photo cards — 4 cards fanned like the design mockup ─────────────
 const PhotoStack = ({ images, flip = false }: { images: string[]; flip?: boolean }) => {
-    const angles = flip ? ['-rotate-6', '-rotate-2', 'rotate-3'] : ['rotate-6', 'rotate-2', '-rotate-3']
-    const visible = images.slice(0, 3)
-    while (visible.length < 3) visible.push('')
+    // W×H for all cards
+    const W = 170, H = 205
+
+    // flip=false → PhotoBlock is on the LEFT column (odd rows)
+    // flip=true  → PhotoBlock is on the RIGHT column (even rows)
+    // Positions carefully match the design screenshots:
+    //   left  pattern: back-top-left, back-top-right, front-bottom-right, front-bottom-left
+    //   right pattern: back-top-right, back-top-left, front-bottom-left,  front-bottom-right
+    const cards = flip
+        ? [
+            // Right-side layout (2nd screenshot)
+            { top: 0, left: 140, rotate: 12, z: 0, bg: 'linear-gradient(150deg,#dce8dc,#bdd4c0)' },
+            { top: 18, left: 45, rotate: 5, z: 1, bg: 'linear-gradient(150deg,#c8ddc8,#a8c8ac)' },
+            { top: 108, left: 0, rotate: -7, z: 2, bg: 'linear-gradient(150deg,#a8bfb0,#8eab94)' },
+            { top: 100, left: 150, rotate: 3, z: 3, bg: 'linear-gradient(150deg,#3d6b5e,#2d5045)' },
+        ]
+        : [
+            // Left-side layout (1st screenshot)
+            { top: 0, left: 0, rotate: -12, z: 0, bg: 'linear-gradient(150deg,#c8ddc8,#a8c8ac)' },
+            { top: 18, left: 105, rotate: -5, z: 1, bg: 'linear-gradient(150deg,#dce8dc,#bdd4c0)' },
+            { top: 108, left: 165, rotate: 8, z: 2, bg: 'linear-gradient(150deg,#e8dcc8,#d4c4a0)' },
+            { top: 100, left: 10, rotate: -2, z: 3, bg: 'linear-gradient(150deg,#3d6b5e,#2d5045)' },
+        ]
+
+    // Cycle images so all 4 slots are always filled with real photos
+    const visible: string[] = Array.from({ length: 4 }, (_, i) =>
+        images.length > 0 ? images[i % images.length] : ''
+    )
+
     return (
-        <div className={`relative h-60 w-72 ${flip ? 'scale-x-[-1]' : ''}`}>
-            {visible.map((src, i) => (
+        <div className="relative" style={{ width: 380, height: 340 }}>
+            {cards.map((c, i) => (
                 <div
                     key={i}
-                    className={`absolute rounded-xl border-4 border-white dark:border-gray-800 bg-[#c5cfc8] dark:bg-gray-700 shadow-md transition-transform duration-300 ${angles[i]}`}
-                    style={{ width: 140, height: 180, top: i * 10, left: i * 14 }}
+                    className="absolute overflow-hidden rounded-2xl border-[5px] border-white shadow-2xl transition-transform duration-300 hover:scale-105"
+                    style={{
+                        width: W,
+                        height: H,
+                        top: c.top,
+                        left: c.left,
+                        zIndex: c.z,
+                        transform: `rotate(${c.rotate}deg)`,
+                    }}
                 >
-                    {src ? (
-                        <Image src={src} alt="" fill className="rounded-lg object-cover" unoptimized />
+                    {visible[i] ? (
+                        <Image src={visible[i]} alt="" fill className="object-cover" unoptimized />
                     ) : (
-                        <div className="flex h-full w-full items-center justify-center rounded-lg bg-[#b0bbb3] dark:bg-gray-600">
-                            <svg className="h-12 w-12 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </div>
+                        <MemberCard bg={c.bg} />
                     )}
                 </div>
             ))}
@@ -85,9 +130,14 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
 
                 return (
                     <div key={ev.path}
-                        className="mb-3 flex items-center gap-4 rounded-2xl bg-white/70 dark:bg-gray-800/70 p-4 shadow-sm backdrop-blur border border-transparent dark:border-gray-700/50">
+                        className="mb-3 flex items-center gap-4 rounded-2xl p-4 shadow-sm border"
+                        style={{
+                            background: 'rgba(255,255,255,0.75)',
+                            backdropFilter: 'blur(12px)',
+                            borderColor: 'rgba(255,255,255,0.7)',
+                        }}>
                         {/* Thumbnail */}
-                        <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-[#c5cfc8] dark:bg-gray-700">
+                        <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-[#c5cfc8]">
                             {cover ? (
                                 <Image src={cover} alt={ev.title} fill className="object-cover" unoptimized />
                             ) : (
@@ -102,7 +152,7 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
                         {/* Info */}
                         <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                                <p className="truncate text-sm font-bold text-gray-800 dark:text-gray-100">{ev.title}</p>
+                                <p className="truncate text-sm font-bold" style={{ color: '#1e293b' }}>{ev.title}</p>
                                 {fbLink && (
                                     <a href={fbLink} target="_blank" rel="noopener noreferrer"
                                         className="flex-shrink-0 text-[#1877F2] transition-opacity hover:opacity-75"
@@ -111,14 +161,14 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
                                     </a>
                                 )}
                             </div>
-                            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                            <p className="mt-0.5 text-xs" style={{ color: '#64748b' }}>
                                 {ev.summary ? ev.summary.slice(0, 60) : ''} · Tháng {date}
                             </p>
                         </div>
 
                         {/* Stats */}
                         {stats.length > 0 && (
-                            <div className="hidden items-center gap-6 text-xs text-gray-500 dark:text-gray-400 sm:flex">
+                            <div className="hidden items-center gap-6 text-xs text-gray-500 sm:flex">
                                 {stats.map((s) => (
                                     <span key={s.label} className="flex items-center gap-1">
                                         <span className="text-[#5c6bc0]">•</span>
@@ -130,7 +180,7 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
 
                         {/* Action */}
                         <Link href={`/${ev.path}`}
-                            className="ml-auto flex-shrink-0 rounded-lg bg-[#5c6bc0]/10 dark:bg-[#5c6bc0]/20 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[#5c6bc0] dark:text-indigo-300 transition-colors hover:bg-[#5c6bc0]/20 dark:hover:bg-[#5c6bc0]/30">
+                            className="ml-auto flex-shrink-0 rounded-lg bg-[#5c6bc0]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[#5c6bc0] transition-colors hover:bg-[#5c6bc0]/20">
                             {(ev as any).hasGallery ? 'Xem lại ảnh' : 'Tài liệu'}
                         </Link>
                     </div>
@@ -143,25 +193,24 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
                     <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="rounded-full border border-gray-300 dark:border-gray-600 px-4 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 disabled:opacity-30 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        className="rounded-full border border-purple-200 px-4 py-1.5 text-sm font-semibold text-gray-600 disabled:opacity-30 hover:bg-white/60">
                         ← Trước
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
                         <button
                             key={n}
                             onClick={() => setPage(n)}
-                            className={`h-8 w-8 rounded-full text-sm font-bold transition-colors ${
-                                n === page
-                                    ? 'bg-[#5c6bc0] text-white'
-                                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                            }`}>
+                            className={`h-8 w-8 rounded-full text-sm font-bold transition-colors ${n === page
+                                ? 'bg-[#5c6bc0] text-white'
+                                : 'text-gray-500 hover:bg-white/60'
+                                }`}>
                             {n}
                         </button>
                     ))}
                     <button
                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                         disabled={page === totalPages}
-                        className="rounded-full border border-gray-300 dark:border-gray-600 px-4 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 disabled:opacity-30 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        className="rounded-full border border-purple-200 px-4 py-1.5 text-sm font-semibold text-gray-600 disabled:opacity-30 hover:bg-white/60">
                         Sau →
                     </button>
                 </div>
@@ -191,34 +240,56 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
 
     const [activeTab, setActiveTab] = useState<'photo' | 'video' | 'memory'>('photo')
 
-    return (
-        <div className="min-h-screen pb-16">
+    const { resolvedTheme } = useTheme()
+    const isDark = resolvedTheme !== 'light'
+    const pageBg = isDark
+        ? '#020617'
+        : 'linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8)'
 
+    return (
+        <div className="min-h-screen pb-16" style={{ background: pageBg }}>
             {/* ── Hero + Workshop section ───────────────────────────────────────── */}
-            <div className="relative bg-[#e8edf7] dark:bg-gray-900 px-6 py-10 md:px-12">
-                <div className="pointer-events-none absolute -top-20 right-0 h-64 w-64 rounded-full bg-blue-200 dark:bg-blue-900 opacity-30 blur-3xl" />
-                <div className="pointer-events-none absolute bottom-0 left-0 h-48 w-48 rounded-full bg-purple-200 dark:bg-purple-900 opacity-20 blur-3xl" />
+            <div className="relative px-6 py-10 md:px-12 pt-40">
+                {/* Decorative blobs — visible in dark mode only */}
+                {isDark && (
+                    <>
+                        <div
+                            className="pointer-events-none absolute -top-20 right-0 h-96 w-96 rounded-full opacity-40 blur-3xl"
+                            style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
+                        />
+                        <div
+                            className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full opacity-30 blur-3xl"
+                            style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
+                        />
+                    </>
+                )}
 
                 <div className="relative mx-auto max-w-5xl">
                     {/* Pill */}
                     <div className="mb-4 flex items-center gap-2">
                         <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                        <span className="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400">
+                        <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-white/70">
                             Sự kiện sắp diễn ra
                         </span>
                     </div>
 
                     {/* Title */}
-                    <h1 className="mb-6 font-extrabold uppercase text-[#1a1a3a] dark:text-white"
-                        style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', letterSpacing: '-0.02em' }}>
+                    <h1
+                        className="mb-6 font-extrabold uppercase text-slate-900 dark:text-white"
+                        style={{
+                            fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+                            letterSpacing: '-0.02em',
+                            textShadow: isDark ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
+                        }}
+                    >
                         DUT AI MOMENTS
                     </h1>
 
                     {/* Divider */}
-                    <div className="mb-6 border-t border-dashed border-[#5c6bc0]/40 dark:border-indigo-700/50" />
+                    <div className="mb-6 border-t border-dashed" style={{ borderColor: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(100,80,200,0.25)' }} />
 
                     {/* Workshops & Seminar label */}
-                    <h2 className="mb-5 text-xl font-extrabold italic text-[#e05c8a] dark:text-pink-400">
+                    <h2 className="mb-5 text-xl font-extrabold italic text-slate-800 dark:text-white/90">
                         Workshops &amp; Seminar
                     </h2>
 
@@ -226,29 +297,45 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                         <div className="flex flex-col gap-6 lg:flex-row">
                             {/* Featured event card */}
                             <div className="flex-1">
-                                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#a78bfa] to-[#6366f1] shadow-lg">
-                                    {workshopEvent.images?.[0] && (
+                                <div className="relative overflow-hidden rounded-2xl shadow-xl" style={{ minHeight: 340 }}>
+                                    {workshopEvent.images?.[0] ? (
                                         <Image
                                             src={workshopEvent.images[0]}
                                             alt={workshopEvent.title}
                                             fill
-                                            className="object-cover opacity-20"
+                                            className="object-cover"
                                             unoptimized
                                         />
+                                    ) : (
+                                        <div
+                                            className="absolute inset-0"
+                                            style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)' }}
+                                        />
                                     )}
-                                    <div className="relative p-6">
-                                        <div className="mb-4 flex flex-wrap gap-2">
-                                            {workshopEvent.tags?.filter((t) => t !== 'event').slice(0, 3).map((tag) => (
-                                                <span key={tag}
-                                                    className="rounded-full border border-white/40 bg-white/20 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur">
-                                                    {tag}
-                                                </span>
-                                            ))}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                                    <div className="absolute inset-0 flex flex-col justify-end p-6">
+                                        <div className="mb-3 flex flex-wrap gap-2">
+                                            {workshopEvent.tags
+                                                ?.filter((t) => t !== 'event')
+                                                .slice(0, 3)
+                                                .map((tag) => (
+                                                    <span
+                                                        key={tag}
+                                                        className="rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white"
+                                                        style={{
+                                                            borderColor: 'rgba(255,255,255,0.45)',
+                                                            background: 'rgba(255,255,255,0.18)',
+                                                            backdropFilter: 'blur(6px)',
+                                                        }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))}
                                         </div>
                                         <h3 className="mb-3 text-2xl font-extrabold leading-tight text-white md:text-3xl">
                                             {workshopEvent.title}
                                         </h3>
-                                        <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
+                                        <div className="flex flex-wrap items-center gap-4 text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
                                             <span className="flex items-center gap-1">
                                                 <CalIcon />
                                                 {workshopEvent.date
@@ -268,65 +355,88 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                 </div>
                             </div>
 
-                            {/* Right sidebar cards */}
+                            {/* Right sidebar */}
                             <div className="flex w-full flex-col gap-4 lg:w-64">
-                                {/* Register card */}
-                                <div className="rounded-2xl border border-[#5c6bc0]/20 dark:border-indigo-700/40 bg-white dark:bg-gray-800 p-5 shadow-sm">
-                                    <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#5c6bc0] dark:text-indigo-400">
+                                <div
+                                    className="rounded-2xl border p-5 shadow-lg"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.75)',
+                                        backdropFilter: 'blur(14px)',
+                                        borderColor: 'rgba(255,255,255,0.8)',
+                                    }}
+                                >
+                                    <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#5c6bc0]">
                                         Đăng ký ngay
                                     </p>
-                                    <p className="mb-2 font-bold text-gray-800 dark:text-gray-100">{workshopEvent.title}</p>
+                                    <p className="mb-2 font-bold text-gray-800">{workshopEvent.title}</p>
                                     {workshopEvent.summary && (
-                                        <p className="mb-4 text-xs leading-relaxed text-gray-500 dark:text-gray-400 line-clamp-3">
+                                        <p className="mb-4 text-xs leading-relaxed text-gray-500 line-clamp-3">
                                             {workshopEvent.summary}
                                         </p>
                                     )}
                                     <Link
                                         href={(workshopEvent as any).registerLink ?? `/${workshopEvent.path}`}
-                                        className="block w-full rounded-xl bg-[#1a1a3a] dark:bg-indigo-600 py-2.5 text-center text-xs font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-80">
+                                        className="block w-full rounded-xl py-2.5 text-center text-xs font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-80"
+                                        style={{ background: '#1a1a3a' }}
+                                    >
                                         Đăng ký tham gia
                                     </Link>
                                 </div>
-                                {/* Notification card */}
-                                <div className="rounded-2xl border border-[#5c6bc0]/20 dark:border-indigo-700/40 bg-white dark:bg-gray-800 p-5 shadow-sm">
-                                    <p className="font-semibold text-gray-800 dark:text-gray-100">Nhận thông báo</p>
-                                    <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                                <div
+                                    className="rounded-2xl border p-5 shadow-lg"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.75)',
+                                        backdropFilter: 'blur(14px)',
+                                        borderColor: 'rgba(255,255,255,0.8)',
+                                    }}
+                                >
+                                    <p className="font-semibold text-gray-800">Nhận thông báo</p>
+                                    <p className="mt-1 text-xs text-gray-400">
                                         Không bỏ lỡ bất kỳ sự kiện nào từ CLB
                                     </p>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="rounded-2xl bg-white/60 dark:bg-gray-800/60 p-10 text-center text-gray-400">
+                        <div
+                            className="rounded-2xl p-10 text-center text-gray-400"
+                            style={{ background: 'rgba(255,255,255,0.6)' }}
+                        >
                             <span className="text-5xl">📅</span>
-                            <p className="mt-3 font-semibold dark:text-gray-300">Hiện chưa có workshop/seminar sắp diễn ra.</p>
+                            <p className="mt-3 font-semibold">Hiện chưa có workshop/seminar sắp diễn ra.</p>
                         </div>
                     )}
                 </div>
             </div>
 
             {/* ── Sự kiện đáng nhớ ────────────────────────────────────────────────── */}
-            <div className="relative bg-[#dce7f5] dark:bg-gray-950 px-6 py-14 md:px-12">
+            <div className="relative px-6 py-14 md:px-12">
                 <div className="mx-auto max-w-5xl">
                     {/* Section header */}
-                    <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="mb-12 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                         <div>
-                            <h2 className="text-2xl font-extrabold text-[#1a1a3a] dark:text-white">Sự kiện đáng nhớ</h2>
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Sự kiện đáng nhớ</h2>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-white/60">
                                 Lưu giữ những khoảnh khắc tuyệt vời nhất của DUT AI Club.
                             </p>
                         </div>
                         {/* Tab bar */}
-                        <div className="flex gap-1 rounded-xl bg-white/60 dark:bg-gray-800/60 p-1 shadow-sm backdrop-blur">
+                        <div
+                            className="flex gap-1 rounded-xl p-1"
+                            style={isDark
+                                ? { background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }
+                                : { background: 'rgba(100,80,200,0.10)', backdropFilter: 'blur(10px)', border: '1px solid rgba(100,80,200,0.2)' }
+                            }
+                        >
                             {(['photo', 'video', 'memory'] as const).map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${
-                                        activeTab === tab
-                                            ? 'bg-white dark:bg-gray-700 text-[#1a1a3a] dark:text-white shadow'
-                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                                    }`}>
+                                    className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${activeTab === tab
+                                        ? 'bg-white text-[#1a1a3a] shadow'
+                                        : isDark ? 'text-white/60 hover:text-white' : 'text-slate-500 hover:text-slate-800'
+                                        }`}
+                                >
                                     {tab === 'photo' ? 'Thư viện ảnh' : tab === 'video' ? 'Videos' : 'Hồi ức'}
                                 </button>
                             ))}
@@ -335,7 +445,7 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
 
                     {/* Memory cards — alternating layout */}
                     {memorableEvents.length > 0 ? (
-                        <div className="space-y-16">
+                        <div className="space-y-24">
                             {memorableEvents.slice(0, 6).map((ev, idx) => {
                                 const fbLink = ((ev as any).facebook as string | undefined) ?? siteMetadata.facebook
                                 const isLeft = idx % 2 === 0
@@ -343,23 +453,34 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                 const year = ev.date ? new Date(ev.date).getFullYear() : ''
 
                                 const TextBlock = (
-                                    <div className="flex flex-col justify-center">
+                                    <div className="flex flex-col justify-center py-4">
                                         {year && (
-                                            <span className="mb-2 inline-block w-fit rounded-full bg-[#5c6bc0]/10 dark:bg-indigo-900/40 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-[#5c6bc0] dark:text-indigo-300">
+                                            <span
+                                                className="mb-3 inline-block w-fit rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
+                                                style={isDark ? {
+                                                    background: 'rgba(255,255,255,0.15)',
+                                                    color: 'rgba(255,255,255,0.9)',
+                                                    border: '1px solid rgba(255,255,255,0.25)',
+                                                } : {
+                                                    background: 'rgba(100,80,200,0.12)',
+                                                    color: '#4338ca',
+                                                    border: '1px solid rgba(100,80,200,0.25)',
+                                                }}
+                                            >
                                                 Kỷ niệm {year}
                                             </span>
                                         )}
-                                        <h3 className="mb-2 text-2xl font-extrabold text-[#e05c8a] dark:text-pink-400">{ev.title}</h3>
+                                        <h3 className="mb-3 text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">{ev.title}</h3>
                                         {ev.summary && (
-                                            <p className="mb-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400 line-clamp-3">
+                                            <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-white/70 line-clamp-3">
                                                 {ev.summary}
                                             </p>
                                         )}
-                                        {/* Xem tất cả + Facebook */}
                                         <div className="flex items-center gap-3">
                                             <Link
                                                 href={`/${ev.path}`}
-                                                className="text-sm font-semibold text-[#e05c8a] dark:text-pink-400 hover:underline">
+                                                className="text-sm font-bold text-pink-600 dark:text-pink-300 hover:underline"
+                                            >
                                                 Xem tất cả {photoCount} ảnh
                                             </Link>
                                             {fbLink && (
@@ -367,8 +488,9 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                                     href={fbLink}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center gap-1 text-[#1877F2] transition-opacity hover:opacity-75"
-                                                    title="Xem album trên Facebook">
+                                                    className="flex items-center gap-1 text-blue-500 dark:text-blue-300 transition-opacity hover:opacity-75"
+                                                    title="Xem album trên Facebook"
+                                                >
                                                     <FacebookIcon className="h-5 w-5" />
                                                 </a>
                                             )}
@@ -377,13 +499,13 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                                 )
 
                                 const PhotoBlock = (
-                                    <div className="flex justify-center">
+                                    <div className="flex items-center justify-center">
                                         <PhotoStack images={ev.images ?? []} flip={!isLeft} />
                                     </div>
                                 )
 
                                 return (
-                                    <div key={ev.path} className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
+                                    <div key={ev.path} className="grid grid-cols-1 items-center gap-4 md:grid-cols-2">
                                         {isLeft ? (
                                             <>
                                                 {PhotoBlock}
@@ -400,88 +522,32 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                             })}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center py-16 text-gray-400">
+                        <div className="flex flex-col items-center py-16 text-slate-400 dark:text-white/40">
                             <span className="mb-4 text-5xl">🖼️</span>
-                            <p className="font-semibold dark:text-gray-500">Chưa có sự kiện đáng nhớ nào.</p>
+                            <p className="font-semibold">Chưa có sự kiện đáng nhớ nào.</p>
                         </div>
                     )}
                 </div>
             </div>
 
             {/* ── Danh sách sự kiện đã qua ─────────────────────────────────────── */}
-            <div className="bg-[#e8edf7] dark:bg-gray-900 px-6 py-12 md:px-12">
+            <div className="px-6 py-12 md:px-12">
                 <div className="mx-auto max-w-5xl">
-                    <h2 className="mb-6 text-center text-xs font-bold uppercase tracking-[0.25em] text-[#5c6bc0] dark:text-indigo-400">
+                    <h2 className="mb-6 text-center text-xs font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/70">
                         Danh sách sự kiện đã qua
                     </h2>
                     {past.length > 0 ? (
                         <PastEventsList events={past} />
                     ) : (
-                        <div className="flex flex-col items-center py-16 text-gray-400">
+                        <div className="flex flex-col items-center py-16 text-slate-400 dark:text-white/40">
                             <span className="mb-4 text-5xl">📭</span>
-                            <p className="font-semibold dark:text-gray-500">Chưa có sự kiện đã qua.</p>
+                            <p className="font-semibold">Chưa có sự kiện đã qua.</p>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* ── Footer card ──────────────────────────────────────────────────── */}
-            <div className="bg-[#dce7f5] dark:bg-gray-950 px-6 py-12 md:px-12">
-                <div className="mx-auto max-w-5xl">
-                    <div className="rounded-3xl bg-white dark:bg-gray-800 px-8 py-10 shadow-sm border border-transparent dark:border-gray-700/50">
-                        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-                            {/* Left: Logo + description */}
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-3">
-                                    {/* Black square with logo.jpg */}
-                                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[#1a1a3a]">
-                                        <Image
-                                            src="/static/images/logo.jpg"
-                                            alt="DUT AI Club logo"
-                                            width={40}
-                                            height={40}
-                                            className="h-full w-full object-cover"
-                                            unoptimized
-                                        />
-                                    </div>
-                                    <span className="text-sm font-bold uppercase tracking-widest text-[#1a1a3a] dark:text-white">
-                                        DUT AI CLUB
-                                    </span>
-                                </div>
-                                <div className="max-w-xs space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                                    <p>Câu lạc bộ trí tuệ nhân tạo DUT</p>
-                                    <p>Trường Đại học Bách Khoa – Đại học Đà Nẵng.</p>
-                                    <p className="mt-3 font-medium text-[#5c6bc0] dark:text-indigo-400">
-                                        Nơi khởi nguồn đam mê, kiến tạo tương lai.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Right: Navigation */}
-                            <div>
-                                <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
-                                    Navigation
-                                </p>
-                                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                                    {[
-                                        { label: 'About Us', href: '/about' },
-                                        { label: 'Projects', href: '/projects' },
-                                        { label: 'Events', href: '/events' },
-                                        { label: 'Blogs', href: '/blog' },
-                                    ].map((link) => (
-                                        <li key={link.href}>
-                                            <Link href={link.href}
-                                                className="transition-colors hover:text-[#5c6bc0] dark:hover:text-indigo-400">
-                                                {link.label}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Footer />
         </div>
     )
 }

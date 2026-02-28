@@ -1,15 +1,69 @@
 import { Authors, allAuthors } from 'contentlayer/generated'
-import { MDXLayoutRenderer } from 'pliny/mdx-components'
 import { genPageMetadata } from 'app/seo'
 import Image from 'next/image'
 import Link from '@/components/Link'
+import { Suspense } from 'react'
+import MembersGrid from '@/components/MembersGrid'
 import type React from 'react'
+import Footer from '@/components/Footer'
 
 export const metadata = genPageMetadata({
   title: 'Về chúng mình | DUT AI Club',
-  description: 'Gặp gỡ đội ngũ sáng lập DUT AI Club — Ban chủ nhiệm và Ban kỹ thuật của câu lạc bộ AI tại Đại học Bách khoa Đà Nẵng.',
-  keywords: ['Ban chủ nhiệm DUT AI', 'đội ngũ AI club', 'thành viên DUT AI Club', 'developer AI sinh viên Đà Nẵng'],
+  description:
+    'Gặp gỡ đội ngũ DUT AI Club — Ban chủ nhiệm, Leaders và các thành viên của câu lạc bộ AI tại Đại học Bách khoa Đà Nẵng.',
 })
+
+// ── Static data ──────────────────────────────────────────────────────────────
+
+const ACTIVITIES = [
+  {
+    icon: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+    emoji: '📚',
+    title: 'Workshops',
+    desc: 'Chuỗi buổi học thực hành từ cơ bản đến nâng cao về AI, ML và Data Science.',
+  },
+  {
+    icon: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+      </svg>
+    ),
+    emoji: '💻',
+    title: 'Projects',
+    desc: 'Triển khai các dự án thực tế ứng dụng AI vào giải quyết bài toán cuộc sống.',
+  },
+  {
+    icon: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+    emoji: '⚡',
+    title: 'Hackathons',
+    desc: 'Thi đua sáng tạo, xây dựng sản phẩm AI trong thời gian ngắn cùng đồng đội.',
+  },
+  {
+    icon: (
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+    ),
+    emoji: '🔬',
+    title: 'Research',
+    desc: 'Nghiên cứu các chủ đề AI tiên tiến và công bố kết quả trong cộng đồng.',
+  },
+]
+
+const CORE_VALUES = [
+  { label: '#Sáng tạo' },
+  { label: '#Hợp tác' },
+  { label: '#Phát triển' },
+  { label: '#Tác động' },
+]
 
 const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   github: (
@@ -29,34 +83,22 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   ),
 }
 
-type BadgeColor = 'rose' | 'primary' | 'purple' | 'amber'
+// ── Glass card style helpers ──────────────────────────────────────────────────
 
-const BADGE_CLS: Record<BadgeColor, string> = {
-  rose: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300',
-  primary: 'bg-primary-100 text-primary-800 dark:bg-primary-900/40 dark:text-primary-300',
-  purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
-  amber: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-}
+// These are now CSS classes — see the <style> tag in the component
+const glassCard = {} as React.CSSProperties
+const glassCardLight = {} as React.CSSProperties
 
-const ICON_CLS: Record<BadgeColor, string> = {
-  rose: 'bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-gray-700 dark:text-rose-300 dark:hover:bg-gray-600',
-  primary: 'bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-gray-700 dark:text-primary-300 dark:hover:bg-gray-600',
-  purple: 'bg-purple-50 text-purple-600 hover:bg-purple-100 dark:bg-gray-700 dark:text-purple-300 dark:hover:bg-gray-600',
-  amber: 'bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-gray-700 dark:text-amber-300 dark:hover:bg-gray-600',
-}
+// ── Sub-components ────────────────────────────────────────────────────────────
 
-function ProfileCard({
+function LeadershipCard({
   author,
   badge,
-  color = 'primary',
-  compact = false,
 }: {
   author: Authors
   badge: string
-  color?: BadgeColor
-  compact?: boolean
 }) {
-  const { name, avatar, occupation, company, email, github, linkedin } = author
+  const { name, avatar, occupation, email, github, linkedin } = author
   const socials = [
     email && { href: `mailto:${email}`, icon: SOCIAL_ICONS.email, label: 'Email' },
     github && { href: github, icon: SOCIAL_ICONS.github, label: 'GitHub' },
@@ -64,63 +106,67 @@ function ProfileCard({
   ].filter(Boolean) as { href: string; icon: React.ReactNode; label: string }[]
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-3xl border border-primary-100 bg-white shadow-sm transition-all hover:shadow-lg dark:border-gray-700 dark:bg-gray-800">
-      {/* Header */}
-      <div className="flex flex-col items-center pt-8 pb-0">
-        <div className={`relative overflow-hidden rounded-full border-4 border-primary-50 shadow-md dark:border-gray-700 ${compact ? 'h-20 w-20' : 'h-28 w-28'}`}>
-          {avatar ? (
-            <Image src={avatar} alt={name} fill className="object-cover" unoptimized />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-primary-100 text-3xl dark:bg-primary-900/30">👤</div>
-          )}
-        </div>
-        <span className={`mt-4 rounded-full px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest ${BADGE_CLS[color]}`}>
-          {badge}
-        </span>
-        <h3 className={`mt-2 font-extrabold text-primary-900 dark:text-white ${compact ? 'text-base' : 'text-lg'}`}>{name}</h3>
-        {occupation && <p className="mt-0.5 text-xs font-medium text-primary-600 dark:text-gray-400">{occupation}</p>}
-        {company && <p className="mb-1 text-[11px] text-gray-400 dark:text-gray-500">{company}</p>}
-
-        {/* Social icons */}
-        <div className="mt-3 flex items-center gap-2 pb-5">
+    <div
+      className="glass-card-light flex flex-col items-center rounded-3xl p-7 text-center transition-all hover:scale-[1.02]"
+    >
+      {/* Avatar */}
+      <div className="relative mb-4 h-24 w-24 overflow-hidden rounded-full border-4 border-white/30 shadow-xl">
+        {avatar ? (
+          <Image src={avatar} alt={name} fill className="object-cover" unoptimized />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-white/20 text-3xl">👤</div>
+        )}
+      </div>
+      {/* Name */}
+      <h3 className="mb-1 text-base font-extrabold text-white">{name}</h3>
+      {/* Badge */}
+      <span
+        className="mb-2 rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white/90"
+        style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.25)' }}
+      >
+        {badge}
+      </span>
+      {occupation && (
+        <p className="mb-3 text-xs text-white/60">{occupation}</p>
+      )}
+      {/* Socials */}
+      {socials.length > 0 && (
+        <div className="flex items-center gap-2">
           {socials.map((s) => (
             <Link
               key={s.label}
               href={s.href}
               aria-label={s.label}
-              className={`rounded-full p-2 transition-colors ${ICON_CLS[color]}`}
+              className="rounded-full p-1.5 text-white/70 transition-all hover:bg-white/20 hover:text-white"
             >
               {s.icon}
             </Link>
           ))}
         </div>
-      </div>
-
-      {/* Bio */}
-      <div className="border-t border-primary-50 px-6 py-5 text-sm dark:border-gray-700">
-        <MDXLayoutRenderer code={author.body.code} />
-      </div>
+      )}
     </div>
   )
 }
 
-function SectionHeading({ label, sub, color }: { label: string; sub: string; color: BadgeColor }) {
-  const barCls: Record<BadgeColor, string> = {
-    rose: 'bg-rose-400',
-    primary: 'bg-primary-400',
-    purple: 'bg-purple-400',
-    amber: 'bg-amber-400',
-  }
+function MembersGridSkeleton() {
   return (
-    <div className="mb-6 flex items-center gap-3">
-      <div className={`h-1 w-8 rounded-full ${barCls[color]}`} />
-      <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400">{sub}</p>
-        <h2 className="text-xl font-extrabold text-primary-900 dark:text-white">{label}</h2>
-      </div>
+    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7">
+      {Array.from({ length: 14 }).map((_, i) => (
+        <div
+          key={i}
+          className="flex flex-col items-center gap-2 rounded-2xl p-4 animate-pulse"
+          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
+        >
+          <div className="h-14 w-14 rounded-full bg-white/20" />
+          <div className="h-2.5 w-16 rounded bg-white/20" />
+          <div className="h-2 w-12 rounded bg-white/10" />
+        </div>
+      ))}
     </div>
   )
 }
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function AboutPage() {
   // Ban chủ nhiệm
@@ -128,50 +174,230 @@ export default function AboutPage() {
   const pctHocthu = allAuthors.find((p) => p.slug === 'pct-hocthu') as Authors
   const pctSkien = allAuthors.find((p) => p.slug === 'pct-skien') as Authors
 
-  // Ban kỹ thuật
-  const devFE = allAuthors.find((p) => p.slug === 'sparrowhawk') as Authors
-  const devBE = allAuthors.find((p) => p.slug === 'dev-be') as Authors
-
   return (
-    <div className="min-h-screen pb-20">
-      {/* Hero */}
-      <div className="relative overflow-hidden py-14">
-        <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-rose-200 opacity-30 blur-3xl dark:opacity-10" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-primary-200 opacity-30 blur-3xl dark:opacity-10" />
-        <div className="relative mx-auto max-w-5xl px-6">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-rose-100 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
-            👥 Đội ngũ DUT AI
-          </span>
-          <h1 className="text-4xl font-extrabold tracking-tight text-primary-900 sm:text-5xl dark:text-white">
-            Về chúng mình
-          </h1>
-          <p className="mt-3 max-w-xl text-base text-primary-600 dark:text-gray-400">
-            DUT AI Club được vận hành bởi những sinh viên đam mê AI tại Đại học Bách khoa Đà Nẵng.
-          </p>
-        </div>
+    <div className="about-page min-h-screen pb-16">
+      <style>{`
+        .about-page {
+          background: linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8);
+        }
+        .dark .about-page {
+          background: #020617;
+        }
+        .glass-card {
+          background: rgba(255,255,255,0.72);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(148,130,252,0.22);
+        }
+        .dark .glass-card {
+          background: rgba(255,255,255,0.10);
+          border: 1px solid rgba(255,255,255,0.18);
+        }
+        .glass-card-light {
+          background: rgba(255,255,255,0.82);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(148,130,252,0.25);
+        }
+        .dark .glass-card-light {
+          background: rgba(255,255,255,0.14);
+          border: 1px solid rgba(255,255,255,0.22);
+        }
+        .value-tag {
+          background: rgba(100,80,200,0.12);
+          border: 1px solid rgba(100,80,200,0.22);
+          backdrop-filter: blur(8px);
+        }
+        .dark .value-tag {
+          background: rgba(255,255,255,0.16);
+          border: 1px solid rgba(255,255,255,0.28);
+        }
+        .member-skeleton {
+          background: rgba(100,80,200,0.08);
+          border: 1px solid rgba(100,80,200,0.12);
+        }
+        .dark .member-skeleton {
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.12);
+        }
+        .about-blobs { display: none; }
+        .dark .about-blobs { display: block; }
+      `}</style>
+      {/* ── Decorative background blobs ── */}
+      <div className="about-blobs pointer-events-none fixed inset-0 overflow-hidden">
+        <div
+          className="absolute -top-40 left-1/3 h-[600px] w-[600px] rounded-full opacity-30 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute bottom-0 right-0 h-80 w-80 rounded-full opacity-25 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute top-1/2 left-0 h-64 w-64 rounded-full opacity-20 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 70%)' }}
+        />
       </div>
 
-      <div className="mx-auto max-w-5xl space-y-16 px-6">
+      {/* ── Hero ── */}
+      <section className="relative px-6 pt-44 pb-20 text-center md:px-12">
+        <div className="relative mx-auto max-w-3xl">
+          {/* Breadcrumb */}
+          <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-white/50">
+            ✦ Câu chuyện của chúng mình ✦
+          </p>
 
-        {/* ── Section 1: Ban chủ nhiệm ── */}
-        <section>
-          <SectionHeading label="Ban chủ nhiệm" sub="Lãnh đạo CLB" color="rose" />
-          <div className="grid gap-6 md:grid-cols-3">
-            {president && <ProfileCard author={president} badge="Chủ nhiệm" color="rose" compact />}
-            {pctHocthu && <ProfileCard author={pctHocthu} badge="P. Học thuật" color="primary" compact />}
-            {pctSkien && <ProfileCard author={pctSkien} badge="P. Sự kiện" color="amber" compact />}
+          {/* Main title */}
+          <h1
+            className="mb-6 font-black uppercase leading-none text-white"
+            style={{
+              fontSize: 'clamp(2.8rem, 8vw, 5rem)',
+              letterSpacing: '-0.03em',
+              textShadow: '0 4px 30px rgba(0,0,0,0.3)',
+            }}
+          >
+            ABOUT
+            <br />
+            <span className="text-purple-500 dark:text-[#c084fc]">DUT AI CLUB</span>
+          </h1>
+
+          {/* Description */}
+          <p className="mx-auto max-w-xl text-base leading-relaxed text-slate-600 dark:text-white/65">
+            Nơi hội tụ của những sinh viên đam mê Trí tuệ Nhân tạo — chúng mình học hỏi, sáng tạo và lan toả sức mạnh của Trí tuệ Nhân tạo.
+          </p>
+        </div>
+      </section>
+
+      <div className="relative mx-auto max-w-5xl space-y-16 px-6 md:px-12">
+
+        {/* ── Chúng tôi là ai? / Tại sao tồn tại? ── */}
+        <section className="grid gap-5 md:grid-cols-2">
+          {/* Card 1 */}
+          <div className="glass-card rounded-3xl p-8 transition-all hover:scale-[1.01]">
+            <div
+              className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-white"
+              style={{ background: 'rgba(192,132,252,0.3)', border: '1px solid rgba(192,132,252,0.4)' }}
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 className="mb-3 text-xl font-extrabold text-slate-900 dark:text-white">Chúng tôi là ai?</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
+              DUT AI là Câu lạc bộ trực thuộc Trường Đại học Bách khoa — ĐHĐN. Chúng tôi tập hợp những sinh viên đam mê AI từ các khóa, cùng nhau khám phá và ứng dụng AI để giải quyết các vấn đề thực trong cuộc sống.
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="glass-card rounded-3xl p-8 transition-all hover:scale-[1.01]">
+            <div
+              className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-white"
+              style={{ background: 'rgba(244,114,182,0.3)', border: '1px solid rgba(244,114,182,0.4)' }}
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 className="mb-3 text-xl font-extrabold text-slate-900 dark:text-white">Tại sao chúng tôi tồn tại?</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
+              Chúng tôi tin rằng AI không chỉ là công cụ mà là chìa khoá giải quyết những bài toán thực tiễn của xã hội. Chúng tôi tạo ra môi trường học tập, nghiên cứu và ứng dụng AI sát với thực tế, nơi thành viên đều có thể tỏa sáng theo cách riêng.
+            </p>
           </div>
         </section>
 
-        {/* ── Section 2: Ban kỹ thuật ── */}
+        {/* ── Hoạt động tiêu biểu ── */}
         <section>
-          <SectionHeading label="Ban kỹ thuật" sub="Website & Systems" color="primary" />
-          <div className="grid gap-6 md:grid-cols-2">
-            {devFE && <ProfileCard author={devFE} badge="FE Developer" color="primary" />}
-            {devBE && <ProfileCard author={devBE} badge="BE Developer" color="purple" />}
+          <div className="mb-10 text-center">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/50">
+              Những gì chúng mình làm
+            </p>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Hoạt động tiêu biểu</h2>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {ACTIVITIES.map((act) => (
+              <div
+                key={act.title}
+                className="glass-card flex flex-col items-center rounded-3xl p-7 text-center transition-all hover:scale-[1.03] hover:shadow-xl"
+              >
+                <div
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
+                  style={{ background: 'rgba(100,80,200,0.12)', border: '1px solid rgba(100,80,200,0.2)' }}
+                >
+                  {act.emoji}
+                </div>
+                <h4 className="mb-2 font-extrabold text-slate-900 dark:text-white">{act.title}</h4>
+                <p className="text-xs leading-relaxed text-slate-600 dark:text-white/60">{act.desc}</p>
+              </div>
+            ))}
           </div>
         </section>
 
+        {/* ── Tầm nhìn & Sứ mệnh ── */}
+        <section className="grid gap-5 md:grid-cols-2">
+          {/* Tầm nhìn */}
+          <div className="glass-card rounded-3xl p-8 transition-all hover:scale-[1.01]">
+            <h3 className="mb-4 text-2xl font-extrabold text-slate-900 dark:text-white">Tầm nhìn</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
+              Trở thành cộng đồng sinh viên AI hàng đầu miền Trung, nơi kiến thức, đam mê và ứng dụng thực tế gặp nhau để kiến tạo tương lai. Chúng mình hướng tới việc đưa DUT AI vươn ra tầm quốc tế và kết nối với mạng lưới AI toàn cầu.
+            </p>
+          </div>
+          {/* Sứ mệnh */}
+          <div className="rounded-3xl p-8 transition-all hover:scale-[1.01] glass-card">
+            <h3 className="mb-4 text-2xl font-extrabold text-slate-900 dark:text-white">Sứ mệnh</h3>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white/65">
+              Xây dựng môi trường học tập hiện đại, kết nối sinh viên với doanh nghiệp, và thúc đẩy ứng dụng AI vì sự phát triển của cộng đồng. Kết nối — Phát triển — Chia sẻ là slogan cốt lõi của chúng mình.
+            </p>
+          </div>
+        </section>
+
+        {/* ── Giá trị cốt lõi ── */}
+        <section className="glass-card rounded-3xl px-8 py-12 text-center">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
+            Những điều chúng mình trân trọng
+          </p>
+          <h2 className="mb-8 text-3xl font-extrabold text-white">Giá trị cốt lõi</h2>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {CORE_VALUES.map((v) => (
+              <span
+                key={v.label}
+                className="value-tag rounded-full px-6 py-2.5 text-sm font-bold tracking-wide text-slate-700 dark:text-white transition-all hover:scale-105"
+              >
+                {v.label}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Ban chủ nhiệm ── */}
+        <section>
+          <div className="mb-10 text-center">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/50">
+              Lãnh đạo câu lạc bộ
+            </p>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Ban chủ nhiệm</h2>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {president && <LeadershipCard author={president} badge="Chủ nhiệm" />}
+            {pctHocthu && <LeadershipCard author={pctHocthu} badge="PCT. Học thuật" />}
+            {pctSkien && <LeadershipCard author={pctSkien} badge="PCT. Sự kiện" />}
+          </div>
+        </section>
+
+        {/* ── Thành viên (dynamic) ── */}
+        <section>
+          <div className="mb-10 text-center">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/50">
+              Những người tạo nên DUT AI
+            </p>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Thành viên</h2>
+          </div>
+          <Suspense fallback={<MembersGridSkeleton />}>
+            <MembersGrid />
+          </Suspense>
+        </section>
+
+        <Footer />
       </div>
     </div>
   )

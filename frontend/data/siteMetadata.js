@@ -2,14 +2,14 @@
 const siteMetadata = {
   title: 'DUT AI Club',
   author: 'DUT AI Club',
-  headerTitle: 'DUT AI',
+  headerTitle: 'DUT AI CLUB',
   description: 'Câu lạc bộ AI hàng đầu tại Đại học Bách Khoa - ĐHĐN (DUT), nơi kết nối đam mê nghiên cứu và ứng dụng Artificial Intelligence tại Đà Nẵng.',
   language: 'vi',
   theme: 'system', // system, dark or light
   siteUrl: 'https://clb.dutai.site/',
   siteRepo: 'https://github.com/dutai-club',
   locale: 'vi-VN',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.jpg`,
+  siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-no-background.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   mastodon: '',
   email: 'contact@dutai.site',
@@ -84,7 +84,7 @@ const siteMetadata = {
       // example: https://giscus.app/themes/custom_example.css
       themeURL: '',
       // This corresponds to the `data-lang="en"` in giscus's configurations
-      lang: 'en',
+      lang: 'vi',
     },
   },
   search: {

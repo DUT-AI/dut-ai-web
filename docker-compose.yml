@@ -44,11 +44,11 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ../docker/frontend.Dockerfile
+      context: ./
+      dockerfile: ./docker/frontend.Dockerfile
       target: production
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    env_file:
+      - .env
     container_name: dut-ai-web-frontend
     restart: always
     ports:
@@ -64,3 +64,4 @@ volumes:
 networks:
   internal:
     driver: bridge
+

@@ -1,127 +1,84 @@
 import { getProjects, Project } from 'app/api-client'
 import { genPageMetadata } from 'app/seo'
-import Image from '@/components/Image'
-import Link from '@/components/Link'
-import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import ProjectsListClient from './ProjectsListClient'
+import Footer from '@/components/Footer'
 
 export const metadata = genPageMetadata({
-  title: 'Projects',
-  description: 'Các dự án AI và công nghệ được phát triển bởi thành viên DUT AI Club.',
-  keywords: ['dự án AI', 'AI project sinh viên', 'Machine Learning project DUT', 'ứng dụng AI Đà Nẵng'],
+    title: 'Projects',
+    description: 'Khám phá những giới hạn giao thoa giữa học máy và sáng tạo con người. Triển lãm những dự án được phát triển bởi Câu lạc bộ DUT AI.',
+    keywords: [
+        'dự án AI',
+        'AI project sinh viên',
+        'Machine Learning project DUT',
+        'ứng dụng AI Đà Nẵng',
+    ],
 })
 
-// Revalidate every 10 minutes on the page level
-export const revalidate = 600
+export const dynamic = 'force-dynamic'
 
-export default async function Projects() {
-  let projects: Project[] = []
-  let error = false
+export default async function ProjectsPage() {
+    let projects: Project[] = []
+    let error = false
 
-  try {
-    projects = await getProjects()
-  } catch {
-    error = true
-  }
+    try {
+        projects = await getProjects()
+    } catch {
+        error = true
+    }
 
-  return (
-    <div className="min-h-screen pb-20">
-      {/* Hero */}
-      <div className="relative overflow-hidden py-14">
-        <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-primary-200 opacity-30 blur-3xl dark:opacity-10" />
-        <div className="pointer-events-none absolute -bottom-16 -right-16 h-56 w-56 rounded-full bg-rose-200 opacity-30 blur-3xl dark:opacity-10" />
-        <div className="relative mx-auto max-w-5xl px-6">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-100 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary-800 dark:bg-primary-900/40 dark:text-primary-300">
-            🚀 Dự án & Nghiên cứu
-          </span>
-          <h1 className="text-4xl font-extrabold tracking-tight text-primary-900 sm:text-5xl dark:text-white">
-            Projects
-          </h1>
-          <p className="mt-3 max-w-xl text-base text-primary-600 dark:text-gray-400">
-            Những dự án AI, Machine Learning và Web được xây dựng bởi thành viên DUT AI Club.
-          </p>
-        </div>
-      </div>
+    return (
+        <div className="relative min-h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
+            {/* Decorative Background */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-[100%] bg-purple-300/40 dark:bg-purple-900/40 blur-[100px]" />
+                <div className="absolute top-[20%] -left-[10%] w-[500px] h-[500px] rounded-full bg-blue-300/30 dark:bg-blue-900/30 blur-[120px]" />
+                <div className="absolute bottom-[-10%] -right-[10%] w-[600px] h-[600px] rounded-full bg-fuchsia-300/30 dark:bg-fuchsia-900/20 blur-[120px]" />
+            </div>
 
-      <div className="mx-auto max-w-5xl px-6">
-        {error && (
-          <div className="mb-8 rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center dark:border-rose-800 dark:bg-rose-900/20">
-            <p className="text-rose-600 dark:text-rose-400">Không thể kết nối đến server. Vui lòng thử lại sau.</p>
-          </div>
-        )}
+            {/* ── Hero ── */}
+            <section className="relative z-10 px-6 pt-32 pb-16 sm:pt-40 text-center flex flex-col items-center">
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/50 dark:bg-white/10 border border-gray-200 dark:border-white/20 backdrop-blur-md mb-8 shadow-sm">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-blue-400"></span>
+                    <span className="text-[13px] font-black tracking-[0.15em] text-blue-700 dark:text-blue-200 uppercase">OUR PORTFOLIO</span>
+                </div>
 
-        {projects.length === 0 && !error ? (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-            <span className="mb-4 text-6xl">📦</span>
-            <p className="text-lg font-semibold">Chưa có dự án nào.</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
-              <Card
-                key={project.id}
-                className="group overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm transition-all hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
-              >
-                {(project.imgSrc || project.image_url) && (
-                  <div className="relative h-40 w-full overflow-hidden">
-                    <Image
-                      alt={project.title}
-                      src={project.imgSrc || project.image_url || ''}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      unoptimized
-                    />
-                  </div>
-                )}
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-bold leading-snug text-primary-900 dark:text-white">
-                    {project.href ? (
-                      <Link href={project.href} aria-label={`Link to ${project.title}`} className="hover:underline">
-                        {project.title}
-                      </Link>
-                    ) : project.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <CardDescription className="line-clamp-3 text-sm leading-relaxed text-primary-600 dark:text-gray-400">
-                    {project.description}
-                  </CardDescription>
-                  {/* Tags */}
-                  {project.tags && project.tags.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {project.tags.slice(0, 4).map((tag) => (
-                        <span key={tag} className="rounded-full bg-primary-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
-                          {tag}
-                        </span>
-                      ))}
+                <h1
+                    className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-blue-100 dark:via-white dark:to-pink-200 sm:text-6xl md:text-7xl lg:text-[84px] mb-8"
+                    style={{ fontFamily: 'var(--font-inter)', letterSpacing: '-0.03em', lineHeight: '1.05' }}
+                >
+                    Next-Gen <br />
+                    AI Innovations
+                </h1>
+
+                <p className="max-w-[700px] mx-auto text-[17px] md:text-[19px] text-gray-600 dark:text-slate-300 leading-[1.7] font-medium px-4">
+                    Khám phá những giới hạn giao thoa giữa học máy và sáng tạo con người.<br className="hidden md:block" />
+                    Triển lãm những dự án được phát triển bởi Câu lạc bộ DUT AI.
+                </p>
+            </section>
+
+            {/* Error */}
+            {error && (
+                <div className="mx-auto max-w-[1220px] px-6 md:px-8">
+                    <div className="mb-8 overflow-hidden rounded-[40px] border border-white/20 bg-white/10 p-8 text-center backdrop-blur-xl">
+                        <p className="text-lg text-slate-200">
+                            Không thể kết nối đến server. Vui lòng thử lại sau.
+                        </p>
                     </div>
-                  )}
-                </CardContent>
-                {(project.href || project.github_url) && (
-                  <CardFooter className="flex gap-3 pt-0">
-                    {project.href && (
-                      <Link
-                        href={project.href}
-                        className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200"
-                        aria-label={`Link to ${project.title}`}
-                      >
-                        Xem thêm →
-                      </Link>
-                    )}
-                    {project.github_url && (
-                      <Link
-                        href={project.github_url}
-                        className="inline-flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                      >
-                        GitHub ↗
-                      </Link>
-                    )}
-                  </CardFooter>
-                )}
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
+                </div>
+            )}
+
+            {/* Interactive content */}
+            {!error && projects.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+                    <span className="mb-4 text-6xl">📦</span>
+                    <p className="text-lg font-semibold">
+                        Chưa có dự án nào.
+                    </p>
+                </div>
+            ) : (
+                !error && <ProjectsListClient initialProjects={projects} />
+            )}
+            <Footer />
+        </div>
+    )
 }
