@@ -244,13 +244,13 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
     const isDark = resolvedTheme !== 'light'
     const pageBg = isDark
         ? '#020617'
-        : 'linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8)'
+        : '#f8fafc'
 
     return (
         <div className="min-h-screen pb-16" style={{ background: pageBg }}>
             {/* ── Hero + Workshop section ───────────────────────────────────────── */}
             <div className="relative px-6 py-10 md:px-12 pt-40">
-                {/* Decorative blobs — visible in dark mode only */}
+                {/* Decorative blobs — dark mode */}
                 {isDark && (
                     <>
                         <div
@@ -261,6 +261,17 @@ export default function EventsListLayout({ posts }: EventsListLayoutProps) {
                             className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full opacity-30 blur-3xl"
                             style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
                         />
+                    </>
+                )}
+                {/* Decorative blobs — light mode */}
+                {!isDark && (
+                    <>
+                        <div className="pointer-events-none fixed top-[-80px] left-[8%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]"
+                            style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }} />
+                        <div className="pointer-events-none fixed top-[35%] right-[5%] h-[320px] w-[320px] rounded-full opacity-30 blur-[80px]"
+                            style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
+                        <div className="pointer-events-none fixed bottom-[8%] left-[20%] h-[260px] w-[260px] rounded-full opacity-25 blur-[70px]"
+                            style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }} />
                     </>
                 )}
 

@@ -110,24 +110,24 @@ function LeadershipCard({
       className="glass-card-light flex flex-col items-center rounded-3xl p-7 text-center transition-all hover:scale-[1.02]"
     >
       {/* Avatar */}
-      <div className="relative mb-4 h-24 w-24 overflow-hidden rounded-full border-4 border-white/30 shadow-xl">
+      <div className="relative mb-4 h-24 w-24 overflow-hidden rounded-full border-4 border-indigo-200/40 dark:border-white/30 shadow-xl">
         {avatar ? (
           <Image src={avatar} alt={name} fill className="object-cover" unoptimized />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-white/20 text-3xl">👤</div>
+          <div className="flex h-full w-full items-center justify-center bg-indigo-100/60 dark:bg-white/20 text-3xl">👤</div>
         )}
       </div>
       {/* Name */}
-      <h3 className="mb-1 text-base font-extrabold text-white">{name}</h3>
+      <h3 className="mb-1 text-base font-extrabold text-slate-800 dark:text-white">{name}</h3>
       {/* Badge */}
       <span
-        className="mb-2 rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white/90"
-        style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.25)' }}
+        className="mb-2 rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-indigo-700 dark:text-white/90"
+        style={{ background: 'rgba(100,80,200,0.12)', border: '1px solid rgba(100,80,200,0.2)' }}
       >
         {badge}
       </span>
       {occupation && (
-        <p className="mb-3 text-xs text-white/60">{occupation}</p>
+        <p className="mb-3 text-xs text-slate-500 dark:text-white/60">{occupation}</p>
       )}
       {/* Socials */}
       {socials.length > 0 && (
@@ -137,7 +137,7 @@ function LeadershipCard({
               key={s.label}
               href={s.href}
               aria-label={s.label}
-              className="rounded-full p-1.5 text-white/70 transition-all hover:bg-white/20 hover:text-white"
+              className="rounded-full p-1.5 text-slate-500 dark:text-white/70 transition-all hover:bg-indigo-100/60 dark:hover:bg-white/20 hover:text-indigo-700 dark:hover:text-white"
             >
               {s.icon}
             </Link>
@@ -154,12 +154,11 @@ function MembersGridSkeleton() {
       {Array.from({ length: 14 }).map((_, i) => (
         <div
           key={i}
-          className="flex flex-col items-center gap-2 rounded-2xl p-4 animate-pulse"
-          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
+          className="member-skeleton flex flex-col items-center gap-2 rounded-2xl p-4 animate-pulse"
         >
-          <div className="h-14 w-14 rounded-full bg-white/20" />
-          <div className="h-2.5 w-16 rounded bg-white/20" />
-          <div className="h-2 w-12 rounded bg-white/10" />
+          <div className="h-14 w-14 rounded-full bg-indigo-200/40 dark:bg-white/20" />
+          <div className="h-2.5 w-16 rounded bg-indigo-200/50 dark:bg-white/20" />
+          <div className="h-2 w-12 rounded bg-indigo-100/50 dark:bg-white/10" />
         </div>
       ))}
     </div>
@@ -178,7 +177,7 @@ export default function AboutPage() {
     <div className="about-page min-h-screen pb-16">
       <style>{`
         .about-page {
-          background: linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8);
+          background: #f8fafc;
         }
         .dark .about-page {
           background: #020617;
@@ -223,20 +222,32 @@ export default function AboutPage() {
         .about-blobs { display: none; }
         .dark .about-blobs { display: block; }
       `}</style>
-      {/* ── Decorative background blobs ── */}
-      <div className="about-blobs pointer-events-none fixed inset-0 overflow-hidden">
-        <div
-          className="absolute -top-40 left-1/3 h-[600px] w-[600px] rounded-full opacity-30 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
-        />
-        <div
-          className="absolute bottom-0 right-0 h-80 w-80 rounded-full opacity-25 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
-        />
-        <div
-          className="absolute top-1/2 left-0 h-64 w-64 rounded-full opacity-20 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 70%)' }}
-        />
+      {/* ── Decorative background blobs (light + dark) ── */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        {/* Dark mode blobs */}
+        <div className="about-blobs absolute inset-0">
+          <div
+            className="absolute -top-40 left-1/3 h-[600px] w-[600px] rounded-full opacity-30 blur-3xl"
+            style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
+          />
+          <div
+            className="absolute bottom-0 right-0 h-80 w-80 rounded-full opacity-25 blur-3xl"
+            style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
+          />
+          <div
+            className="absolute top-1/2 left-0 h-64 w-64 rounded-full opacity-20 blur-3xl"
+            style={{ background: 'radial-gradient(circle, #818cf8 0%, transparent 70%)' }}
+          />
+        </div>
+        {/* Light mode blobs */}
+        <div className="dark:hidden">
+          <div className="absolute top-[-80px] left-[10%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]"
+            style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }} />
+          <div className="absolute top-[30%] right-[5%] h-[320px] w-[320px] rounded-full opacity-35 blur-[80px]"
+            style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
+          <div className="absolute bottom-[10%] left-[20%] h-[280px] w-[280px] rounded-full opacity-30 blur-[70px]"
+            style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }} />
+        </div>
       </div>
 
       {/* ── Hero ── */}
@@ -258,7 +269,10 @@ export default function AboutPage() {
           >
             ABOUT
             <br />
-            <span className="text-purple-500 dark:text-[#c084fc]">DUT AI CLUB</span>
+            <span
+              className="bg-clip-text text-transparent"
+              style={{ backgroundImage: 'linear-gradient(90deg, #7C3AED 0%, #C026D3 50%, #E879F9 100%)' }}
+            >DUT AI CLUB</span>
           </h1>
 
           {/* Description */}
@@ -353,10 +367,10 @@ export default function AboutPage() {
 
         {/* ── Giá trị cốt lõi ── */}
         <section className="glass-card rounded-3xl px-8 py-12 text-center">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/50">
             Những điều chúng mình trân trọng
           </p>
-          <h2 className="mb-8 text-3xl font-extrabold text-white">Giá trị cốt lõi</h2>
+          <h2 className="mb-8 text-3xl font-extrabold text-slate-900 dark:text-white">Giá trị cốt lõi</h2>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {CORE_VALUES.map((v) => (
               <span
