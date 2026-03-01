@@ -8,7 +8,7 @@ from alembic import context
 from app.core.database import Base, engine
 from app.v1.blogs.models import Blog, Keyword
 from app.v1.blogs.models import Blog, Keyword
-from app.v1.projects.models import Project
+from app.v1.projects.models import Project, ProjectMember
 from app.v1.public_events.models import PublicEvent
 from app.v1.posts.models import Post
 
