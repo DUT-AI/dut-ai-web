@@ -118,15 +118,16 @@ function LeadershipCard({
         )}
       </div>
       {/* Name */}
-      <h3 className="mb-1 text-base font-extrabold text-slate-800 dark:text-white">{name}</h3>
+      <h3 className="mb-1 text-base font-extrabold text-slate-900 dark:text-white">{name}</h3>
       {/* Badge */}
       <span
-        className="mb-2 rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-indigo-700 dark:text-white/90"
-        style={{ background: 'rgba(100,80,200,0.12)', border: '1px solid rgba(100,80,200,0.2)' }}
+        className="mb-2 rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-white/90"
+        style={{ background: 'rgba(100,80,200,0.12)', border: '1px solid rgba(100,80,200,0.20)' }}
       >
         {badge}
       </span>
       {occupation && (
+        <p className="mb-3 text-xs text-slate-500 dark:text-white/60">{occupation}</p>
         <p className="mb-3 text-xs text-slate-500 dark:text-white/60">{occupation}</p>
       )}
       {/* Socials */}
@@ -137,7 +138,7 @@ function LeadershipCard({
               key={s.label}
               href={s.href}
               aria-label={s.label}
-              className="rounded-full p-1.5 text-slate-500 dark:text-white/70 transition-all hover:bg-indigo-100/60 dark:hover:bg-white/20 hover:text-indigo-700 dark:hover:text-white"
+              className="rounded-full p-1.5 text-slate-500 dark:text-white/70 transition-all hover:bg-slate-100 dark:hover:bg-white/20 hover:text-slate-900 dark:hover:text-white"
             >
               {s.icon}
             </Link>
@@ -260,19 +261,17 @@ export default function AboutPage() {
 
           {/* Main title */}
           <h1
-            className="mb-6 font-black uppercase leading-none text-white"
+            className="mb-6 font-black uppercase leading-none"
             style={{
               fontSize: 'clamp(2.8rem, 8vw, 5rem)',
               letterSpacing: '-0.03em',
-              textShadow: '0 4px 30px rgba(0,0,0,0.3)',
             }}
           >
-            ABOUT
+            <span className="bg-gradient-to-r from-blue-500 via-purple-600 to-red-500 bg-clip-text text-transparent dark:from-white dark:via-white dark:to-white dark:drop-shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+              ABOUT
+            </span>
             <br />
-            <span
-              className="bg-clip-text text-transparent"
-              style={{ backgroundImage: 'linear-gradient(90deg, #7C3AED 0%, #C026D3 50%, #E879F9 100%)' }}
-            >DUT AI CLUB</span>
+            <span className="bg-gradient-to-r from-blue-500 via-purple-600 to-red-500 bg-clip-text text-transparent dark:from-purple-300 dark:via-purple-400 dark:to-[#c084fc]">DUT AI CLUB</span>
           </h1>
 
           {/* Description */}

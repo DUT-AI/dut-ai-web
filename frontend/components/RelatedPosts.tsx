@@ -14,10 +14,10 @@ interface RelatedPostsProps {
 }
 
 const gradients = [
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#22c55e1a] dark:to-[#eab3081a] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#64748b1a] dark:to-[#14b8a61a] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#f973161a] dark:to-[#ec48991a] bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED]', // Orange to Pink
-    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#8b5cf61a] dark:to-[#d946ef1a] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#22c55e40] dark:to-[#eab30840] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#64748b40] dark:to-[#14b8a640] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#f9731640] dark:to-[#ec489940] bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED]', // Orange to Pink
+    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#8b5cf640] dark:to-[#d946ef40] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
 ]
 
 export default function RelatedPosts({ posts, hideTitle }: RelatedPostsProps) {
@@ -68,20 +68,20 @@ export default function RelatedPosts({ posts, hideTitle }: RelatedPostsProps) {
                         <button
                             onClick={() => scrollByAmount('left')}
                             disabled={!canScrollLeft}
-                            className={`flex items-center justify-center bg-white hover:bg-gray-50 transition-colors w-10 h-10 rounded-full border border-gray-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex items-center justify-center bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
                             aria-label="Previous"
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-700">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-700 dark:text-gray-300">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
                         <button
                             onClick={() => scrollByAmount('right')}
                             disabled={!canScrollRight}
-                            className={`flex items-center justify-center bg-white hover:bg-gray-50 transition-colors w-10 h-10 rounded-full border border-gray-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex items-center justify-center bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
                             aria-label="Next"
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-700">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-700 dark:text-gray-300">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
                         </button>
