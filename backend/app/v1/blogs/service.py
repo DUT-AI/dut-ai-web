@@ -13,6 +13,23 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         super().__init__(repo, entity_name="Blog")
         self._factory = service_factory
 
+    def _serialize_blog(self, blog: Blog) -> dict:
+        """Serialize a Blog model instance to dict with authors and keywords."""
+        return {
+            "id": blog.id,
+            "title": blog.title,
+            "content": blog.content,
+            "image_url": blog.image_url,
+            "views": blog.views,
+            "authors": [
+                {"id": u.id, "name": u.name, "avatar_url": u.avatar_url}
+                for u in blog.authors_rel
+            ],
+            "keywords": blog.keywords_rel,
+            "created_at": blog.created_at,
+            "updated_at": blog.updated_at,
+        }
+
     def get_by_id(self, id: int) -> Blog:
         blog = super().get_by_id(id)
         if not blog:
@@ -73,19 +90,10 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         blog = self.get_by_id(id)
         related = self.repo.get_related_blogs(id, related_limit)
 
-        from sqlalchemy import inspect
+        blog_dict = self._serialize_blog(blog)
+        blog_dict["related_blogs"] = [self._serialize_blog(r) for r in related]
 
-        cols = [
-            c.key for c in inspect(blog).mapper.column_attrs if c.key != "search_vector"
-        ]
-
-        blog_dict = {c: getattr(blog, c) for c in cols}
-        blog_dict["keywords"] = blog.keywords_rel
-
-        return {
-            **blog_dict,
-            "related_blogs": related,
-        }
+        return blog_dict
 
     def get_all_blogs(
         self,
@@ -93,15 +101,14 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         keyword: Optional[str] = None,
         limit: Optional[int] = None,
     ):
-        # We need to update repository to support limit if we want to use it in Homepage
-        # For now let's just use slicing if limit is provided
         blogs = self.repo.get_all_blogs(title=title, keyword=keyword)
         if limit:
-            return blogs[:limit]
-        return blogs
+            blogs = blogs[:limit]
+        return [self._serialize_blog(b) for b in blogs]
 
     def get_most_viewed_in_latest_month(self, limit: int = 5):
-        return self.repo.get_most_viewed_in_latest_month(limit)
+        blogs = self.repo.get_most_viewed_in_latest_month(limit)
+        return [self._serialize_blog(b) for b in blogs]
 
     def get_top_authors(self, limit: int = 5):
         return self.repo.get_top_authors(limit)

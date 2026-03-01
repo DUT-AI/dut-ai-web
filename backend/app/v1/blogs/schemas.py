@@ -2,15 +2,22 @@ from datetime import datetime
 from typing import List, Optional
 
 from app.v1.keywords.schema import KeywordResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+
+# Author object embedded in BlogResponse
+class AuthorBrief(BaseModel):
+    id: int
+    name: str
+    avatar_url: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Base class chứa các trường chung
 class BlogBase(BaseModel):
     title: str
     content: str
-    authors: Optional[str] = None
-    keywords: List[KeywordResponse] = []
     image_url: Optional[str] = None
 
 
@@ -28,20 +35,23 @@ class BlogUpdate(BlogBase):
 class BlogResponse(BlogBase):
     id: int
     views: int
+    authors: List[AuthorBrief] = []
+    keywords: List[KeywordResponse] = []
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Schema chi tiết với bài viết liên quan
 class BlogDetailResponse(BlogResponse):
-    related_blogs: list[BlogResponse] = []
+    related_blogs: list["BlogResponse"] = []
 
 
 class AuthorStatsResponse(BaseModel):
-    author: str
+    id: int
+    name: str
+    avatar_url: Optional[str] = None
     total_views: int
     post_count: int
     

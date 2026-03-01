@@ -73,10 +73,10 @@ export async function getIntroduction(id: number): Promise<Introduction> {
     return apiFetch<Introduction>(`/introductions/${id}`, { revalidate: 600 })
 }
 
-// ── Members ───────────────────────────────────────────────────────────────
+// ── Members (backend endpoint: /users) ────────────────────────────────────
 
 export async function getMembers(): Promise<Member[]> {
-    return apiFetch<Member[]>('/members', { revalidate: 300 })
+    return apiFetch<Member[]>('/users', { revalidate: 300 })
 }
 
 // ── Public Events (Workshops & Seminars) ─────────────────────────────────
@@ -129,4 +129,57 @@ export interface PastEvent {
     cover?: string
     date?: string
     facebook_url?: string
+}
+
+// ── Blogs ─────────────────────────────────────────────────────────────────
+
+export interface BlogAuthor {
+    id: number
+    name: string
+    avatar_url?: string
+}
+
+export interface BlogKeyword {
+    id: number
+    keyword_name: string
+    number_blog_contain: number
+}
+
+export interface BlogPost {
+    id: number
+    title: string
+    content: string
+    image_url?: string
+    views: number
+    authors: BlogAuthor[]
+    keywords: BlogKeyword[]
+    created_at: string
+    updated_at: string
+}
+
+export interface AuthorStats {
+    id: number
+    name: string
+    avatar_url?: string
+    total_views: number
+}
+
+export async function getBlogs(params?: { title?: string; keyword?: string }): Promise<BlogPost[]> {
+    const searchParams = new URLSearchParams()
+    if (params?.title) searchParams.set('title', params.title)
+    if (params?.keyword) searchParams.set('keyword', params.keyword)
+    const qs = searchParams.toString()
+    return apiFetch<BlogPost[]>(`/blogs/${qs ? `?${qs}` : ''}`, { revalidate: 300 })
+}
+
+export async function getFeaturedBlogs(limit = 5): Promise<BlogPost[]> {
+    return apiFetch<BlogPost[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
+}
+
+export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
+    return apiFetch<AuthorStats[]>(`/blogs/top-authors?limit=${limit}`, { revalidate: 300 })
+}
+
+export async function getBlogKeywords(): Promise<BlogKeyword[]> {
+    return apiFetch<BlogKeyword[]>('/keywords/', { revalidate: 600 })
 }

@@ -70,10 +70,10 @@ export async function getIntroduction(id: number): Promise<Introduction> {
     return apiFetch<Introduction>(`/introductions/${id}`, { revalidate: 600 })
 }
 
-// ── Members ───────────────────────────────────────────────────────────────
+// ── Members (backend endpoint: /users) ────────────────────────────────────
 
 export async function getMembers(): Promise<Member[]> {
-    return apiFetch<Member[]>('/members', { revalidate: 300 })
+    return apiFetch<Member[]>('/users', { revalidate: 300 })
 }
 
 // ── Author Stats ───────────────────────────────────────────────────────────
