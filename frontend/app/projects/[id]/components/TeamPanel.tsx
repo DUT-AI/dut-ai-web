@@ -1,6 +1,6 @@
 import type { Member } from 'app/api-client'
 import Image from '@/components/Image'
-import { jakarta, glassClass } from './styles'
+import { glassClass } from './styles'
 
 interface TeamPanelProps {
   members: Record<string, Member[]>
@@ -27,7 +27,7 @@ export default function TeamPanel({ members }: TeamPanelProps) {
       <div className="mb-8 flex items-center gap-4 flex-shrink-0">
         <h2
           className="text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl lg:text-[42px]"
-          style={{ ...jakarta, lineHeight: '1.1em' }}
+          style={{ lineHeight: '1.1em' }}
         >
           Thành viên dự án
         </h2>
@@ -74,10 +74,10 @@ function MemberCard({ member }: { member: Member }) {
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent pointer-events-none" />
 
       <div className="absolute bottom-0 left-0 right-0 p-3 pb-4 text-left flex flex-col items-start">
-        <p className="text-[13px] sm:text-[15px] font-bold text-white leading-tight drop-shadow-md whitespace-normal" style={jakarta}>
+        <p className="text-[13px] sm:text-[15px] font-bold text-white leading-tight drop-shadow-md whitespace-normal">
           {member.name}
         </p>
-        <p className="text-[10px] sm:text-[11px] text-white/80 mt-1 drop-shadow-md" style={jakarta}>
+        <p className="text-[10px] sm:text-[11px] text-white/80 mt-1 drop-shadow-md">
           {member.role_name || 'Member'}
         </p>
       </div>

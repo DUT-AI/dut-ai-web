@@ -1,5 +1,5 @@
 import type { Project } from 'app/api-client'
-import { glassClass, jakarta } from './styles'
+import { glassClass } from './styles'
 
 interface TechStackPanelProps {
   project: Project
@@ -22,17 +22,17 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
 
       <h3
         className="mb-6 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl"
-        style={{ ...jakarta, lineHeight: '1.111em' }}
+        style={{ lineHeight: '1.111em' }}
       >
         Tech Stack – Công nghệ sử dụng
       </h3>
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl" style={jakarta}>
+          <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl">
             01. FrontEnd
           </h4>
-          <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]" style={jakarta}>
+          <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]">
             <li className="text-sm sm:text-base">React / Next.js – Xây dựng giao diện web</li>
             <li className="text-sm sm:text-base">
               TailwindCSS / Prisma – UI hiển thị, responsive
@@ -44,10 +44,10 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
         </div>
 
         <div>
-          <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl" style={jakarta}>
+          <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl">
             02. BackEnd
           </h4>
-          <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]" style={jakarta}>
+          <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]">
             <li className="text-sm sm:text-base">FastAPI / Django Flask Python – Xây API</li>
             <li className="text-sm sm:text-base">PostgreSQL – Hệ CSDL/Frontend à server</li>
             <li className="text-sm sm:text-base">JWT Authentication – Bảo mật người dùng</li>
@@ -62,7 +62,6 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
             <span
               key={tag}
               className="proj-tag rounded-full px-4 py-1.5 text-xs font-medium backdrop-blur-sm"
-              style={jakarta}
             >
               {tag}
             </span>

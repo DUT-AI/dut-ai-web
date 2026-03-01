@@ -1,28 +1,10 @@
-import { Alfa_Slab_One, Plus_Jakarta_Sans, Inter } from 'next/font/google'
-
-const alfaSlabOne = Alfa_Slab_One({
-    weight: '400',
-    subsets: ['latin', 'vietnamese'],
-    display: 'swap',
-})
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-    subsets: ['latin', 'vietnamese'],
-    display: 'swap',
-})
-
-const inter = Inter({
-    subsets: ['latin', 'vietnamese'],
-    display: 'swap',
-})
-
 export default function RoadmapSection() {
     return (
-        <section id="roadmap" className={`px-6 py-20 md:px-12 max-w-[1200px] mx-auto ${plusJakartaSans.className}`}>
+        <section id="roadmap" className="px-6 py-20 md:px-12 max-w-[1200px] mx-auto">
             {/* Header */}
             <div className="mb-20 flex flex-col items-center text-center">
                 <h2
-                    className={`text-[42px] md:text-[60px] font-normal leading-[1.2] tracking-[-0.02em] bg-gradient-to-b from-[#003C9F] to-[#C97FA9] bg-clip-text text-transparent uppercase drop-shadow-sm ${alfaSlabOne.className}`}
+                    className="text-[42px] md:text-[60px] leading-[1.2] tracking-[-0.02em] bg-gradient-to-b from-[#003C9F] to-[#C97FA9] bg-clip-text text-transparent uppercase drop-shadow-sm"
                 >
                     ROADMAP TO AI ENGINEER
                 </h2>
@@ -46,8 +28,8 @@ export default function RoadmapSection() {
                             🎓
                         </div>
                         <div className="flex flex-col">
-                            <p className={`text-[12px] font-extrabold uppercase tracking-[0.3em] text-[#2563EB] mb-1 ${inter.className}`}>Phase 01</p>
-                            <h3 className={`text-[32px] md:text-[40px] font-extrabold leading-[1.1] text-[#1E293B] dark:text-white ${inter.className}`}>Học tập cùng Mentor</h3>
+                            <p className="text-[12px] font-extrabold uppercase tracking-[0.3em] text-[#2563EB] mb-1">Phase 01</p>
+                            <h3 className="text-[32px] md:text-[40px] font-extrabold leading-[1.1] text-[#1E293B] dark:text-white">Học tập cùng Mentor</h3>
                         </div>
                     </div>
 
@@ -65,7 +47,7 @@ export default function RoadmapSection() {
                                 <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-[16px] ${item.bg} text-2xl`}>
                                     {item.icon}
                                 </div>
-                                <h4 className={`text-[20px] font-bold text-[#1E293B] dark:text-white mb-2 ${plusJakartaSans.className}`}>{item.title}</h4>
+                                <h4 className="text-[20px] font-bold text-[#1E293B] dark:text-white mb-2">{item.title}</h4>
                                 <p className="text-[14px] leading-[1.6] text-[#475569] dark:text-gray-400 mb-8">{item.desc}</p>
                                 <div className="mt-auto">
                                     <span className={`rounded-md px-3 py-1.5 text-[10px] font-bold uppercase ${item.timeColor} ${item.bg}`}>
@@ -88,8 +70,8 @@ export default function RoadmapSection() {
                             🚀
                         </div>
                         <div className="flex flex-col">
-                            <p className={`text-[12px] font-extrabold uppercase tracking-[0.3em] text-[#EC4899] mb-1 ${inter.className}`}>Phase 02</p>
-                            <h3 className={`text-[32px] md:text-[40px] font-extrabold leading-[1.1] text-[#1E293B] dark:text-white ${inter.className}`}>Thực chiến & Trải nghiệm</h3>
+                            <p className="text-[12px] font-extrabold uppercase tracking-[0.3em] text-[#EC4899] mb-1">Phase 02</p>
+                            <h3 className="text-[32px] md:text-[40px] font-extrabold leading-[1.1] text-[#1E293B] dark:text-white">Thực chiến & Trải nghiệm</h3>
                         </div>
                     </div>
 
@@ -106,7 +88,7 @@ export default function RoadmapSection() {
                                 <div className={`flex h-20 w-20 items-center justify-center rounded-full ${item.bg} text-3xl`}>
                                     {item.icon}
                                 </div>
-                                <span className={`text-[18px] leading-snug font-bold text-[#1E293B] dark:text-white text-center whitespace-pre-wrap ${plusJakartaSans.className}`}>{item.title}</span>
+                                <span className="text-[18px] leading-snug font-bold text-[#1E293B] dark:text-white text-center whitespace-pre-wrap">{item.title}</span>
                             </div>
                         ))}
 
@@ -119,7 +101,7 @@ export default function RoadmapSection() {
                                 <div className={`flex h-20 w-20 items-center justify-center rounded-full ${item.bg} text-3xl`}>
                                     {item.icon}
                                 </div>
-                                <span className={`text-[18px] font-bold text-[#1E293B] dark:text-white text-center ${plusJakartaSans.className}`}>{item.title}</span>
+                                <span className="text-[18px] font-bold text-[#1E293B] dark:text-white text-center">{item.title}</span>
                             </div>
                         ))}
                     </div>
