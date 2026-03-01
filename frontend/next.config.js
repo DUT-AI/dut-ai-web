@@ -1,8 +1,4 @@
 const path = require('path')
-const dotenv = require('dotenv')
-
-// Load file .env từ thư mục cha (root directory)
-dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 const { withContentlayer } = require('next-contentlayer2')
 

@@ -64,11 +64,14 @@ class PostAdmin(BaseAdmin, model=Post):
     name_plural = "Posts"
     icon = "fa-solid fa-camera-retro"
 
-    column_list = [Post.id, Post.title, Post.hashtag]
+    column_list = [Post.id, Post.title, Post.hashtag, Post.events_date]
     form_columns = [
         Post.title,
+        Post.summary,
         Post.description,
         Post.hashtag,
+        Post.events_date,
+        Post.facebook_url,
         Post.img_urls,
     ]
 

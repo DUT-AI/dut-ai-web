@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqladmin import Admin
 
@@ -8,6 +9,17 @@ from app.v1.v1_router import v1_router
 
 
 app = FastAPI(title="DUT-AI FastAPI Backend")
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "*"
+    ],  # Trong môi trường dev có thể để "*" hoặc cụ thể http://localhost:3000
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

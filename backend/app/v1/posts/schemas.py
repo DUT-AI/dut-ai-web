@@ -6,8 +6,11 @@ from typing import Optional, List
 class PostBase(BaseModel):
     title: str
     description: Optional[str] = None
+    summary: Optional[str] = None
     img_urls: Optional[List[str]] = None
     hashtag: Optional[str] = None
+    events_date: Optional[datetime] = None
+    facebook_url: Optional[str] = None
 
 
 class PostCreate(PostBase):

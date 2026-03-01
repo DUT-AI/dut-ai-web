@@ -69,13 +69,17 @@ class PublicEventAdmin(BaseAdmin, model=PublicEvent):
         PublicEvent.title,
         PublicEvent.events_date,
         PublicEvent.location,
+        PublicEvent.tags,
     ]
     form_columns = [
         PublicEvent.title,
+        PublicEvent.summary,
         PublicEvent.description,
         PublicEvent.events_date,
         PublicEvent.location,
         PublicEvent.register_link,
+        PublicEvent.facebook_url,
+        PublicEvent.tags,
         PublicEvent.img_url,
     ]
 
