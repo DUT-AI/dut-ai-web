@@ -6,12 +6,12 @@ from fastapi import HTTPException, UploadFile
 from app.core.base_service import BaseService
 from app.v1.media.service import MinioService
 from .repository import ProjectRepository
-from .models import Project
-from .schemas import ProjectCreate, ProjectUpdate
+from .models import Project, ProjectMember
+from .schemas import ProjectCreate, ProjectUpdate, ProjectMemberInfo, ProjectMemberResponse
 
 
 class ProjectService(BaseService[Project, ProjectCreate, ProjectUpdate]):
-    """Project service — kế thừa BaseService, thêm logic upload ảnh."""
+    """Project service — kế thừa BaseService, thêm logic upload ảnh & quản lý members."""
 
     def __init__(self, repo: ProjectRepository, minio: MinioService):
         super().__init__(repo, entity_name="Project")
@@ -21,8 +21,12 @@ class ProjectService(BaseService[Project, ProjectCreate, ProjectUpdate]):
         self,
         title: str,
         description: Optional[str] = None,
-        product_link: Optional[str] = None,
         image: Optional[UploadFile] = None,
+        features: Optional[str] = None,
+        technologies: Optional[str] = None,
+        demo_url: Optional[str] = None,
+        video_url: Optional[str] = None,
+        members: Optional[list[ProjectMemberInfo]] = None,
     ) -> Project:
         """Tạo project mới, upload ảnh lên MinIO nếu có."""
         image_url = (
@@ -32,10 +36,22 @@ class ProjectService(BaseService[Project, ProjectCreate, ProjectUpdate]):
         data = ProjectCreate(
             title=title,
             description=description,
-            product_link=product_link,
             image_url=image_url,
+            features=features,
+            technologies=technologies,
+            demo_url=demo_url,
+            video_url=video_url,
         )
-        return self.repo.create(**data.model_dump())
+        # Create project (without members field)
+        project = self.repo.create(**data.model_dump(exclude={"members"}))
+
+        # Add members if provided
+        if members:
+            for m in members:
+                self.repo.add_member(project.id, m.user_id, m.role)
+
+        # Reload to include members
+        return self.repo.get_by_id(project.id)
 
     async def update_image(self, project_id: int, image: UploadFile) -> Project:
         """Upload/thay đổi ảnh cho project đã có."""
@@ -63,3 +79,39 @@ class ProjectService(BaseService[Project, ProjectCreate, ProjectUpdate]):
             filename=object_name,
             content_type=image.content_type or "image/png",
         )
+
+    # --- Member management ---
+
+    def add_member(self, project_id: int, member: ProjectMemberInfo) -> ProjectMemberResponse:
+        """Thêm thành viên vào project."""
+        # Verify project exists
+        self.get_by_id(project_id)
+        pm = self.repo.add_member(project_id, member.user_id, member.role)
+        return ProjectMemberResponse(
+            id=pm.id,
+            user_id=pm.user_id,
+            user_name=pm.user.name if pm.user else "Unknown",
+            user_avatar_url=pm.user.avatar_url if pm.user else None,
+            role=pm.role,
+        )
+
+    def remove_member(self, project_id: int, member_id: int) -> None:
+        """Xoá thành viên khỏi project."""
+        self.get_by_id(project_id)  # verify project exists
+        if not self.repo.remove_member(member_id):
+            raise HTTPException(status_code=404, detail="Member not found")
+
+    def get_members(self, project_id: int) -> list[ProjectMemberResponse]:
+        """Lấy danh sách thành viên của project."""
+        self.get_by_id(project_id)
+        members = self.repo.get_members(project_id)
+        return [
+            ProjectMemberResponse(
+                id=m.id,
+                user_id=m.user_id,
+                user_name=m.user.name if m.user else "Unknown",
+                user_avatar_url=m.user.avatar_url if m.user else None,
+                role=m.role,
+            )
+            for m in members
+        ]

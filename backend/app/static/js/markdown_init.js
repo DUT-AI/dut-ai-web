@@ -9,7 +9,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (
         textarea.name === "content" ||
         textarea.id === "content" ||
-        textarea.name === "description"
+        textarea.name === "description" ||
+        textarea.name === "features" ||
+        textarea.name === "technologies"
       ) {
         console.log("Initializing EasyMDE for:", textarea.name);
 
