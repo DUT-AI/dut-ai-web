@@ -1,18 +1,25 @@
 'use client'
 
-import React, { useState } from 'react'
-import { CoreContent } from 'pliny/utils/contentlayer'
-import type { Blog } from 'contentlayer/generated'
+import React, { useState, useEffect, Suspense } from 'react'
+import { usePathname } from 'next/navigation'
+import type { PublicEvent, Post, PastEvent } from 'app/api-client'
 import Link from '@/components/Link'
 import Image from 'next/image'
 import siteMetadata from '@/data/siteMetadata'
 import Footer from '@/components/Footer'
 import { useTheme } from 'next-themes'
 
+interface PaginationProps {
+    totalPages: number
+    currentPage: number
+}
+
 interface EventsListLayoutProps {
-    posts: CoreContent<Blog>[]
-    initialDisplayPosts?: CoreContent<Blog>[]
-    pagination?: { totalPages: number; currentPage: number }
+    publicEvents: PublicEvent[]
+    posts: Post[]
+    initialDisplayPosts?: PastEvent[]
+    pagination?: PaginationProps
+    error?: boolean
 }
 
 // ── Facebook SVG icon ──────────────────────────────────────────────────────────
@@ -51,33 +58,24 @@ const MemberCard = ({ bg }: { bg: string }) => (
     </div>
 )
 
-// ── Scattered photo cards — 4 cards fanned like the design mockup ─────────────
+// ── Scattered photo cards ───────────────────────────────────────────────────
 const PhotoStack = ({ images, flip = false }: { images: string[]; flip?: boolean }) => {
-    // W×H for all cards
     const W = 170, H = 205
 
-    // flip=false → PhotoBlock is on the LEFT column (odd rows)
-    // flip=true  → PhotoBlock is on the RIGHT column (even rows)
-    // Positions carefully match the design screenshots:
-    //   left  pattern: back-top-left, back-top-right, front-bottom-right, front-bottom-left
-    //   right pattern: back-top-right, back-top-left, front-bottom-left,  front-bottom-right
     const cards = flip
         ? [
-            // Right-side layout (2nd screenshot)
             { top: 0, left: 140, rotate: 12, z: 0, bg: 'linear-gradient(150deg,#dce8dc,#bdd4c0)' },
             { top: 18, left: 45, rotate: 5, z: 1, bg: 'linear-gradient(150deg,#c8ddc8,#a8c8ac)' },
             { top: 108, left: 0, rotate: -7, z: 2, bg: 'linear-gradient(150deg,#a8bfb0,#8eab94)' },
             { top: 100, left: 150, rotate: 3, z: 3, bg: 'linear-gradient(150deg,#3d6b5e,#2d5045)' },
         ]
         : [
-            // Left-side layout (1st screenshot)
             { top: 0, left: 0, rotate: -12, z: 0, bg: 'linear-gradient(150deg,#c8ddc8,#a8c8ac)' },
             { top: 18, left: 105, rotate: -5, z: 1, bg: 'linear-gradient(150deg,#dce8dc,#bdd4c0)' },
             { top: 108, left: 165, rotate: 8, z: 2, bg: 'linear-gradient(150deg,#e8dcc8,#d4c4a0)' },
             { top: 100, left: 10, rotate: -2, z: 3, bg: 'linear-gradient(150deg,#3d6b5e,#2d5045)' },
         ]
 
-    // Cycle images so all 4 slots are always filled with real photos
     const visible: string[] = Array.from({ length: 4 }, (_, i) =>
         images.length > 0 ? images[i % images.length] : ''
     )
@@ -108,28 +106,67 @@ const PhotoStack = ({ images, flip = false }: { images: string[]; flip?: boolean
     )
 }
 
-// ── Past events paged list ─────────────────────────────────────────────────────
-const PAST_PER_PAGE = 5
-
-function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
-    const [page, setPage] = useState(1)
-    const totalPages = Math.ceil(events.length / PAST_PER_PAGE)
-    const slice = events.slice((page - 1) * PAST_PER_PAGE, page * PAST_PER_PAGE)
+// ── Pagination component (URL-based) ──────────────────────────────────────────
+function Pagination({ totalPages, currentPage }: PaginationProps) {
+    const pathname = usePathname()
+    const basePath = pathname
+        .replace(/^\//, '')
+        .replace(/\/page\/\d+\/?$/, '')
+        .replace(/\/$/, '')
+    const prevPage = currentPage - 1 > 0
+    const nextPage = currentPage + 1 <= totalPages
 
     return (
+        <div className="space-y-2 pt-6 pb-8 md:space-y-5">
+            <nav className="flex justify-between items-center text-sm font-medium">
+                {!prevPage ? (
+                    <button className="cursor-auto text-gray-400 disabled:opacity-50 dark:text-gray-500" disabled>
+                        Trước
+                    </button>
+                ) : (
+                    <Link
+                        href={
+                            currentPage - 1 === 1
+                                ? `/${basePath}`
+                                : `/${basePath}/page/${currentPage - 1}`
+                        }
+                        rel="prev"
+                        className="text-[#5c6bc0] hover:opacity-70 transition-opacity"
+                    >
+                        Trước
+                    </Link>
+                )}
+                <span className="text-gray-600 dark:text-gray-300 font-bold">
+                    Trang {currentPage} / {totalPages}
+                </span>
+                {!nextPage ? (
+                    <button className="cursor-auto text-gray-400 disabled:opacity-50 dark:text-gray-500" disabled>
+                        Sau
+                    </button>
+                ) : (
+                    <Link
+                        href={`/${basePath}/page/${currentPage + 1}`}
+                        rel="next"
+                        className="text-[#5c6bc0] hover:opacity-70 transition-opacity"
+                    >
+                        Sau
+                    </Link>
+                )}
+            </nav>
+        </div>
+    )
+}
+
+// ── Past events list ─────────────────────────────────────────────────────
+function PastEventsList({ events, pagination }: { events: PastEvent[], pagination?: PaginationProps }) {
+    return (
         <div>
-            {slice.map((ev) => {
-                const cover = ev.images?.[0] ?? null
+            {events.map((ev) => {
                 const date = ev.date ? new Date(ev.date).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' }) : ''
-                const fbLink = ((ev as any).facebook as string | undefined) ?? siteMetadata.facebook
-                const stats: { label: string }[] = []
-                if ((ev as any).attendees) stats.push({ label: `${(ev as any).attendees} Người tham gia` })
-                if ((ev as any).awards) stats.push({ label: `${(ev as any).awards} Giải thưởng lớn` })
-                if ((ev as any).members) stats.push({ label: `${(ev as any).members}+ Thành viên` })
-                if ((ev as any).mentors) stats.push({ label: `${(ev as any).mentors} Mentors` })
+                const fbLink = ev.facebook_url ?? siteMetadata.facebook
 
                 return (
-                    <div key={ev.path}
+                    <div key={ev.id}
                         className="mb-3 flex items-center gap-4 rounded-2xl p-4 shadow-sm border"
                         style={{
                             background: 'rgba(255,255,255,0.75)',
@@ -138,8 +175,8 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
                         }}>
                         {/* Thumbnail */}
                         <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-[#c5cfc8]">
-                            {cover ? (
-                                <Image src={cover} alt={ev.title} fill className="object-cover" unoptimized />
+                            {ev.cover ? (
+                                <Image src={ev.cover} alt={ev.title} fill className="object-cover" unoptimized />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center">
                                     <svg className="h-8 w-8 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,388 +203,215 @@ function PastEventsList({ events }: { events: CoreContent<Blog>[] }) {
                             </p>
                         </div>
 
-                        {/* Stats */}
-                        {stats.length > 0 && (
-                            <div className="hidden items-center gap-6 text-xs text-gray-500 sm:flex">
-                                {stats.map((s) => (
-                                    <span key={s.label} className="flex items-center gap-1">
-                                        <span className="text-[#5c6bc0]">•</span>
-                                        {s.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Action */}
-                        <Link href={`/${ev.path}`}
-                            className="ml-auto flex-shrink-0 rounded-lg bg-[#5c6bc0]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[#5c6bc0] transition-colors hover:bg-[#5c6bc0]/20">
-                            {(ev as any).hasGallery ? 'Xem lại ảnh' : 'Tài liệu'}
-                        </Link>
+                        {/* Type badge */}
+                        <span className="ml-auto flex-shrink-0 rounded-lg bg-[#5c6bc0]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[#5c6bc0]">
+                            {ev.type === 'public_event' ? 'Workshop' : 'Kỷ niệm'}
+                        </span>
                     </div>
                 )
             })}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="mt-5 flex items-center justify-center gap-2">
-                    <button
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="rounded-full border border-purple-200 px-4 py-1.5 text-sm font-semibold text-gray-600 disabled:opacity-30 hover:bg-white/60">
-                        ← Trước
-                    </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                        <button
-                            key={n}
-                            onClick={() => setPage(n)}
-                            className={`h-8 w-8 rounded-full text-sm font-bold transition-colors ${n === page
-                                ? 'bg-[#5c6bc0] text-white'
-                                : 'text-gray-500 hover:bg-white/60'
-                                }`}>
-                            {n}
-                        </button>
-                    ))}
-                    <button
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={page === totalPages}
-                        className="rounded-full border border-purple-200 px-4 py-1.5 text-sm font-semibold text-gray-600 disabled:opacity-30 hover:bg-white/60">
-                        Sau →
-                    </button>
+            {/* Pagination Component */}
+            {pagination && pagination.totalPages > 1 && (
+                <div className="mt-8 border-t border-gray-100/50 pt-2">
+                    <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} />
                 </div>
             )}
         </div>
     )
 }
 
-// ── Main layout ────────────────────────────────────────────────────────────────
-export default function EventsListLayout({ posts }: EventsListLayoutProps) {
+// ── Main layout inner (handles featured + lists) ───────────────────────────
+function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagination, error }: EventsListLayoutProps) {
     const now = new Date()
-    const upcoming = posts.filter((p) => {
-        const d = p.date ? new Date(p.date) : null
+
+    // Workshops & Seminar: find upcoming
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const workshopEvent = publicEvents.find((ev) => {
+        const d = ev.events_date ? new Date(ev.events_date) : null
         return d && d >= now
-    })
-    const past = posts.filter((p) => {
-        const d = p.date ? new Date(p.date) : null
-        return !d || d < now
+    }) ?? publicEvents[0] ?? null
+
+    // Memorable events
+    const memorableEvents = posts.filter((p) => (p.img_urls && p.img_urls.length > 0))
+
+    // Sorted past events
+    const allPastEvents: PastEvent[] = [
+        ...publicEvents.map((ev) => ({
+            id: `pe-${ev.id}`,
+            type: 'public_event' as const,
+            title: ev.title,
+            summary: ev.summary || ev.description,
+            cover: ev.img_url,
+            date: ev.events_date || ev.created_at,
+            facebook_url: ev.facebook_url,
+        })),
+        ...posts.map((p) => ({
+            id: `post-${p.id}`,
+            type: 'post' as const,
+            title: p.title,
+            summary: p.summary || p.description,
+            cover: p.img_urls?.[0],
+            date: p.events_date || p.created_at,
+            facebook_url: p.facebook_url,
+        })),
+    ].sort((a, b) => {
+        const da = a.date ? new Date(a.date).getTime() : 0
+        const db = b.date ? new Date(b.date).getTime() : 0
+        return db - da
     })
 
-    const workshopEvent =
-        upcoming.find((p) => p.tags?.some((t) => ['workshop', 'seminar', 'Workshop', 'Seminar'].includes(t))) ??
-        upcoming[0] ??
-        null
-
-    const memorableEvents = past.filter((p) => p.images && p.images.length > 0)
+    const displayEvents = initialDisplayPosts || allPastEvents.slice(0, 5)
+    // Use the passed pagination or calculate default for page 1
+    const displayPagination = pagination || { currentPage: 1, totalPages: Math.ceil(allPastEvents.length / 5) }
 
     const [activeTab, setActiveTab] = useState<'photo' | 'video' | 'memory'>('photo')
 
     const { resolvedTheme } = useTheme()
-    const isDark = resolvedTheme !== 'light'
-    const pageBg = isDark
-        ? '#020617'
-        : 'linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8)'
+    const isDark = mounted && resolvedTheme !== 'light'
+    const pageBg = mounted ? (isDark ? '#020617' : '#f8fafc') : '#f8fafc'
+
+    // Show featured only on first page
+    const showFeatured = !pagination || pagination.currentPage === 1
 
     return (
         <div className="min-h-screen pb-16" style={{ background: pageBg }}>
-            {/* ── Hero + Workshop section ───────────────────────────────────────── */}
-            <div className="relative px-6 py-10 md:px-12 pt-40">
-                {/* Decorative blobs — visible in dark mode only */}
-                {isDark && (
-                    <>
-                        <div
-                            className="pointer-events-none absolute -top-20 right-0 h-96 w-96 rounded-full opacity-40 blur-3xl"
-                            style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }}
-                        />
-                        <div
-                            className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full opacity-30 blur-3xl"
-                            style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }}
-                        />
-                    </>
-                )}
-
-                <div className="relative mx-auto max-w-5xl">
-                    {/* Pill */}
-                    <div className="mb-4 flex items-center gap-2">
-                        <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                        <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-white/70">
-                            Sự kiện sắp diễn ra
-                        </span>
-                    </div>
-
-                    {/* Title */}
-                    <h1
-                        className="mb-6 font-extrabold uppercase text-slate-900 dark:text-white"
-                        style={{
-                            fontSize: 'clamp(2rem, 6vw, 3.5rem)',
-                            letterSpacing: '-0.02em',
-                            textShadow: isDark ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
-                        }}
-                    >
-                        DUT AI MOMENTS
-                    </h1>
-
-                    {/* Divider */}
-                    <div className="mb-6 border-t border-dashed" style={{ borderColor: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(100,80,200,0.25)' }} />
-
-                    {/* Workshops & Seminar label */}
-                    <h2 className="mb-5 text-xl font-extrabold italic text-slate-800 dark:text-white/90">
-                        Workshops &amp; Seminar
-                    </h2>
-
-                    {workshopEvent ? (
-                        <div className="flex flex-col gap-6 lg:flex-row">
-                            {/* Featured event card */}
-                            <div className="flex-1">
-                                <div className="relative overflow-hidden rounded-2xl shadow-xl" style={{ minHeight: 340 }}>
-                                    {workshopEvent.images?.[0] ? (
-                                        <Image
-                                            src={workshopEvent.images[0]}
-                                            alt={workshopEvent.title}
-                                            fill
-                                            className="object-cover"
-                                            unoptimized
-                                        />
-                                    ) : (
-                                        <div
-                                            className="absolute inset-0"
-                                            style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)' }}
-                                        />
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-                                    <div className="absolute inset-0 flex flex-col justify-end p-6">
-                                        <div className="mb-3 flex flex-wrap gap-2">
-                                            {workshopEvent.tags
-                                                ?.filter((t) => t !== 'event')
-                                                .slice(0, 3)
-                                                .map((tag) => (
-                                                    <span
-                                                        key={tag}
-                                                        className="rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white"
-                                                        style={{
-                                                            borderColor: 'rgba(255,255,255,0.45)',
-                                                            background: 'rgba(255,255,255,0.18)',
-                                                            backdropFilter: 'blur(6px)',
-                                                        }}
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                        </div>
-                                        <h3 className="mb-3 text-2xl font-extrabold leading-tight text-white md:text-3xl">
-                                            {workshopEvent.title}
-                                        </h3>
-                                        <div className="flex flex-wrap items-center gap-4 text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                                            <span className="flex items-center gap-1">
-                                                <CalIcon />
-                                                {workshopEvent.date
-                                                    ? new Date(workshopEvent.date).toLocaleDateString('vi-VN', {
-                                                        day: '2-digit', month: '2-digit', year: 'numeric',
-                                                    })
-                                                    : ''}
-                                            </span>
-                                            {(workshopEvent as any).location && (
-                                                <span className="flex items-center gap-1">
-                                                    <LocIcon />
-                                                    {(workshopEvent as any).location}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right sidebar */}
-                            <div className="flex w-full flex-col gap-4 lg:w-64">
-                                <div
-                                    className="rounded-2xl border p-5 shadow-lg"
-                                    style={{
-                                        background: 'rgba(255,255,255,0.75)',
-                                        backdropFilter: 'blur(14px)',
-                                        borderColor: 'rgba(255,255,255,0.8)',
-                                    }}
-                                >
-                                    <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#5c6bc0]">
-                                        Đăng ký ngay
-                                    </p>
-                                    <p className="mb-2 font-bold text-gray-800">{workshopEvent.title}</p>
-                                    {workshopEvent.summary && (
-                                        <p className="mb-4 text-xs leading-relaxed text-gray-500 line-clamp-3">
-                                            {workshopEvent.summary}
-                                        </p>
-                                    )}
-                                    <Link
-                                        href={(workshopEvent as any).registerLink ?? `/${workshopEvent.path}`}
-                                        className="block w-full rounded-xl py-2.5 text-center text-xs font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-80"
-                                        style={{ background: '#1a1a3a' }}
-                                    >
-                                        Đăng ký tham gia
-                                    </Link>
-                                </div>
-                                <div
-                                    className="rounded-2xl border p-5 shadow-lg"
-                                    style={{
-                                        background: 'rgba(255,255,255,0.75)',
-                                        backdropFilter: 'blur(14px)',
-                                        borderColor: 'rgba(255,255,255,0.8)',
-                                    }}
-                                >
-                                    <p className="font-semibold text-gray-800">Nhận thông báo</p>
-                                    <p className="mt-1 text-xs text-gray-400">
-                                        Không bỏ lỡ bất kỳ sự kiện nào từ CLB
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+            {/* ── Hero + Workshop ── */}
+            {showFeatured && (
+                <div className="relative px-6 py-10 md:px-12 pt-40">
+                    {/* Decorative blobs */}
+                    {isDark ? (
+                        <>
+                            <div className="pointer-events-none absolute -top-20 right-0 h-96 w-96 rounded-full opacity-40 blur-3xl" style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }} />
+                            <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full opacity-30 blur-3xl" style={{ background: 'radial-gradient(circle, #f472b6 0%, transparent 70%)' }} />
+                        </>
                     ) : (
-                        <div
-                            className="rounded-2xl p-10 text-center text-gray-400"
-                            style={{ background: 'rgba(255,255,255,0.6)' }}
-                        >
-                            <span className="text-5xl">📅</span>
-                            <p className="mt-3 font-semibold">Hiện chưa có workshop/seminar sắp diễn ra.</p>
-                        </div>
+                        <>
+                            <div className="pointer-events-none fixed top-[-80px] left-[8%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]" style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }} />
+                            <div className="pointer-events-none fixed top-[35%] right-[5%] h-[320px] w-[320px] rounded-full opacity-30 blur-[80px]" style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
+                        </>
                     )}
-                </div>
-            </div>
 
-            {/* ── Sự kiện đáng nhớ ────────────────────────────────────────────────── */}
-            <div className="relative px-6 py-14 md:px-12">
-                <div className="mx-auto max-w-5xl">
-                    {/* Section header */}
-                    <div className="mb-12 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                        <div>
-                            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Sự kiện đáng nhớ</h2>
-                            <p className="mt-1 text-sm text-slate-500 dark:text-white/60">
-                                Lưu giữ những khoảnh khắc tuyệt vời nhất của DUT AI Club.
-                            </p>
+                    <div className="relative mx-auto max-w-5xl">
+                        <div className="mb-4 flex items-center gap-2">
+                            <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
+                            <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-white/70">Sự kiện sắp diễn ra</span>
                         </div>
-                        {/* Tab bar */}
-                        <div
-                            className="flex gap-1 rounded-xl p-1"
-                            style={isDark
-                                ? { background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }
-                                : { background: 'rgba(100,80,200,0.10)', backdropFilter: 'blur(10px)', border: '1px solid rgba(100,80,200,0.2)' }
-                            }
-                        >
-                            {(['photo', 'video', 'memory'] as const).map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-all ${activeTab === tab
-                                        ? 'bg-white text-[#1a1a3a] shadow'
-                                        : isDark ? 'text-white/60 hover:text-white' : 'text-slate-500 hover:text-slate-800'
-                                        }`}
-                                >
-                                    {tab === 'photo' ? 'Thư viện ảnh' : tab === 'video' ? 'Videos' : 'Hồi ức'}
-                                </button>
-                            ))}
-                        </div>
+                        <h1 className="mb-6 font-extrabold uppercase text-slate-900 dark:text-white" style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', letterSpacing: '-0.02em' }}>DUT AI MOMENTS</h1>
+                        <div className="mb-6 border-t border-dashed" style={{ borderColor: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(100,80,200,0.25)' }} />
+                        <h2 className="mb-5 text-xl font-extrabold italic text-slate-800 dark:text-white/90">Workshops &amp; Seminar</h2>
+
+                        {error ? (
+                            <div className="mb-8 overflow-hidden rounded-[40px] border border-white/20 bg-white/10 p-8 text-center backdrop-blur-xl">
+                                <p className="text-lg text-slate-200">Không thể kết nối đến server. Vui lòng thử lại sau.</p>
+                            </div>
+                        ) : workshopEvent ? (
+                            <div className="flex flex-col gap-6 lg:flex-row">
+                                <div className="flex-1">
+                                    <div className="relative overflow-hidden rounded-2xl shadow-xl" style={{ minHeight: 340 }}>
+                                        {workshopEvent.img_url ? (
+                                            <Image src={workshopEvent.img_url} alt={workshopEvent.title} fill className="object-cover" unoptimized />
+                                        ) : (
+                                            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)' }} />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                                        <div className="absolute inset-0 flex flex-col justify-end p-6">
+                                            <div className="mb-3 flex flex-wrap gap-2">
+                                                {workshopEvent.tags?.filter(t => t !== 'event').slice(0, 3).map(tag => (
+                                                    <span key={tag} className="rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white" style={{ borderColor: 'rgba(255,255,255,0.45)', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)' }}>{tag}</span>
+                                                ))}
+                                            </div>
+                                            <h3 className="mb-3 text-2xl font-extrabold leading-tight text-white md:text-3xl">{workshopEvent.title}</h3>
+                                            <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
+                                                <span className="flex items-center gap-1"><CalIcon />{workshopEvent.events_date ? new Date(workshopEvent.events_date).toLocaleDateString('vi-VN') : ''}</span>
+                                                {workshopEvent.location && <span className="flex items-center gap-1"><LocIcon />{workshopEvent.location}</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex w-full flex-col gap-4 lg:w-64">
+                                    <div className="rounded-2xl border p-5 shadow-lg" style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(14px)', borderColor: 'rgba(255,255,255,0.8)' }}>
+                                        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#5c6bc0]">Đăng ký ngay</p>
+                                        <p className="mb-2 font-bold text-gray-800">{workshopEvent.title}</p>
+                                        {(workshopEvent.summary || workshopEvent.description) && <p className="mb-4 text-xs leading-relaxed text-gray-500 line-clamp-3">{workshopEvent.summary || workshopEvent.description}</p>}
+                                        <Link href={workshopEvent.register_link ?? '#'} className="block w-full rounded-xl py-2.5 text-center text-xs font-bold uppercase tracking-widest text-white" style={{ background: '#1a1a3a' }}>Đăng ký tham gia</Link>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="rounded-2xl p-10 text-center text-gray-400" style={{ background: 'rgba(255,255,255,0.6)' }}><span className="text-5xl">📅</span><p className="mt-3 font-semibold">Hiện chưa có workshop sắp tới.</p></div>
+                        )}
                     </div>
+                </div>
+            )}
 
-                    {/* Memory cards — alternating layout */}
-                    {memorableEvents.length > 0 ? (
+            {/* ── Memorable Events ── */}
+            {showFeatured && memorableEvents.length > 0 && (
+                <div className="relative px-6 py-14 md:px-12">
+                    <div className="mx-auto max-w-5xl">
+                        <div className="mb-12 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                            <div><h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Sự kiện đáng nhớ</h2><p className="text-sm text-slate-500 dark:text-white/60">Lưu giữ khoảnh khắc tuyệt vời nhất.</p></div>
+                            <div className="flex gap-1 rounded-xl p-1" style={{ background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(100,80,200,0.1)', border: '1px solid rgba(0,0,0,0.1)' }}>
+                                {['photo', 'video', 'memory'].map(tab => (
+                                    <button key={tab} onClick={() => setActiveTab(tab as any)} className={`rounded-lg px-4 py-1.5 text-sm font-semibold ${activeTab === tab ? 'bg-white text-black shadow' : 'text-gray-500'}`}>{tab === 'photo' ? 'Ảnh' : tab === 'video' ? 'Video' : 'Hồi ức'}</button>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="space-y-24">
-                            {memorableEvents.slice(0, 6).map((ev, idx) => {
-                                const fbLink = ((ev as any).facebook as string | undefined) ?? siteMetadata.facebook
+                            {memorableEvents.slice(0, 4).map((ev, idx) => {
                                 const isLeft = idx % 2 === 0
-                                const photoCount = ev.images?.length ?? 0
-                                const year = ev.date ? new Date(ev.date).getFullYear() : ''
+                                const year = ev.events_date ? new Date(ev.events_date).getFullYear() : ''
+                                const fbLink = ev.facebook_url ?? siteMetadata.facebook
 
-                                const TextBlock = (
-                                    <div className="flex flex-col justify-center py-4">
-                                        {year && (
-                                            <span
-                                                className="mb-3 inline-block w-fit rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
-                                                style={isDark ? {
-                                                    background: 'rgba(255,255,255,0.15)',
-                                                    color: 'rgba(255,255,255,0.9)',
-                                                    border: '1px solid rgba(255,255,255,0.25)',
-                                                } : {
-                                                    background: 'rgba(100,80,200,0.12)',
-                                                    color: '#4338ca',
-                                                    border: '1px solid rgba(100,80,200,0.25)',
-                                                }}
-                                            >
-                                                Kỷ niệm {year}
-                                            </span>
-                                        )}
-                                        <h3 className="mb-3 text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">{ev.title}</h3>
-                                        {ev.summary && (
-                                            <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-white/70 line-clamp-3">
-                                                {ev.summary}
-                                            </p>
-                                        )}
+                                const Text = (
+                                    <div className="flex flex-col justify-center">
+                                        {year && <span className="mb-3 inline-block w-fit rounded-full px-3 py-1 text-xs font-bold bg-[#5c6bc0]/10 text-[#5c6bc0]">Kỷ niệm {year}</span>}
+                                        <h3 className="mb-3 text-3xl font-extrabold text-slate-900 dark:text-white">{ev.title}</h3>
+                                        <p className="mb-4 text-sm text-slate-600 dark:text-white/70 line-clamp-3">{ev.summary || ev.description}</p>
                                         <div className="flex items-center gap-3">
-                                            <Link
-                                                href={`/${ev.path}`}
-                                                className="text-sm font-bold text-pink-600 dark:text-pink-300 hover:underline"
-                                            >
-                                                Xem tất cả {photoCount} ảnh
-                                            </Link>
-                                            {fbLink && (
-                                                <a
-                                                    href={fbLink}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center gap-1 text-blue-500 dark:text-blue-300 transition-opacity hover:opacity-75"
-                                                    title="Xem album trên Facebook"
-                                                >
-                                                    <FacebookIcon className="h-5 w-5" />
-                                                </a>
-                                            )}
+                                            <span className="text-sm font-bold text-pink-500">Xem tất cả {ev.img_urls?.length} ảnh</span>
+                                            {fbLink && <a href={fbLink} target="_blank" rel="noreferrer"><FacebookIcon className="text-blue-600" /></a>}
                                         </div>
                                     </div>
                                 )
-
-                                const PhotoBlock = (
-                                    <div className="flex items-center justify-center">
-                                        <PhotoStack images={ev.images ?? []} flip={!isLeft} />
-                                    </div>
-                                )
+                                const Photos = <PhotoStack images={ev.img_urls || []} flip={!isLeft} />
 
                                 return (
-                                    <div key={ev.path} className="grid grid-cols-1 items-center gap-4 md:grid-cols-2">
-                                        {isLeft ? (
-                                            <>
-                                                {PhotoBlock}
-                                                {TextBlock}
-                                            </>
-                                        ) : (
-                                            <>
-                                                {TextBlock}
-                                                {PhotoBlock}
-                                            </>
-                                        )}
+                                    <div key={ev.id} className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+                                        {isLeft ? <>{Photos}{Text}</> : <>{Text}{Photos}</>}
                                     </div>
                                 )
                             })}
                         </div>
-                    ) : (
-                        <div className="flex flex-col items-center py-16 text-slate-400 dark:text-white/40">
-                            <span className="mb-4 text-5xl">🖼️</span>
-                            <p className="font-semibold">Chưa có sự kiện đáng nhớ nào.</p>
-                        </div>
-                    )}
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* ── Danh sách sự kiện đã qua ─────────────────────────────────────── */}
-            <div className="px-6 py-12 md:px-12">
+            {/* ── Past Events ── */}
+            <div className={`px-6 py-12 md:px-12 ${!showFeatured ? 'pt-40' : ''}`}>
                 <div className="mx-auto max-w-5xl">
-                    <h2 className="mb-6 text-center text-xs font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-white/70">
-                        Danh sách sự kiện đã qua
-                    </h2>
-                    {past.length > 0 ? (
-                        <PastEventsList events={past} />
+                    <h2 className="mb-6 text-center text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Danh sách sự kiện đã qua</h2>
+                    {displayEvents.length > 0 ? (
+                        <PastEventsList events={displayEvents} pagination={displayPagination} />
                     ) : (
-                        <div className="flex flex-col items-center py-16 text-slate-400 dark:text-white/40">
-                            <span className="mb-4 text-5xl">📭</span>
-                            <p className="font-semibold">Chưa có sự kiện đã qua.</p>
-                        </div>
+                        <div className="py-16 text-center text-gray-400">Chưa có sự kiện nào.</div>
                     )}
                 </div>
             </div>
-
             <Footer />
         </div>
+    )
+}
+
+export default function EventsListLayout(props: EventsListLayoutProps) {
+    return (
+        <Suspense fallback={<div className="min-h-screen pt-40 text-center">Đang tải...</div>}>
+            <EventsListLayoutInner {...props} />
+        </Suspense>
     )
 }

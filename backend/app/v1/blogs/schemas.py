@@ -1,21 +1,28 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
+
+from app.v1.keywords.schema import KeywordResponse
+from pydantic import BaseModel
+
 
 # Base class chứa các trường chung
 class BlogBase(BaseModel):
     title: str
     content: str
     authors: Optional[str] = None
-    keywords: Optional[str] = None
+    keywords: List[KeywordResponse] = []
     image_url: Optional[str] = None
+
+
 # Schema để tạo mới
 class BlogCreate(BlogBase):
     pass
 
+
 # Schema để cập nhật
 class BlogUpdate(BlogBase):
     pass
+
 
 # Schema để trả về
 class BlogResponse(BlogBase):
@@ -27,9 +34,11 @@ class BlogResponse(BlogBase):
     class Config:
         from_attributes = True
 
+
 # Schema chi tiết với bài viết liên quan
 class BlogDetailResponse(BlogResponse):
     related_blogs: list[BlogResponse] = []
+
 
 class AuthorStatsResponse(BaseModel):
     author: str

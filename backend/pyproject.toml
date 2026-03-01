@@ -9,6 +9,7 @@ dependencies = [
     "fastapi>=0.129.0",
     "gunicorn>=25.1.0",
     "httpx>=0.28.1",
+    "itsdangerous>=2.2.0",
     "loguru>=0.7.3",
     "minio>=7.2.20",
     "psycopg[binary]>=3.3.2",
@@ -18,5 +19,7 @@ dependencies = [
     "python-multipart>=0.0.22",
     "sqladmin>=0.23.0",
     "sqlalchemy>=2.0.46",
+    "sqlalchemy-file>=0.6.0",
+    "starlette-admin>=0.16.0",
     "uvicorn>=0.40.0",
 ]

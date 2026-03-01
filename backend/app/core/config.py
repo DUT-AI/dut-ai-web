@@ -9,6 +9,11 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: str = "5432"
 
+    # Admin
+    ADMIN_USERNAME: str = ""
+    ADMIN_PASSWORD: str = ""
+    SECRET_KEY: str = ""
+
     # External API
     DUT_MANAGER_API_KEY: str = ""
 

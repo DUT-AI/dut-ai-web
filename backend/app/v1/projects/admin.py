@@ -3,12 +3,13 @@ from .models import Project
 from wtforms import MultipleFileField, widgets, TextAreaField
 from markupsafe import Markup
 
+
 class AutoUploadWidget(widgets.FileInput):
     def __call__(self, field, **kwargs):
-        kwargs.setdefault('id', field.id)
-        kwargs.setdefault('multiple', True)
+        kwargs.setdefault("id", field.id)
+        kwargs.setdefault("multiple", True)
         html = super().__call__(field, **kwargs)
-        
+
         script = f"""
         <script>
             setTimeout(() => {{
@@ -35,7 +36,7 @@ class AutoUploadWidget(widgets.FileInput):
                             
                             try {{
                                 // Gọi API riêng của Projects
-                                const response = await fetch('/api/v1/projects/upload-async', {{
+                                const response = await fetch('/api/v1/media/upload?folder=projects', {{
                                     method: 'POST',
                                     body: formData
                                 }});
@@ -61,33 +62,38 @@ class AutoUploadWidget(widgets.FileInput):
         """
         return html + Markup(script)
 
+
 class ProjectAdmin(BaseAdmin, model=Project):
     name = "Dự án"
     name_plural = "Projects"
     icon = "fa-solid fa-briefcase"
-    
-    column_list = [Project.id, Project.title, Project.description, Project.image_url, Project.project_url]
 
-    form_columns = [Project.title, Project.description, Project.project_url, Project.image_url] 
+    column_list = [
+        Project.id,
+        Project.title,
+        Project.description,
+        Project.image_url,
+        Project.project_url,
+    ]
 
-    form_overrides = {
-        "image_url": TextAreaField
-    }
+    form_columns = [
+        Project.title,
+        Project.description,
+        Project.project_url,
+        Project.image_url,
+    ]
+
+    form_overrides = {"image_url": TextAreaField}
     form_args = {
         "image_url": {
-            "render_kw": {
-                "rows": 6, 
-                "class": "form-control",
-                "placeholder": "link ảnh"
-            }
+            "render_kw": {"rows": 6, "class": "form-control", "placeholder": "link ảnh"}
         }
     }
 
     async def scaffold_form(self, *args, **kwargs):
         form_class = await super().scaffold_form(*args, **kwargs)
         form_class.upload_new_images = MultipleFileField(
-            "Tải ảnh từ thiết bị", 
-            widget=AutoUploadWidget()
+            "Tải ảnh từ thiết bị", widget=AutoUploadWidget()
         )
         return form_class
 

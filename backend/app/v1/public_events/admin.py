@@ -1,26 +1,23 @@
 from app.core.admin import BaseAdmin
-from .models import Event
-from wtforms import MultipleFileField, widgets, TextAreaField, SelectField
+from .models import PublicEvent
+from wtforms import MultipleFileField, widgets, TextAreaField
 from markupsafe import Markup
 
+
+# --- NÚT UPLOAD ẢNH ---
 class AutoUploadWidget(widgets.FileInput):
     def __call__(self, field, **kwargs):
-        kwargs.setdefault('id', field.id)
-        kwargs.setdefault('multiple', True)
+        kwargs.setdefault("id", field.id)
+        kwargs.setdefault("multiple", True)
         html = super().__call__(field, **kwargs)
-        
+
         script = f"""
         <script>
             setTimeout(() => {{
                 const fileInput = document.getElementById('{field.id}');
-                const urlInput = document.getElementById('image_url');
+                const urlInput = document.getElementById('img_url');
                 
                 if(fileInput && urlInput) {{
-                    // Tính năng thông minh: Tự động chuyển dấu phẩy thành xuống dòng
-                    if (urlInput.value.includes(',') && !urlInput.value.includes('\\n')) {{
-                        urlInput.value = urlInput.value.split(',').map(s => s.trim()).join('\\n');
-                    }}
-
                     fileInput.addEventListener('change', async function(e) {{
                         const files = e.target.files;
                         if (files.length === 0) return;
@@ -35,8 +32,7 @@ class AutoUploadWidget(widgets.FileInput):
                             urlInput.value = (originalValue ? originalValue + "\\n" : "") + "⏳ Đang tải ảnh " + files[i].name + "...";
                             
                             try {{
-                                // GỌI API BÊN EVENTS
-                                const response = await fetch('/api/v1/events/upload-async', {{
+                                const response = await fetch('/api/v1/media/upload?folder=public_events', {{
                                     method: 'POST',
                                     body: formData
                                 }});
@@ -62,56 +58,46 @@ class AutoUploadWidget(widgets.FileInput):
         """
         return html + Markup(script)
 
-class EventAdmin(BaseAdmin, model=Event):
+
+class PublicEventAdmin(BaseAdmin, model=PublicEvent):
     name = "Sự kiện"
-    name_plural = "Events"
+    name_plural = "Sự kiện"
     icon = "fa-solid fa-calendar-days"
 
-    column_list = [Event.id, Event.title, Event.event_type, Event.event_date, Event.updated_at]
-
-    form_columns = [
-        Event.event_type, 
-        Event.title, 
-        Event.description, 
-        Event.event_date, 
-        Event.location, 
-        Event.registration_link,
-        Event.hashtags,
-        Event.image_url
+    column_list = [
+        PublicEvent.id,
+        PublicEvent.title,
+        PublicEvent.events_date,
+        PublicEvent.location,
+        PublicEvent.tags,
     ]
-    
-    column_searchable_list = [Event.title, Event.location, Event.hashtags]
-    form_overrides = {
-        "image_url": TextAreaField,
-        "event_type": SelectField
-    }
-    form_args = {
-        "event_type": {
-            "choices": [
-                ("workshop", "Workshops & Seminar"),  
-                ("memorable", "Sự kiện đáng nhớ")
-            ],
-            "default": "workshop" 
-        },
+    form_columns = [
+        PublicEvent.title,
+        PublicEvent.summary,
+        PublicEvent.description,
+        PublicEvent.events_date,
+        PublicEvent.location,
+        PublicEvent.register_link,
+        PublicEvent.facebook_url,
+        PublicEvent.tags,
+        PublicEvent.img_url,
+    ]
 
-        "image_url": {
-            "render_kw": {
-                "rows": 6, 
-                "class": "form-control",
-                "placeholder": "link ảnh"
-            }
+    column_searchable_list = [PublicEvent.title, PublicEvent.location]
+    form_overrides = {"img_url": TextAreaField}
+    form_args = {
+        "img_url": {
+            "render_kw": {"rows": 6, "class": "form-control", "placeholder": "link ảnh"}
         }
     }
 
     async def scaffold_form(self, *args, **kwargs):
         form_class = await super().scaffold_form(*args, **kwargs)
         form_class.upload_new_images = MultipleFileField(
-            "Tải ảnh từ thiết bị", 
-            widget=AutoUploadWidget()
+            "Tải ảnh từ thiết bị", widget=AutoUploadWidget()
         )
         return form_class
 
     async def on_model_change(self, data: dict, model: any, is_created: bool, request):
-        # Dọn dẹp trường ảo
         data.pop("upload_new_images", None)
         await super().on_model_change(data, model, is_created, request)

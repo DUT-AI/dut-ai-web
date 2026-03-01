@@ -35,7 +35,7 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
     <>
       <style>{`
         .projects-detail-page {
-          background: linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8);
+          background: #f8fafc;
         }
         .dark .projects-detail-page {
           background: #020617;
@@ -80,6 +80,15 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
       <div
         className="projects-detail-page relative min-h-screen overflow-hidden"
       >
+        {/* Light-mode decorative blobs */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden dark:hidden">
+          <div className="absolute top-[-80px] left-[10%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]"
+            style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }} />
+          <div className="absolute top-[40%] right-[5%] h-[300px] w-[300px] rounded-full opacity-30 blur-[80px]"
+            style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
+          <div className="absolute bottom-[5%] left-[25%] h-[260px] w-[260px] rounded-full opacity-25 blur-[70px]"
+            style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }} />
+        </div>
         {/* ── Hero ── */}
         <section className="relative px-6 pt-10 pb-6 sm:pt-14 md:px-8 md:pt-32 lg:pt-36">
           <div className="mx-auto max-w-[1220px]">

@@ -78,3 +78,55 @@ export async function getIntroduction(id: number): Promise<Introduction> {
 export async function getMembers(): Promise<Member[]> {
     return apiFetch<Member[]>('/members', { revalidate: 300 })
 }
+
+// ── Public Events (Workshops & Seminars) ─────────────────────────────────
+
+export interface PublicEvent {
+    id: number
+    title: string
+    description?: string
+    summary?: string
+    img_url?: string
+    events_date?: string
+    location?: string
+    register_link?: string
+    facebook_url?: string
+    tags?: string[]
+    created_at: string
+    updated_at: string
+}
+
+export async function getPublicEvents(): Promise<PublicEvent[]> {
+    return apiFetch<PublicEvent[]>('/public-events', { revalidate: 300 })
+}
+
+// ── Posts (Memorable Events) ──────────────────────────────────────────────
+
+export interface Post {
+    id: number
+    title: string
+    description?: string
+    summary?: string
+    img_urls?: string[]
+    hashtag?: string
+    events_date?: string
+    facebook_url?: string
+    created_at: string
+    updated_at: string
+}
+
+export async function getPosts(): Promise<Post[]> {
+    return apiFetch<Post[]>('/posts', { revalidate: 300 })
+}
+
+// ── Shared Unified Type ──────────────────────────────────────────────────
+
+export interface PastEvent {
+    id: string
+    type: 'public_event' | 'post'
+    title: string
+    summary?: string
+    cover?: string
+    date?: string
+    facebook_url?: string
+}
