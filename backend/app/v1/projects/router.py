@@ -4,30 +4,9 @@ from fastapi import APIRouter, Depends, UploadFile, File, Form
 
 from app.core.dependencies import get_service_factory
 from .schemas import ProjectResponse, ProjectUpdate
-from fastapi import UploadFile, File
-import uuid
-import mimetypes
-from app.v1.media.service import MinioService
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
-@router.post("/upload-async")
-async def upload_async_image(file: UploadFile = File(...)):
-    minio_service = MinioService()
-    file_data = await file.read()
-    
-    content_type, _ = mimetypes.guess_type(file.filename)
-    content_type = content_type or "application/octet-stream"
-    
-    # Đặt tên thư mục là projects
-    unique_filename = f"projects/async-{uuid.uuid4().hex}-{file.filename}"
-    
-    file_url = minio_service.upload_file(
-        file_data=file_data, 
-        filename=unique_filename,
-        content_type=content_type
-    )
-    return {"url": file_url}
 
 @router.get("", response_model=list[ProjectResponse])
 def list_projects(service_factory=Depends(get_service_factory)):

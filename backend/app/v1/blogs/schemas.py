@@ -1,26 +1,8 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
 
-
-class KeywordBase(BaseModel):
-    keyword_name: str
-
-
-class KeywordCreate(KeywordBase):
-    pass
-
-
-class KeywordUpdate(KeywordBase):
-    pass
-
-
-class KeywordResponse(KeywordBase):
-    id: int
-    number_blog_contain: int
-
-    class Config:
-        from_attributes = True
+from app.v1.keywords.schema import KeywordResponse
+from pydantic import BaseModel
 
 
 # Base class chứa các trường chung
@@ -28,7 +10,7 @@ class BlogBase(BaseModel):
     title: str
     content: str
     authors: Optional[str] = None
-    keywords: Optional[List[str]] = None
+    keywords: List[KeywordResponse] = []
     image_url: Optional[str] = None
 
 
@@ -46,7 +28,6 @@ class BlogUpdate(BlogBase):
 class BlogResponse(BlogBase):
     id: int
     views: int
-    keywords: List[KeywordResponse] = []
     created_at: datetime
     updated_at: datetime
 

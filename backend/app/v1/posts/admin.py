@@ -1,9 +1,10 @@
 from app.core.admin import BaseAdmin
-from .models import Project
+from .models import Post
 from wtforms import MultipleFileField, widgets, TextAreaField
 from markupsafe import Markup
 
 
+# --- NÚT UPLOAD ẢNH ---
 class AutoUploadWidget(widgets.FileInput):
     def __call__(self, field, **kwargs):
         kwargs.setdefault("id", field.id)
@@ -14,13 +15,9 @@ class AutoUploadWidget(widgets.FileInput):
         <script>
             setTimeout(() => {{
                 const fileInput = document.getElementById('{field.id}');
-                const urlInput = document.getElementById('image_url');
+                const urlInput = document.getElementById('img_urls');
                 
                 if(fileInput && urlInput) {{
-                    if (urlInput.value.includes(',') && !urlInput.value.includes('\\n')) {{
-                        urlInput.value = urlInput.value.split(',').map(s => s.trim()).join('\\n');
-                    }}
-
                     fileInput.addEventListener('change', async function(e) {{
                         const files = e.target.files;
                         if (files.length === 0) return;
@@ -35,8 +32,7 @@ class AutoUploadWidget(widgets.FileInput):
                             urlInput.value = (originalValue ? originalValue + "\\n" : "") + "⏳ Đang tải ảnh " + files[i].name + "...";
                             
                             try {{
-                                // Gọi API riêng của Projects
-                                const response = await fetch('/api/v1/media/upload?folder=projects', {{
+                                const response = await fetch('/api/v1/media/upload?folder=posts', {{
                                     method: 'POST',
                                     body: formData
                                 }});
@@ -63,30 +59,28 @@ class AutoUploadWidget(widgets.FileInput):
         return html + Markup(script)
 
 
-class ProjectAdmin(BaseAdmin, model=Project):
-    name = "Dự án"
-    name_plural = "Projects"
-    icon = "fa-solid fa-briefcase"
+class PostAdmin(BaseAdmin, model=Post):
+    name = "Post"
+    name_plural = "Posts"
+    icon = "fa-solid fa-camera-retro"
 
-    column_list = [
-        Project.id,
-        Project.title,
-        Project.description,
-        Project.image_url,
-        Project.project_url,
-    ]
-
+    column_list = [Post.id, Post.title, Post.hashtag]
     form_columns = [
-        Project.title,
-        Project.description,
-        Project.project_url,
-        Project.image_url,
+        Post.title,
+        Post.description,
+        Post.hashtag,
+        Post.img_urls,
     ]
 
-    form_overrides = {"image_url": TextAreaField}
+    column_searchable_list = [Post.title, Post.hashtag]
+    form_overrides = {"img_urls": TextAreaField}
     form_args = {
-        "image_url": {
-            "render_kw": {"rows": 6, "class": "form-control", "placeholder": "link ảnh"}
+        "img_urls": {
+            "render_kw": {
+                "rows": 6,
+                "class": "form-control",
+                "placeholder": "mỗi link ảnh một dòng",
+            }
         }
     }
 
@@ -99,4 +93,10 @@ class ProjectAdmin(BaseAdmin, model=Project):
 
     async def on_model_change(self, data: dict, model: any, is_created: bool, request):
         data.pop("upload_new_images", None)
+
+        # Chuyển chuỗi xuống dòng thành list cho ARRAY field
+        if "img_urls" in data and isinstance(data["img_urls"], str):
+            urls = [url.strip() for url in data["img_urls"].split("\n") if url.strip()]
+            data["img_urls"] = urls
+
         await super().on_model_change(data, model, is_created, request)

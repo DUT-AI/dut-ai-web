@@ -1,16 +1,17 @@
 import httpx
-from fastapi import HTTPException
-from sqlalchemy.orm import Session
 from app.core.config import settings
-from app.v1.users.models import User
-from app.v1.users.schemas import UserResponse
+from app.core.base_service import BaseService
+from .models import User
+from .repository import UserRepository
+from .schemas import UserCreate, UserUpdate, UserResponse
+from fastapi import HTTPException
 
 
-class UserService:
+class UserService(BaseService[User, UserCreate, UserUpdate]):
     API_URL = "https://manage.dutai.site/api/v1/users"
 
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self, repo: UserRepository):
+        super().__init__(repo, entity_name="User")
 
     def sync_users(self):
         api_key = settings.DUT_MANAGER_API_KEY
@@ -34,10 +35,10 @@ class UserService:
 
         synced_count = 0
         for data in users_data:
-            user = self.db.query(User).filter(User.id == data["id"]).first()
+            user = self.repo.db.query(User).filter(User.id == data["id"]).first()
             if not user:
                 user = User(id=data["id"])
-                self.db.add(user)
+                self.repo.db.add(user)
 
             user.name = data.get("name")
             user.email = data.get("email")
@@ -50,17 +51,14 @@ class UserService:
 
             synced_count += 1
 
-        self.db.commit()
+        self.repo.db.commit()
         return {"message": "Đồng bộ user thành công", "synced_count": synced_count}
 
-    def get_all(self) -> list[UserResponse]:
-        users = self.db.query(User).all()
-        return [
-            UserResponse.model_validate(user, from_attributes=True) for user in users
-        ]
+    def get_all(self) -> list[User]:
+        return self.repo.get_all()
 
-    def get_by_id(self, user_id: int) -> UserResponse:
-        user = self.db.query(User).filter(User.id == user_id).first()
+    def get_by_id(self, user_id: int) -> User:
+        user = self.repo.get_by_id(user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        return UserResponse.model_validate(user, from_attributes=True)
+        return user

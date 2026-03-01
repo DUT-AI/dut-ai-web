@@ -6,9 +6,11 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.core.database import Base, engine
-from app.v1.blogs.models import Blog
-from app.v1.events.models import Event
+from app.v1.blogs.models import Blog, Keyword
+from app.v1.blogs.models import Blog, Keyword
 from app.v1.projects.models import Project
+from app.v1.public_events.models import PublicEvent
+from app.v1.posts.models import Post
 
 
 from app.v1.introductions.models import Introduction

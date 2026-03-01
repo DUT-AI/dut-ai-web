@@ -1,4 +1,14 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Index, ForeignKey, Table
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    DateTime,
+    Index,
+    ForeignKey,
+    Table,
+    event,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from app.core.database import Base
@@ -21,19 +31,9 @@ blog_keywords = Table(
     Column("keyword_id", Integer, ForeignKey("keywords.id"), primary_key=True),
 )
 
-# Để SQLAlchemy tìm thấy User class
+# Để SQLAlchemy tìm thấy User và Keyword class
 from app.v1.users.models import User
-
-
-class Keyword(Base):
-    __tablename__ = "keywords"
-
-    id = Column(Integer, primary_key=True, index=True)
-    keyword_name = Column(String(255), unique=True, index=True, nullable=False)
-    number_blog_contain = Column(Integer, default=0)
-
-    def __str__(self):
-        return self.keyword_name
+from app.v1.keywords.models import Keyword
 
 
 class Blog(Base, HasImageUpload):
@@ -58,3 +58,27 @@ class Blog(Base, HasImageUpload):
 
     def __str__(self):
         return self.title
+
+
+# --- EVENT LISTENERS FOR KEYWORD COUNTER ---
+@event.listens_for(Blog.keywords_rel, "append")
+def keyword_append(target, value, initiator):
+    """Tự động tăng counter khi gắn keyword vào blog."""
+    if value.number_blog_contain is None:
+        value.number_blog_contain = 0
+    value.number_blog_contain += 1
+
+
+@event.listens_for(Blog.keywords_rel, "remove")
+def keyword_remove(target, value, initiator):
+    """Tự động giảm counter khi gỡ keyword khỏi blog."""
+    if value.number_blog_contain is not None and value.number_blog_contain > 0:
+        value.number_blog_contain -= 1
+
+
+@event.listens_for(Blog, "before_delete")
+def blog_before_delete(mapper, connection, target):
+    """Tự động giảm counter cho tất cả keywords khi xóa blog."""
+    for kw in target.keywords_rel:
+        if kw.number_blog_contain is not None and kw.number_blog_contain > 0:
+            kw.number_blog_contain -= 1

@@ -4,37 +4,17 @@ from app.core.mixins import HasImageUpload
 import datetime
 
 
-class Event(Base, HasImageUpload):
-    __tablename__ = "events"
+class PublicEvent(Base, HasImageUpload):
+    __tablename__ = "public_events"
 
     id = Column(Integer, primary_key=True, index=True)
-    
-    event_type = Column(String, nullable=False) 
-
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     img_url = Column(String, nullable=True)
-
     events_date = Column(DateTime, nullable=True)
     location = Column(String, nullable=True)
     register_link = Column(String, nullable=True)
-
-    hashtag = Column(String, nullable=True)
-    __mapper_args__ = {
-        "polymorphic_on": event_type,
-        "polymorphic_identity": "base_event",
-    }
-
-class Workshop(Event):
-    __mapper_args__ = {
-        "polymorphic_identity": "workshop", 
-    }
-
-class MemorableEvent(Event):
-    __mapper_args__ = {
-        "polymorphic_identity": "memorable",
-    }
-    hashtags = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )

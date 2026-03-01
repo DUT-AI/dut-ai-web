@@ -91,6 +91,7 @@ def upgrade() -> None:
                 )
     # --- Data Migration End ---
 
+    op.execute("DROP TRIGGER IF EXISTS blogs_search_vector_trigger ON blogs")
     op.drop_column("blogs", "keywords")
     # ### end Alembic commands ###
 

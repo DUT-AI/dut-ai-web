@@ -1,9 +1,10 @@
 from app.core.admin import BaseAdmin
-from .models import Project
+from .models import PublicEvent
 from wtforms import MultipleFileField, widgets, TextAreaField
 from markupsafe import Markup
 
 
+# --- NÚT UPLOAD ẢNH ---
 class AutoUploadWidget(widgets.FileInput):
     def __call__(self, field, **kwargs):
         kwargs.setdefault("id", field.id)
@@ -14,13 +15,9 @@ class AutoUploadWidget(widgets.FileInput):
         <script>
             setTimeout(() => {{
                 const fileInput = document.getElementById('{field.id}');
-                const urlInput = document.getElementById('image_url');
+                const urlInput = document.getElementById('img_url');
                 
                 if(fileInput && urlInput) {{
-                    if (urlInput.value.includes(',') && !urlInput.value.includes('\\n')) {{
-                        urlInput.value = urlInput.value.split(',').map(s => s.trim()).join('\\n');
-                    }}
-
                     fileInput.addEventListener('change', async function(e) {{
                         const files = e.target.files;
                         if (files.length === 0) return;
@@ -35,8 +32,7 @@ class AutoUploadWidget(widgets.FileInput):
                             urlInput.value = (originalValue ? originalValue + "\\n" : "") + "⏳ Đang tải ảnh " + files[i].name + "...";
                             
                             try {{
-                                // Gọi API riêng của Projects
-                                const response = await fetch('/api/v1/media/upload?folder=projects', {{
+                                const response = await fetch('/api/v1/media/upload?folder=public_events', {{
                                     method: 'POST',
                                     body: formData
                                 }});
@@ -63,29 +59,30 @@ class AutoUploadWidget(widgets.FileInput):
         return html + Markup(script)
 
 
-class ProjectAdmin(BaseAdmin, model=Project):
-    name = "Dự án"
-    name_plural = "Projects"
-    icon = "fa-solid fa-briefcase"
+class PublicEventAdmin(BaseAdmin, model=PublicEvent):
+    name = "Sự kiện"
+    name_plural = "Sự kiện"
+    icon = "fa-solid fa-calendar-days"
 
     column_list = [
-        Project.id,
-        Project.title,
-        Project.description,
-        Project.image_url,
-        Project.project_url,
+        PublicEvent.id,
+        PublicEvent.title,
+        PublicEvent.events_date,
+        PublicEvent.location,
     ]
-
     form_columns = [
-        Project.title,
-        Project.description,
-        Project.project_url,
-        Project.image_url,
+        PublicEvent.title,
+        PublicEvent.description,
+        PublicEvent.events_date,
+        PublicEvent.location,
+        PublicEvent.register_link,
+        PublicEvent.img_url,
     ]
 
-    form_overrides = {"image_url": TextAreaField}
+    column_searchable_list = [PublicEvent.title, PublicEvent.location]
+    form_overrides = {"img_url": TextAreaField}
     form_args = {
-        "image_url": {
+        "img_url": {
             "render_kw": {"rows": 6, "class": "form-control", "placeholder": "link ảnh"}
         }
     }
