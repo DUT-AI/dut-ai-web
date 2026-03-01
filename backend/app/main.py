@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from sqladmin import Admin
 
+from app.core.auth import AdminAuth
+from app.core.config import settings
 from app.core.database import engine
 from app.v1.v1_admin import register_admin_views
 from app.v1.v1_router import v1_router
@@ -12,8 +14,9 @@ app = FastAPI(title="DUT-AI FastAPI Backend")
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Admin
-admin = Admin(app, engine, templates_dir="app/templates")
+# Admin with authentication
+authentication_backend = AdminAuth(secret_key=settings.SECRET_KEY)
+admin = Admin(app, engine, templates_dir="app/templates", authentication_backend=authentication_backend)
 register_admin_views(admin)
 
 # API routers
