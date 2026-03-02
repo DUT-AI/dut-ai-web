@@ -8,7 +8,7 @@ from .schemas import AuthorStatsResponse, BlogDetailResponse, BlogResponse
 router = APIRouter(prefix="/blogs", tags=["Blogs"])
 
 
-@router.get("/", response_model=list[BlogResponse])
+@router.get("", response_model=list[BlogResponse])
 def get_blogs(
     title: Optional[str] = Query(None, description="Tìm theo tiêu đề bài viết"),
     keyword: Optional[str] = Query(None, description="Tìm theo từ khóa (keywords)"),

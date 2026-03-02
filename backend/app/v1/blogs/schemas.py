@@ -24,12 +24,14 @@ class BlogBase(BaseModel):
 
 # Schema để tạo mới
 class BlogCreate(BlogBase):
-    pass
+    author_ids: List[int] = []
+    keywords: List[str] = []
 
 
 # Schema để cập nhật
 class BlogUpdate(BlogBase):
-    pass
+    author_ids: Optional[List[int]] = None
+    keywords: Optional[List[str]] = None
 
 
 # Schema để trả về

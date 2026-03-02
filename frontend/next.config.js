@@ -69,7 +69,7 @@ module.exports = () => {
     output,
     basePath,
     reactStrictMode: true,
-    trailingSlash: true,
+    trailingSlash: false,
     eslint: {
       ignoreDuringBuilds: true,
     },

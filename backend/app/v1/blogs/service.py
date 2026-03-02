@@ -47,11 +47,21 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
     def create(self, data: BlogCreate) -> Blog:
         data_dict = data.model_dump()
         keyword_names = data_dict.pop("keywords", []) or []
+        author_ids = data_dict.pop("author_ids", []) or []
 
         blog = self.repo.model(**data_dict)
+
+        # Handle keywords
         for name in keyword_names:
             kw = self._factory.keyword.repo.get_or_create(name)
             blog.keywords_rel.append(kw)
+
+        # Handle authors
+        if author_ids:
+            from app.v1.users.models import User
+
+            authors = self.repo.db.query(User).filter(User.id.in_(author_ids)).all()
+            blog.authors_rel = authors
 
         self.repo.db.add(blog)
         self.repo.db.flush()  # get the ID
@@ -67,6 +77,7 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
 
         data_dict = data.model_dump(exclude_unset=True)
         keyword_names = data_dict.pop("keywords", None)
+        author_ids = data_dict.pop("author_ids", None)
 
         # Update basic fields
         for key, value in data_dict.items():
@@ -75,11 +86,16 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         if keyword_names is not None:
             # Remove old associations
             instance.keywords_rel = []
-
             # Add new associations
             for name in keyword_names:
                 kw = self._factory.keyword.repo.get_or_create(name)
                 instance.keywords_rel.append(kw)
+
+        if author_ids is not None:
+            from app.v1.users.models import User
+
+            authors = self.repo.db.query(User).filter(User.id.in_(author_ids)).all()
+            instance.authors_rel = authors
 
         self.repo.db.commit()
         self.repo.db.refresh(instance)

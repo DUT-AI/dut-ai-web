@@ -30,7 +30,7 @@ export default function TableOfContents({
         const timer = setTimeout(() => {
             const article = document.querySelector(contentSelector)
             if (!article) return
-            const nodes = Array.from(article.querySelectorAll('h2, h3, h4'))
+            const nodes = Array.from(article.querySelectorAll('h1, h2, h3, h4'))
             const items: Heading[] = nodes.map((node) => {
                 if (!node.id) {
                     const text = node.textContent || ''
@@ -143,10 +143,11 @@ export default function TableOfContents({
                                     <button
                                         onClick={() => handleClick(id)}
                                         className={cn(
-                                            'relative block w-full text-left transition-all duration-150 py-1 pl-4',
-                                            level === 2 && 'text-[15px] font-bold',
-                                            level === 3 && 'ml-4 text-[14px] font-semibold text-gray-600 dark:text-gray-400',
-                                            level === 4 && 'ml-8 text-[13px] font-medium text-gray-500 dark:text-gray-500',
+                                            'relative block w-full text-left transition-all duration-150 py-1',
+                                            level === 1 && 'pl-4 text-[16px] font-extrabold',
+                                            level === 2 && 'pl-9 text-[15px] font-bold',
+                                            level === 3 && 'pl-14 text-[14px] font-semibold text-gray-600 dark:text-gray-400',
+                                            level === 4 && 'pl-20 text-[13px] font-medium text-gray-500 dark:text-gray-500',
                                             isActive
                                                 ? 'text-blue-600 dark:text-blue-400'
                                                 : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'

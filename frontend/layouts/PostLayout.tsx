@@ -12,6 +12,7 @@ import { allBlogs } from 'contentlayer/generated'
 import { sortPosts } from 'pliny/utils/contentlayer'
 import Footer from '@/components/Footer'
 import RelatedPosts from '@/components/RelatedPosts'
+import type { BlogPost } from 'app/api-client'
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
     year: 'numeric',
@@ -31,7 +32,22 @@ export default function PostLayout({ content, authorDetails, children }: LayoutP
     const { slug: postSlug, date, lastmod, title, tags } = content
     const basePath = 'blog'
 
-    const relatedPosts = sortPosts(allBlogs).filter(p => p.slug !== postSlug).slice(0, 7)
+    const relatedPosts = sortPosts(allBlogs)
+        .filter((p) => p.slug !== postSlug)
+        .slice(0, 7)
+        .map(
+            (p) =>
+                ({
+                    ...p,
+                    id: p._id,
+                    created_at: p.date,
+                    keywords: p.tags?.map((tag) => ({ keyword_name: tag })),
+                    content: p.body.raw,
+                    views: 0,
+                    authors: [],
+                    updated_at: p.lastmod || p.date,
+                }) as unknown as BlogPost
+        )
 
     return (
         <div className="min-h-screen flex flex-col bg-[#FDFBFB] dark:bg-gray-950 relative z-0">

@@ -4,7 +4,7 @@ import Link from '@/components/Link'
 import Image from '@/components/Image'
 import TableWrapper from '@/components/TableWrapper'
 import Pre from '@/components/Pre'
-import { getBlogBySlug } from 'app/api-client'
+import { getBlogBySlug, getBlogs } from 'app/api-client'
 import PostLayoutAPI from '@/layouts/PostLayoutAPI'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -39,14 +39,22 @@ const mdxComponents = {
   },
   table: TableWrapper,
   pre: Pre,
-  // Ensure code inside headings looks natural
-  h2: (props: any) => <h2 {...props} className="group flex whitespace-pre-wrap">{props.children}</h2>,
-  h3: (props: any) => <h3 {...props} className="group flex whitespace-pre-wrap">{props.children}</h3>,
-  h4: (props: any) => <h4 {...props} className="group flex whitespace-pre-wrap">{props.children}</h4>,
 }
 
 interface PageProps {
   params: Promise<{ slug: string[] }>
+}
+
+export async function generateStaticParams() {
+  try {
+    const posts = await getBlogs()
+    return posts.map((post) => ({
+      slug: post.slug?.split('/') || [post.id.toString()],
+    }))
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -212,6 +220,10 @@ export default async function BlogDetailPage({ params }: PageProps) {
                 }
 
                 /* --- Heading Optimizations --- */
+                .prose h1, .prose h2, .prose h3, .prose h4 {
+                    scroll-margin-top: 120px;
+                }
+
                 .prose h2 code, .prose h3 code, .prose h4 code {
                     background: transparent !important;
                     border: none !important;
@@ -236,6 +248,31 @@ export default async function BlogDetailPage({ params }: PageProps) {
                 h3:hover .subheading-anchor,
                 h4:hover .subheading-anchor {
                     opacity: 1;
+                }
+
+                /* --- Article Layout Improvements --- */
+                .prose {
+                    max-width: none;
+                }
+
+                /* --- Premium Aside/Callout Style --- */
+                .prose aside {
+                    margin: 2.5rem 0;
+                    padding: 0.5rem 0.5rem 0.5rem 1rem;
+                    border-radius: 1.25rem;
+                    border-left: 5px solid #3b82f6;
+                    background-color: #f0f7ff;
+                    position: relative;
+                    color: #1e40af;
+                    font-style: italic;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+                }
+
+                .dark .prose aside {
+                    background-color: rgba(30, 58, 138, 0.25);
+                    border-color: #3b82f6;
+                    color: #dbeafe;
+                    box-shadow: none;
                 }
 
                 /* --- Code Block Overrides --- */

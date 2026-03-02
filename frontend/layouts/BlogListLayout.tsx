@@ -296,9 +296,9 @@ function BlogListLayoutInner({
                                         className={`rounded-[32px] p-8 sm:p-10 ${backgroundClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group cursor-pointer`}
                                     >
                                         {/* Full-card click overlay */}
-                                        <Link href={`/blog/${post.slug || post.id}`} className="absolute inset-0 z-[1]" aria-hidden="true" />
+                                        <Link href={`/blog/${post.slug || post.id}`} className="absolute inset-0 z-10" aria-hidden="true" />
 
-                                        <div className="flex flex-col h-full relative z-10">
+                                        <div className="flex flex-col h-full relative">
 
                                             {/* Top Row: Date & Tag */}
                                             <div className="flex flex-wrap items-center gap-4 mb-5">
@@ -318,7 +318,7 @@ function BlogListLayoutInner({
                                                     {post.title}
                                                 </h2>
 
-                                                <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl line-clamp-2">
+                                                <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl line-clamp-3">
                                                     {post.summary || post.content?.substring(0, 300)}
                                                 </p>
                                             </div>
