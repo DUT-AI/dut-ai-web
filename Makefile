@@ -29,13 +29,13 @@ setup:
 	cd frontend && npm install
 	cd backend && uv run python manage.py migrate
 
-migrate-revision:
+db-revision:
 	@read -p "Enter migration message: " msg; \
 	cd backend && uv run alembic revision --autogenerate -m "$$msg"
 
-migrate-upgrade:
+db-up:
 	cd backend && uv run alembic upgrade head
 
-migrate-downgrade:
+db-down:
 	@read -p "Enter revision to downgrade to (e.g., -1): " rev; \
 	cd backend && uv run alembic downgrade "$$rev"

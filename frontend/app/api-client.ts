@@ -147,7 +147,9 @@ export interface BlogKeyword {
 
 export interface BlogPost {
     id: number
+    slug?: string
     title: string
+    summary: string
     content: string
     image_url?: string
     views: number
@@ -162,6 +164,7 @@ export interface AuthorStats {
     name: string
     avatar_url?: string
     total_views: number
+    post_count: number
 }
 
 export async function getBlogs(params?: { title?: string; keyword?: string }): Promise<BlogPost[]> {
@@ -182,4 +185,8 @@ export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
 
 export async function getBlogKeywords(): Promise<BlogKeyword[]> {
     return apiFetch<BlogKeyword[]>('/keywords/', { revalidate: 600 })
+}
+
+export async function getBlogBySlug(slug: string): Promise<BlogPost> {
+    return apiFetch<BlogPost>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
 }

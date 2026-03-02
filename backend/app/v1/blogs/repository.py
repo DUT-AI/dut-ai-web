@@ -1,17 +1,25 @@
 from typing import Optional
 
 from app.core.base_repository import BaseRepository
-from sqlalchemy import extract, func
+from app.v1.users.models import User
+from sqlalchemy import String, extract, func, text
 from sqlalchemy.orm import Session, joinedload
 
 from .models import Blog, Keyword, blog_authors
-from app.v1.users.models import User
 
 
 class BlogRepository(BaseRepository[Blog]):
 
     def __init__(self, db: Session):
         super().__init__(Blog, db)
+
+    def get_by_slug(self, slug: str):
+        return (
+            self.db.query(Blog)
+            .options(joinedload(Blog.authors_rel), joinedload(Blog.keywords_rel))
+            .filter(Blog.slug == slug)
+            .first()
+        )
 
     def get_all_blogs(self, title: Optional[str] = None, keyword: Optional[str] = None):
         query = self.db.query(Blog).options(
@@ -56,17 +64,31 @@ class BlogRepository(BaseRepository[Blog]):
 
     def get_top_authors(self, limit: int = 5):
         """Lấy top tác giả theo tổng views qua bảng blog_authors join."""
+
         results = (
             self.db.query(
-                func.unnest(func.cast(Blog.authors_rel, String)).label(
-                    "author"
-                ),  # This is likely wrong now
+                User,
                 func.sum(Blog.views).label("total_views"),
+                func.count(Blog.id).label("post_count"),
             )
-            # This needs refactoring if authors is now a relationship
-            # But the user only asked for keywords. I'll focus on keywords for now.
-            .limit(limit).all()  # Placeholder
+            .join(blog_authors, User.id == blog_authors.c.user_id)
+            .join(Blog, Blog.id == blog_authors.c.blog_id)
+            .group_by(User.id)
+            .order_by(text("total_views DESC"))
+            .limit(limit)
+            .all()
         )
+        # Chuyển đổi sang format AuthorStats
+        return [
+            {
+                "id": author.id,
+                "name": author.name,
+                "avatar_url": getattr(author, "avatar_url", None),
+                "total_views": total_views,
+                "post_count": post_count,
+            }
+            for author, total_views, post_count in results
+        ]
 
     def get_related_blogs(self, blog_id: int, limit: int = 5):
         """Tìm bài viết liên quan dựa trên PostgreSQL Full-Text Search và Keywords."""

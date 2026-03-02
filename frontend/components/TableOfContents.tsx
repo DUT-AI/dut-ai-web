@@ -18,24 +18,63 @@ export default function TableOfContents({
 }: TableOfContentsProps) {
     const [headings, setHeadings] = useState<Heading[]>([])
     const [activeId, setActiveId] = useState<string>('')
-    const [expanded, setExpanded] = useState(false)
     const observerRef = useRef<IntersectionObserver | null>(null)
+
+    // ref cho container list để cuộn nội bộ
+    const navRef = useRef<HTMLElement>(null)
+    // ref map từ id → li element
+    const itemRefs = useRef<Map<string, HTMLLIElement>>(new Map())
 
     // ── Parse headings ──────────────────────────────────────────────────────────
     useEffect(() => {
-        const article = document.querySelector(contentSelector)
-        if (!article) return
-        const nodes = Array.from(article.querySelectorAll('h2, h3, h4'))
-        const items: Heading[] = nodes.map((node, i) => {
-            if (!node.id) node.id = `toc-${i}`
-            return {
-                id: node.id,
-                text: node.textContent ?? '',
-                level: parseInt(node.tagName[1], 10),
-            }
-        })
-        setHeadings(items)
+        const timer = setTimeout(() => {
+            const article = document.querySelector(contentSelector)
+            if (!article) return
+            const nodes = Array.from(article.querySelectorAll('h2, h3, h4'))
+            const items: Heading[] = nodes.map((node) => {
+                if (!node.id) {
+                    const text = node.textContent || ''
+                    node.id = text
+                        .toLowerCase()
+                        .replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/-+/g, '-')
+                        .replace(/^-|-$/g, '')
+                }
+                return {
+                    id: node.id,
+                    text: node.textContent ?? '',
+                    level: parseInt(node.tagName[1], 10),
+                }
+            })
+            setHeadings(items)
+        }, 300)
+
+        return () => clearTimeout(timer)
     }, [contentSelector])
+
+    // ── Auto-scroll TOC: giữ active item ở giữa container ───────────────────
+    useEffect(() => {
+        if (!activeId) return
+
+        const activeItem = itemRefs.current.get(activeId)
+        const container = navRef.current
+        if (!activeItem || !container) return
+
+        const containerRect = container.getBoundingClientRect()
+        const itemRect = activeItem.getBoundingClientRect()
+
+        const itemOffsetInContainer = itemRect.top - containerRect.top + container.scrollTop
+        const itemHeight = activeItem.clientHeight
+        const containerHeight = container.clientHeight
+
+        const targetScrollTop = itemOffsetInContainer - containerHeight / 2 + itemHeight / 2
+
+        // SỬ DỤNG behavior: 'auto' (hoặc bỏ behavior) để cập nhật tức thì.
+        // Khi dùng 'smooth', nếu setActiveId gọi liên tục (lúc đang cuộn trang), 
+        // các lệnh scroll của sidebar sẽ bị chồng chéo gây ra hiện tượng "giật".
+        container.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' })
+    }, [activeId])
 
     // ── Active tracking ─────────────────────────────────────────────────────────
     useEffect(() => {
@@ -46,9 +85,12 @@ export default function TableOfContents({
                 const visible = entries
                     .filter((e) => e.isIntersecting)
                     .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-                if (visible.length) setActiveId(visible[0].target.id)
+
+                if (visible.length) {
+                    setActiveId(visible[0].target.id)
+                }
             },
-            { rootMargin: '0px 0px -68% 0px', threshold: 0 }
+            { rootMargin: '-10% 0px -70% 0px', threshold: 0 }
         )
         headings.forEach(({ id }) => {
             const el = document.getElementById(id)
@@ -58,26 +100,25 @@ export default function TableOfContents({
     }, [headings])
 
     const handleClick = useCallback((id: string) => {
+        // Cuộn trang web
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        setActiveId(id)
-        setExpanded(false)   // collapse after navigation
+
+        // KHÔNG gọi setActiveId(id) ở đây. 
+        // Để IntersectionObserver tự bắt các heading trung gian khi trang cuộn qua.
+        // Điều này giúp hiệu ứng "chạy loăng quăng" (sequential highlight) mượt mà hơn.
     }, [])
 
     if (!headings.length) return null
-
-    // How far (0–1) through the document the active heading is
-    const activeIndex = headings.findIndex((h) => h.id === activeId)
-    const progress = headings.length > 1 ? Math.max(0, activeIndex) / (headings.length - 1) : 0
 
     return (
         <div className="hidden lg:block w-full lg:w-[300px] xl:w-[320px] shrink-0">
             <aside
                 aria-label="Mục lục bài viết"
-                className="sticky top-24 self-start bg-white dark:bg-gray-900 rounded-[24px] p-6 sm:p-8 shadow-sm ring-1 ring-gray-100 dark:ring-gray-800"
+                className="sticky top-24 self-start bg-white dark:bg-gray-900 rounded-[24px] shadow-sm ring-1 ring-gray-100 dark:ring-gray-800"
             >
-                {/* Header row */}
-                <div className="mb-6 flex items-center gap-3">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-blue-600 dark:text-blue-400">
+                {/* Header row – không cuộn */}
+                <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-4 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-blue-600 dark:text-blue-400 shrink-0">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                     <h3 className="text-sm font-extrabold uppercase tracking-widest text-gray-900 dark:text-gray-100">
@@ -85,13 +126,20 @@ export default function TableOfContents({
                     </h3>
                 </div>
 
-                <nav>
+                {/* Scrollable nav list */}
+                <nav ref={navRef} className="overflow-y-auto max-h-[calc(100vh-160px)] px-6 sm:px-8 py-5 no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <ul className="space-y-4">
                         {headings.map(({ id, text, level }, index) => {
-                            const isActive = activeId === id || (activeId === '' && index === 0);
+                            const isActive = activeId === id || (activeId === '' && index === 0)
 
                             return (
-                                <li key={id}>
+                                <li
+                                    key={id}
+                                    ref={(el) => {
+                                        if (el) itemRefs.current.set(id, el)
+                                        else itemRefs.current.delete(id)
+                                    }}
+                                >
                                     <button
                                         onClick={() => handleClick(id)}
                                         className={cn(

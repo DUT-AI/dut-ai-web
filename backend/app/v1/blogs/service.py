@@ -3,7 +3,7 @@ from typing import Optional
 from app.core.base_service import BaseService
 from fastapi import HTTPException
 
-from .models import Blog
+from .models import Blog, generate_slug
 from .repository import BlogRepository
 from .schemas import BlogCreate, BlogUpdate
 
@@ -17,7 +17,9 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         """Serialize a Blog model instance to dict with authors and keywords."""
         return {
             "id": blog.id,
+            "slug": blog.slug,
             "title": blog.title,
+            "summary": blog.summary or "",
             "content": blog.content,
             "image_url": blog.image_url,
             "views": blog.views,
@@ -52,6 +54,8 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
             blog.keywords_rel.append(kw)
 
         self.repo.db.add(blog)
+        self.repo.db.flush()  # get the ID
+        blog.slug = generate_slug(blog.title, blog.id)
         self.repo.db.commit()
         self.repo.db.refresh(blog)
         return blog
@@ -90,6 +94,28 @@ class BlogService(BaseService[Blog, BlogCreate, BlogUpdate]):
         blog = self.get_by_id(id)
         related = self.repo.get_related_blogs(id, related_limit)
 
+        blog_dict = self._serialize_blog(blog)
+        blog_dict["related_blogs"] = [self._serialize_blog(r) for r in related]
+
+        return blog_dict
+
+    def get_detail_by_slug(self, slug: str, related_limit: int = 5):
+        """Lấy blog detail bằng slug kèm bài viết liên quan."""
+        # Try finding by slug first
+        blog = self.repo.get_by_slug(slug)
+
+        # Fallback to ID if not found and slug is a number
+        if not blog and slug.isdigit():
+            blog = self.repo.get_by_id(int(slug))
+
+        if not blog:
+            raise HTTPException(status_code=404, detail="Không tìm thấy bài viết")
+
+        blog.views += 1
+        self.repo.db.commit()
+        self.repo.db.refresh(blog)
+
+        related = self.repo.get_related_blogs(blog.id, related_limit)
         blog_dict = self._serialize_blog(blog)
         blog_dict["related_blogs"] = [self._serialize_blog(r) for r in related]
 

@@ -17,6 +17,7 @@ class AuthorBrief(BaseModel):
 # Base class chứa các trường chung
 class BlogBase(BaseModel):
     title: str
+    summary: Optional[str] = None
     content: str
     image_url: Optional[str] = None
 
@@ -34,6 +35,7 @@ class BlogUpdate(BlogBase):
 # Schema để trả về
 class BlogResponse(BlogBase):
     id: int
+    slug: Optional[str] = None
     views: int
     authors: List[AuthorBrief] = []
     keywords: List[KeywordResponse] = []
@@ -54,6 +56,6 @@ class AuthorStatsResponse(BaseModel):
     avatar_url: Optional[str] = None
     total_views: int
     post_count: int
-    
+
     class Config:
         from_attributes = True

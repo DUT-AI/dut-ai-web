@@ -128,7 +128,6 @@ function LeadershipCard({
       </span>
       {occupation && (
         <p className="mb-3 text-xs text-slate-500 dark:text-white/60">{occupation}</p>
-        <p className="mb-3 text-xs text-slate-500 dark:text-white/60">{occupation}</p>
       )}
       {/* Socials */}
       {socials.length > 0 && (

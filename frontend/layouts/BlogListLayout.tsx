@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation'
 import Footer from '@/components/Footer'
 import type { BlogPost, BlogKeyword, AuthorStats } from 'app/api-client'
 import { slug } from 'github-slugger'
+import RelatedPosts from '@/components/RelatedPosts'
 
 interface PaginationProps {
     totalPages: number
@@ -87,12 +88,12 @@ function Pagination(props: PaginationProps) {
     )
 }
 
-// Các màu nền Card lấy cảm hứng từ Figma
+// Các màu nền Card cao cấp
 const gradients = [
-    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#22c55e40] dark:to-[#eab30840] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
-    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#64748b40] dark:to-[#14b8a640] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
-    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#f9731640] dark:to-[#ec489940] bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED]', // Orange to Pink
-    'bg-white dark:bg-gray-800 dark:bg-linear-to-br dark:from-[#8b5cf640] dark:to-[#d946ef40] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#22c55e1a] dark:to-[#eab3081a] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#64748b1a] dark:to-[#14b8a61a] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#f973161a] dark:to-[#ec48991a] bg-linear-to-r from-[#FFF5F5] to-[#FFF0ED]', // Orange to Pink
+    'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#8b5cf61a] dark:to-[#d946ef1a] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
 ]
 
 function formatDate(dateStr: string): string {
@@ -249,7 +250,7 @@ function BlogListLayoutInner({
                                                 {author.avatar_url ? (
                                                     <Image src={author.avatar_url} width={40} height={40} className="rounded-full w-10 h-10 object-cover" alt={author.name} />
                                                 ) : (
-                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                                                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
                                                         {author.name.charAt(0).toUpperCase()}
                                                     </div>
                                                 )}
@@ -271,42 +272,7 @@ function BlogListLayoutInner({
                         {/* Featured Posts Carousel */}
                         {!activeTagParam && !searchValue && (!pagination || pagination.currentPage === 1) && featuredPosts.length > 0 && (
                             <div className="mb-16 -mx-4 sm:mx-0">
-                                <div className="px-4 sm:px-0 mb-6">
-                                    <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">Bài viết nổi bật</h2>
-                                </div>
-                                <div className="flex gap-6 overflow-x-auto pb-4 px-4 sm:px-0 snap-x snap-mandatory scrollbar-hide">
-                                    {featuredPosts.map((post) => (
-                                        <Link
-                                            key={post.id}
-                                            href={`/blog/${post.id}`}
-                                            className="flex-none w-[280px] sm:w-[320px] snap-start group"
-                                        >
-                                            <div className="bg-white dark:bg-gray-900/50 rounded-2xl overflow-hidden shadow-sm ring-1 ring-gray-100 dark:ring-gray-800 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                                                {post.image_url && (
-                                                    <div className="aspect-[16/10] overflow-hidden">
-                                                        <Image
-                                                            src={post.image_url}
-                                                            alt={post.title}
-                                                            width={320}
-                                                            height={200}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                        />
-                                                    </div>
-                                                )}
-                                                <div className="p-4">
-                                                    <h3 className="font-bold text-sm text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                                        {post.title}
-                                                    </h3>
-                                                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                                        <span>{formatDate(post.created_at)}</span>
-                                                        <span>·</span>
-                                                        <span>{post.views} views</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
+                                <RelatedPosts posts={featuredPosts} title="Bài viết nổi bật" />
                             </div>
                         )}
 
@@ -323,38 +289,37 @@ function BlogListLayoutInner({
                         <div className="flex flex-col space-y-6">
                             {displayPosts.map((post, index) => {
                                 const backgroundClass = gradients[index % gradients.length]
-                                const firstKeyword = post.keywords?.[0]
 
                                 return (
                                     <article
                                         key={post.id}
-                                        className={`rounded-[32px] p-8 sm:p-10 ${backgroundClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group`}
+                                        className={`rounded-[32px] p-8 sm:p-10 ${backgroundClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group cursor-pointer`}
                                     >
+                                        {/* Full-card click overlay */}
+                                        <Link href={`/blog/${post.slug || post.id}`} className="absolute inset-0 z-[1]" aria-hidden="true" />
+
                                         <div className="flex flex-col h-full relative z-10">
 
                                             {/* Top Row: Date & Tag */}
                                             <div className="flex flex-wrap items-center gap-4 mb-5">
-                                                <time dateTime={post.created_at} className="text-sm font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
+                                                <time dateTime={post.created_at} className="text-sm font-bold tracking-wide text-gray-500/80 dark:text-gray-400 uppercase">
                                                     {formatDate(post.created_at)}
                                                 </time>
-                                                {firstKeyword && (
-                                                    <Link href={`/blog?tag=${encodeURIComponent(firstKeyword.keyword_name)}`} className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors">
-                                                        <span className="opacity-60 mr-0.5">#</span>{firstKeyword.keyword_name}
+                                                {post.keywords?.map((keyword, index) => (
+                                                    <Link key={index} href={`/blog?tag=${encodeURIComponent(keyword.keyword_name)}`} className="relative z-20 bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors border border-blue-100/50 dark:border-blue-900/30">
+                                                        <span className="opacity-60 mr-0.5">#</span>{keyword.keyword_name}
                                                     </Link>
-                                                )}
+                                                ))}
                                             </div>
 
                                             {/* Title & Summary */}
                                             <div className="mb-8">
                                                 <h2 className="text-[26px] md:text-[28px] leading-tight font-extrabold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                                    <Link href={`/blog/${post.id}`} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg">
-                                                        <span className="absolute inset-0 z-0" aria-hidden="true" />
-                                                        {post.title}
-                                                    </Link>
+                                                    {post.title}
                                                 </h2>
 
                                                 <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl line-clamp-2">
-                                                    {post.content?.substring(0, 200)}
+                                                    {post.summary || post.content?.substring(0, 300)}
                                                 </p>
                                             </div>
 
@@ -367,7 +332,7 @@ function BlogListLayoutInner({
                                                                 author.avatar_url ? (
                                                                     <Image key={author.id} src={author.avatar_url} width={28} height={28} className="rounded-full w-7 h-7 object-cover ring-2 ring-white dark:ring-gray-900" alt={author.name} />
                                                                 ) : (
-                                                                    <div key={author.id} className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white dark:ring-gray-900">
+                                                                    <div key={author.id} className="w-7 h-7 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white dark:ring-gray-900">
                                                                         {author.name.charAt(0).toUpperCase()}
                                                                     </div>
                                                                 )

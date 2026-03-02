@@ -74,7 +74,7 @@ class AutoUploadWidget(widgets.FileInput):
 
                 // --- SELECT2 TAGGING ---
                 const reinitSelect2 = () => {{
-                    const $kw = jQuery('select[name="keywords_rel"]');
+                    const $kw = jQuery('select[name="keywords_tags"]');
                     if ($kw.length) {{
                         const s2 = $kw.data('select2');
                         if (s2) $kw.select2('destroy');
@@ -113,6 +113,7 @@ class BlogAdmin(BaseAdmin, model=Blog):
     column_list = [
         Blog.id,
         Blog.title,
+        Blog.summary,
         Blog.authors_rel,
         Blog.keywords_rel,
         Blog.views,
@@ -120,9 +121,9 @@ class BlogAdmin(BaseAdmin, model=Blog):
     ]
     form_columns = [
         Blog.title,
+        Blog.summary,
         Blog.content,
         Blog.authors_rel,
-        Blog.keywords_rel,
         Blog.image_url,
     ]
     column_searchable_list = [Blog.title]
@@ -136,6 +137,7 @@ class BlogAdmin(BaseAdmin, model=Blog):
 
     form_overrides = {
         "image_url": TextAreaField,
+        "summary": TextAreaField,
     }
     form_args = {
         "image_url": {
@@ -145,27 +147,31 @@ class BlogAdmin(BaseAdmin, model=Blog):
                 "placeholder": "link ảnh...",
             }
         },
+        "summary": {
+            "render_kw": {
+                "rows": 3,
+                "class": "form-control",
+                "placeholder": "tóm tắt bài viết...",
+            }
+        },
     }
 
     async def scaffold_form(self, *args, **kwargs):
         form_class = await super().scaffold_form(*args, **kwargs)
 
-        # Replace keywords_rel field with our TaggableSelectMultipleField
-        original_field = getattr(form_class, "keywords_rel", None)
-        if original_field:
-            from app.v1.keywords.models import Keyword
-            from app.core.database import SessionLocal
+        from app.v1.keywords.models import Keyword
+        from app.core.database import SessionLocal
 
-            # Get existing keywords for choices
-            with SessionLocal() as session:
-                keywords = session.query(Keyword).all()
-                choices = [(str(kw.id), kw.keyword_name) for kw in keywords]
+        # Get existing keywords for choices
+        with SessionLocal() as session:
+            keywords = session.query(Keyword).all()
+            choices = [(str(kw.id), kw.keyword_name) for kw in keywords]
 
-            form_class.keywords_rel = TaggableSelectMultipleField(
-                label="Keywords Rel",
-                choices=choices,
-                render_kw={"class": "form-control"},
-            )
+        form_class.keywords_tags = TaggableSelectMultipleField(
+            label="Từ khóa",
+            choices=choices,
+            render_kw={"class": "form-control"},
+        )
 
         form_class.upload_new_images = MultipleFileField(
             "Tải thêm ảnh mới (Tự động up và nhả link ngay lập tức)",
@@ -173,19 +179,35 @@ class BlogAdmin(BaseAdmin, model=Blog):
         )
         return form_class
 
+    async def get_form(self, *args, **kwargs):
+        form = await super().get_form(*args, **kwargs)
+        obj = kwargs.get("obj")
+        if obj and hasattr(obj, "keywords_rel"):
+            form.keywords_tags.data = [str(kw.id) for kw in obj.keywords_rel]
+        return form
+
     async def on_model_change(self, data: dict, model: any, is_created: bool, request):
         data.pop("upload_new_images", None)
 
-        # Handle keywords: create new ones, convert all to integer IDs
-        if "keywords_rel" in data:
-            keyword_items = data.get("keywords_rel", [])
+        # Handle keywords: create new ones, manage relationship manually
+        if "keywords_tags" in data:
+            keyword_items = data.pop("keywords_tags", [])
             if not isinstance(keyword_items, (list, set)):
                 keyword_items = [keyword_items] if keyword_items else []
 
-            resolved_ids = []
-            with self.session_maker() as session:
-                from app.v1.keywords.models import Keyword
+            from sqlalchemy.orm import object_session
+            from app.v1.keywords.models import Keyword
 
+            # Get the session the model belongs to, or create a new one if not yet attached
+            session = object_session(model)
+            external_session = False
+
+            if not session:
+                session = self.session_maker()
+                external_session = True
+
+            try:
+                resolved_objs = []
                 for item in keyword_items:
                     if not item:
                         continue
@@ -193,10 +215,12 @@ class BlogAdmin(BaseAdmin, model=Blog):
                     if not item_str:
                         continue
 
+                    kw = None
                     if item_str.isdigit():
-                        resolved_ids.append(str(item_str))
-                    else:
-                        # New keyword — get or create
+                        kw = session.get(Keyword, int(item_str))
+
+                    if not kw:
+                        # Check keyword by name
                         kw = (
                             session.query(Keyword)
                             .filter(Keyword.keyword_name == item_str)
@@ -206,10 +230,31 @@ class BlogAdmin(BaseAdmin, model=Blog):
                             kw = Keyword(keyword_name=item_str, number_blog_contain=0)
                             session.add(kw)
                             session.flush()
-                        resolved_ids.append(str(kw.id))
 
-                session.commit()
+                    if kw:
+                        resolved_objs.append(kw)
 
-            data["keywords_rel"] = resolved_ids
+                # Update relationship
+                model.keywords_rel = resolved_objs
+
+                if external_session:
+                    session.commit()
+            finally:
+                if external_session:
+                    session.close()
 
         await super().on_model_change(data, model, is_created, request)
+
+    async def after_model_change(
+        self, data: dict, model: any, is_created: bool, request
+    ):
+        """Auto-generate slug after model is saved (so we have the ID)."""
+        from .models import generate_slug
+
+        if is_created or not model.slug:
+            from sqlalchemy.orm import object_session
+
+            session = object_session(model)
+            if session and model.id:
+                model.slug = generate_slug(model.title, model.id)
+                session.commit()

@@ -22,7 +22,6 @@ const siteMetadata = {
   instagram: 'https://instagram.com/dutai.club',
   medium: '',
   bluesky: '',
-  locale: 'vi-VN',
   phone: '0123.456.789',
   address: '54 Nguyễn Lương Bằng, Liên Chiểu, Đà Nẵng',
   slogan: 'Dreams Never Need Half Hearts',
