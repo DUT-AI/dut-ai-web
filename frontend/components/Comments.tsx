@@ -20,9 +20,9 @@ export default function Comments({ slug }: { slug: string }) {
       ...(siteMetadata.comments as { giscusConfig?: Record<string, unknown> }).giscusConfig,
       theme: isDark
         ? ((siteMetadata.comments as { giscusConfig?: Record<string, unknown> }).giscusConfig
-            ?.darkTheme ?? 'dark_dimmed')
+          ?.darkTheme ?? 'dark_dimmed')
         : ((siteMetadata.comments as { giscusConfig?: Record<string, unknown> }).giscusConfig
-            ?.theme ?? 'light'),
+          ?.theme ?? 'light'),
     },
   }
 
