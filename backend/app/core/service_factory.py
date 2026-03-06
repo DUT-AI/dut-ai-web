@@ -1,3 +1,4 @@
+from sqlalchemy.orm import Session
 from app.v1.projects.service import ProjectService
 from app.v1.introductions.service import IntroductionService
 from app.v1.users.service import UserService
@@ -7,6 +8,7 @@ from app.v1.keywords.service import KeywordService
 from app.v1.homepage.service import HomepageService
 from app.v1.public_events.service import PublicEventService
 from app.v1.posts.service import PostService
+from app.admin_v2.service import AdminService
 from .repository_factory import RepositoryFactory
 
 
@@ -19,6 +21,16 @@ class ServiceFactory:
     def __init__(self, repo_factory: RepositoryFactory):
         self._repo = repo_factory
         self._cache: dict = {}
+
+    @property
+    def db(self) -> Session:
+        return self._repo.db
+
+    @property
+    def admin(self) -> AdminService:
+        if "admin" not in self._cache:
+            self._cache["admin"] = AdminService(self)
+        return self._cache["admin"]
 
     @property
     def project(self) -> ProjectService:

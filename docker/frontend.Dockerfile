@@ -21,7 +21,7 @@ WORKDIR /app
 # Copy source code first, including .env from parent directory
 # Since context is ./ (root), we can copy frontend and .env
 COPY frontend ./
-COPY .env ../.env
+COPY .env ./
 
 # Then overlay node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules

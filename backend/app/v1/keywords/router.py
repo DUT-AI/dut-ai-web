@@ -7,7 +7,7 @@ from .schema import KeywordCreate, KeywordUpdate, KeywordResponse
 keyword_router = APIRouter(prefix="/keywords", tags=["Keywords"])
 
 
-@keyword_router.get("/", response_model=list[KeywordResponse])
+@keyword_router.get("", response_model=list[KeywordResponse])
 def get_keywords(service_factory=Depends(get_service_factory)):
     return service_factory.keyword.get_all()
 
@@ -17,7 +17,7 @@ def get_keyword(id: int, service_factory=Depends(get_service_factory)):
     return service_factory.keyword.get_by_id(id)
 
 
-@keyword_router.post("/", response_model=KeywordResponse)
+@keyword_router.post("", response_model=KeywordResponse)
 def create_keyword(
     keyword: KeywordCreate, service_factory=Depends(get_service_factory)
 ):

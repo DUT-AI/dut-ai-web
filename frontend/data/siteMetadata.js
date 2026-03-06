@@ -6,13 +6,13 @@ const siteMetadata = {
   description: 'Câu lạc bộ AI hàng đầu tại Đại học Bách Khoa - ĐHĐN (DUT), nơi kết nối đam mê nghiên cứu và ứng dụng Artificial Intelligence tại Đà Nẵng.',
   language: 'vi',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://clb.dutai.site/',
+  siteUrl: 'https://clb.dutai.site',
   siteRepo: 'https://github.com/dutai-club',
   locale: 'vi-VN',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-no-background.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
+  socialBanner: `${process.env.BASE_PATH || ''}/static/images/dut-ai-banner.png`,
   mastodon: '',
-  email: 'contact@dutai.site',
+  email: 'dut.ai.clb@gmail.com',
   github: 'https://github.com/dutai-club',
   x: 'https://twitter.com/dutaiclub',
   facebook: 'https://www.facebook.com/dutai.club',
@@ -22,10 +22,10 @@ const siteMetadata = {
   instagram: 'https://instagram.com/dutai.club',
   medium: '',
   bluesky: '',
-  locale: 'vi-VN',
   phone: '0123.456.789',
   address: '54 Nguyễn Lương Bằng, Liên Chiểu, Đà Nẵng',
   slogan: 'Dreams Never Need Half Hearts',
+  googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   // set to true if you want a navbar fixed to the top
   stickyNav: true,
   analytics: {

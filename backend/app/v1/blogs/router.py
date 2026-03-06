@@ -8,7 +8,7 @@ from .schemas import AuthorStatsResponse, BlogDetailResponse, BlogResponse
 router = APIRouter(prefix="/blogs", tags=["Blogs"])
 
 
-@router.get("/", response_model=list[BlogResponse])
+@router.get("", response_model=list[BlogResponse])
 def get_blogs(
     title: Optional[str] = Query(None, description="Tìm theo tiêu đề bài viết"),
     keyword: Optional[str] = Query(None, description="Tìm theo từ khóa (keywords)"),
@@ -36,3 +36,8 @@ def get_top_authors(
 @router.get("/{id}", response_model=BlogDetailResponse)
 def get_blog(id: int, service_factory=Depends(get_service_factory)):
     return service_factory.blog.get_detail_with_related(id)
+
+
+@router.get("/by-slug/{slug}", response_model=BlogDetailResponse)
+def get_blog_by_slug(slug: str, service_factory=Depends(get_service_factory)):
+    return service_factory.blog.get_detail_by_slug(slug)

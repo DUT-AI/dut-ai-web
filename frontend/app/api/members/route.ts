@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
         const query = searchParams.toString()
-        const url = `${API_BASE}/members${query ? `?${query}` : ''}`
+        const url = `${API_BASE}/users${query ? `?${query}` : ''}`
 
         const res = await fetch(url, {
             next: { revalidate: 300 }, // cache 5 minutes

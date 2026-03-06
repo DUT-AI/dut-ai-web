@@ -1,7 +1,6 @@
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
-import { notFound } from 'next/navigation'
 import { genPageMetadata } from 'app/seo'
+import { getBlogs, getFeaturedBlogs, getTopAuthors, getBlogKeywords } from 'app/api-client'
+import type { BlogPost, BlogKeyword, AuthorStats } from 'app/api-client'
 import BlogListLayout from '@/layouts/BlogListLayout'
 
 const POSTS_PER_PAGE = 10
@@ -12,10 +11,26 @@ export const metadata = genPageMetadata({
   keywords: ['blog AI', 'bài viết machine learning', 'học deep learning', 'AI blog tiếng Việt', 'nghiên cứu AI sinh viên'],
 })
 
+export const dynamic = 'force-dynamic'
+
 export default async function BlogPage() {
-  const allPosts = allCoreContent(sortPosts(allBlogs))
-  // Filter out event-tagged posts — those live under /events
-  const posts = allPosts.filter((post) => !post.tags?.includes('event'))
+  let posts: BlogPost[] = []
+  let featuredPosts: BlogPost[] = []
+  let featuredAuthors: AuthorStats[] = []
+  let tags: BlogKeyword[] = []
+  let error = false
+
+  try {
+    ;[posts, featuredPosts, featuredAuthors, tags] = await Promise.all([
+      getBlogs(),
+      getFeaturedBlogs(5),
+      getTopAuthors(5),
+      getBlogKeywords(),
+    ])
+  } catch {
+    error = true
+  }
+
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
   const initialDisplayPosts = posts.slice(0, POSTS_PER_PAGE)
   const pagination = {
@@ -29,6 +44,9 @@ export default async function BlogPage() {
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
       title="All Posts"
+      featuredPosts={featuredPosts}
+      featuredAuthors={featuredAuthors}
+      tags={tags}
     />
   )
 }

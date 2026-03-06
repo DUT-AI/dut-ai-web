@@ -11,6 +11,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import TSVECTOR
+from slugify import slugify
 from app.core.database import Base
 from app.core.mixins import HasImageUpload
 import datetime
@@ -36,11 +37,19 @@ from app.v1.users.models import User
 from app.v1.keywords.models import Keyword
 
 
+def generate_slug(title: str, blog_id: int) -> str:
+    """Generate a URL-friendly slug from title + id. Handles Vietnamese characters."""
+    base = slugify(title, max_length=200)
+    return f"{base}-{blog_id}" if base else str(blog_id)
+
+
 class Blog(Base, HasImageUpload):
     __tablename__ = "blogs"
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255), nullable=False)
+    slug = Column(String(500), unique=True, index=True, nullable=True)
+    summary = Column(Text, nullable=True)
     content = Column(Text, nullable=False)
     authors_rel = relationship("User", secondary=blog_authors, backref="blogs")
     views = Column(Integer, default=0)
