@@ -41,8 +41,11 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
           </div>
           <div className="prose dark:prose-invert max-w-none py-4">{children}</div>
           {siteMetadata.comments && (
-            <div className="pt-6 pb-6 text-center text-gray-700 dark:text-gray-300" id="comment">
-              <Comments slug={slug} />
+            <div className="pt-8 pb-6" id="comment">
+              <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6">Bình luận</h2>
+              <div className="rounded-[32px] bg-white dark:bg-[#22272e] p-8 ring-1 ring-gray-100 dark:ring-white/10">
+                <Comments slug={slug} />
+              </div>
             </div>
           )}
           <footer>

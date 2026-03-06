@@ -36,12 +36,12 @@ export default function RoadmapSection() {
                     {/* Phase 01 Cards Container */}
                     <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3 pl-0 md:pl-10">
                         {[
-                            { icon: '🖥️', title: 'Python cơ bản', desc: 'Xây dựng nền tảng lập trình vững chắc với ngôn ngữ phổ biến nhất trong AI.', time: 'Tháng 1-2', timeColor: 'text-[#2563EB]', bg: 'bg-[#EFF6FF] dark:bg-blue-900/30' },
-                            { icon: '∑', title: 'Toán cho AI', desc: 'Đại số tuyến tính, giải tích và tối ưu hóa – ngôn ngữ của trí tuệ nhân tạo.', time: 'Tháng 2-3', timeColor: 'text-[#EC4899]', bg: 'bg-[#FFE4E6] dark:bg-pink-900/30' },
-                            { icon: '📊', title: 'Thống kê & ML', desc: 'Từ các thuật toán cổ điển đến các mô hình dự đoán hiện đại nhất.', time: 'Tháng 3-4', timeColor: 'text-[#8B5CF6]', bg: 'bg-[#F3E8FF] dark:bg-purple-900/30' },
-                            { icon: '🧠', title: 'Deep Learning', desc: 'Mạng nơ-ron sâu và các kiến trúc Transformer đột phá.', time: 'Tháng 4-5', timeColor: 'text-[#0D9488]', bg: 'bg-[#CCFBF1] dark:bg-teal-900/30' },
-                            { icon: '👁️', title: 'Computer Vision', desc: 'Xử lý hình ảnh, nhận diện vật thể và phân đoạn ngữ nghĩa.', time: 'Tháng 5-6', timeColor: 'text-[#A855F7]', bg: 'bg-[#F3E8FF] dark:bg-purple-900/30' },
-                            { icon: '💬', title: 'NLP & Generative AI', desc: 'Xử lý ngôn ngữ tự nhiên và kỷ nguyên của Generative AI.', time: 'Tháng 6-7', timeColor: 'text-[#F97316]', bg: 'bg-[#FFEDD5] dark:bg-orange-900/30' },
+                            { icon: '🖥️', title: 'Python cơ bản', desc: 'Xây dựng nền tảng lập trình vững chắc với ngôn ngữ phổ biến nhất trong AI.', time: 'Tháng 1-2', timeColor: 'text-[#2563EB]', bg: 'bg-[#EFF6FF] dark:bg-blue-700/50' },
+                            { icon: '∑', title: 'Toán cho AI', desc: 'Đại số tuyến tính, giải tích và tối ưu hóa – ngôn ngữ của trí tuệ nhân tạo.', time: 'Tháng 2-3', timeColor: 'text-[#EC4899]', bg: 'bg-[#FFE4E6] dark:bg-pink-700/50' },
+                            { icon: '📊', title: 'Thống kê & ML', desc: 'Từ các thuật toán cổ điển đến các mô hình dự đoán hiện đại nhất.', time: 'Tháng 3-4', timeColor: 'text-[#8B5CF6]', bg: 'bg-[#F3E8FF] dark:bg-purple-700/50' },
+                            { icon: '🧠', title: 'Deep Learning', desc: 'Mạng nơ-ron sâu và các kiến trúc Transformer đột phá.', time: 'Tháng 4-5', timeColor: 'text-[#0D9488]', bg: 'bg-[#CCFBF1] dark:bg-teal-700/50' },
+                            { icon: '👁️', title: 'Computer Vision', desc: 'Xử lý hình ảnh, nhận diện vật thể và phân đoạn ngữ nghĩa.', time: 'Tháng 5-6', timeColor: 'text-[#A855F7]', bg: 'bg-[#F3E8FF] dark:bg-purple-700/50' },
+                            { icon: '💬', title: 'NLP & Generative AI', desc: 'Xử lý ngôn ngữ tự nhiên và kỷ nguyên của Generative AI.', time: 'Tháng 6-7', timeColor: 'text-[#F97316]', bg: 'bg-[#FFEDD5] dark:bg-orange-700/50' },
                         ].map((item, idx) => (
                             <div key={idx} className="flex flex-col rounded-[32px] bg-white dark:bg-gray-800 p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
                                 <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-[16px] ${item.bg} text-2xl`}>
@@ -79,10 +79,10 @@ export default function RoadmapSection() {
                     <div className="grid gap-6 md:gap-8 grid-cols-2 lg:grid-cols-4 pl-0 md:pl-10">
                         {/* Top row - 4 items */}
                         {[
-                            { icon: '💼', title: 'Dự án\nLab', bg: 'bg-[#EFF6FF] dark:bg-blue-900/30' },
-                            { icon: '💻', title: 'Hackathons', bg: 'bg-[#FFE4E6] dark:bg-pink-900/30' },
-                            { icon: '🔬', title: 'Nghiên\ncứu', bg: 'bg-[#FEF9C3] dark:bg-yellow-900/30' },
-                            { icon: '👥', title: 'Cộng\nđồng', bg: 'bg-[#F3E8FF] dark:bg-purple-900/30' },
+                            { icon: '💼', title: 'Dự án\nLab', bg: 'bg-[#EFF6FF] dark:bg-blue-700/50' },
+                            { icon: '💻', title: 'Hackathons', bg: 'bg-[#FFE4E6] dark:bg-pink-700/50' },
+                            { icon: '🔬', title: 'Nghiên\ncứu', bg: 'bg-[#FEF9C3] dark:bg-yellow-700/50' },
+                            { icon: '👥', title: 'Cộng\nđồng', bg: 'bg-[#F3E8FF] dark:bg-purple-700/50' },
                         ].map((item, idx) => (
                             <div key={idx} className="col-span-1 flex flex-col items-center justify-center gap-5 rounded-[32px] bg-white dark:bg-gray-800 p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
                                 <div className={`flex h-20 w-20 items-center justify-center rounded-full ${item.bg} text-3xl`}>
@@ -94,8 +94,8 @@ export default function RoadmapSection() {
 
                         {/* Bottom row - 2 wide items */}
                         {[
-                            { icon: '🏆', title: 'Competitions', bg: 'bg-[#FEF9C3] dark:bg-yellow-900/30' },
-                            { icon: '🛠️', title: 'Workshops', bg: 'bg-[#EFF6FF] dark:bg-blue-900/30' },
+                            { icon: '🏆', title: 'Competitions', bg: 'bg-[#FEF9C3] dark:bg-yellow-700/50' },
+                            { icon: '🛠️', title: 'Workshops', bg: 'bg-[#EFF6FF] dark:bg-blue-700/50' },
                         ].map((item, idx) => (
                             <div key={`bottom-${idx}`} className="col-span-2 flex flex-col items-center justify-center gap-5 rounded-[32px] bg-white dark:bg-gray-800 px-8 py-10 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
                                 <div className={`flex h-20 w-20 items-center justify-center rounded-full ${item.bg} text-3xl`}>

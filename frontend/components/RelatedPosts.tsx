@@ -25,10 +25,13 @@ export default function RelatedPosts({ posts, hideTitle }: RelatedPostsProps) {
     const [canScrollLeft, setCanScrollLeft] = useState(false)
     const [canScrollRight, setCanScrollRight] = useState(true)
 
-    if (!posts || posts.length === 0) return null
+    // Filter out event-tagged posts defensively
+    const safePosts = (posts || []).filter((p) => !p.tags?.some((t) => t.toLowerCase() === 'event'))
+
+    if (safePosts.length === 0) return null
 
     // Ensure 7 posts
-    const displayPosts = posts.slice(0, 7)
+    const displayPosts = safePosts.slice(0, 7)
 
     const checkScroll = () => {
         if (scrollRef.current) {

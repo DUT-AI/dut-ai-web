@@ -14,7 +14,7 @@ import { useState, Suspense } from 'react'
 import { Search } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import Footer from '@/components/Footer'
-import { allAuthors } from 'contentlayer/generated'
+import { allAuthors, allBlogs } from 'contentlayer/generated'
 import RelatedPosts from '@/components/RelatedPosts'
 
 interface PaginationProps {
@@ -135,8 +135,24 @@ function BlogListLayoutInner({
     const totalPagesForTag = activeTagParam ? Math.ceil(basePosts.length / 10) : pagination?.totalPages
     const adjustedPagination = pagination && totalPagesForTag ? { ...pagination, totalPages: totalPagesForTag } : pagination
 
-    const featuredPosts = posts.slice(0, 5)
+    // TODO: Replace mockViewCount with real API call for view counts
+    const mockViewCount = (str: string): string => {
+        let hash = 0
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash)
+        const major = (Math.abs(hash) % 9) + 1
+        const minor = Math.abs(hash >> 4) % 10
+        return `${major}.${minor}k`
+    }
+    const featuredPosts = posts
+        .filter((p) => !p.tags?.some((t) => t.toLowerCase() === 'event'))
+        .slice(0, 5)
     const featuredAuthors = allAuthors.slice(0, 5)
+    const postCountBySlug = featuredAuthors.reduce<Record<string, number>>((acc, author) => {
+        acc[author.slug] = allBlogs.filter(
+            (b) => !b.draft && b.authors?.includes(author.slug)
+        ).length
+        return acc
+    }, {})
 
 
     return (
@@ -211,7 +227,7 @@ function BlogListLayoutInner({
                                 )}
 
                                 {/* Tag Pills */}
-                                <div className="flex flex-col space-y-2">
+                                <div className="flex flex-wrap gap-2">
                                     {sortedTags.map((t) => {
                                         const tagSlug = slug(t)
                                         const isActive = activeTagParam === tagSlug
@@ -247,6 +263,9 @@ function BlogListLayoutInner({
                                             <div className="flex-1 min-w-0">
                                                 <h4 className="font-bold text-[14px] text-gray-900 dark:text-white truncate">{author.name}</h4>
                                                 <p className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{author.occupation}</p>
+                                                <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                                                    {postCountBySlug[author.slug] ?? 0} bài · {mockViewCount(author.slug)} lượt xem
+                                                </p>
                                             </div>
                                         </div>
                                     ))}
