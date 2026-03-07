@@ -7,9 +7,17 @@ from typing import List, Optional
 from app.core.dependencies import get_service_factory
 from app.v1.blogs.schemas import BlogCreate, BlogUpdate
 
+from app.core.auth import is_admin_logged_in
+
+
 router = APIRouter(prefix="/admin_v2", tags=["Admin V2"])
 templates = Jinja2Templates(directory="app/templates")
 
+def _redirect_login():
+    return RedirectResponse(url="/admin_v2/login", status_code=303)
+
+def _require_admin(request: Request) -> bool:
+    return is_admin_logged_in(request)
 
 @router.get("", response_class=HTMLResponse)
 async def admin_dashboard(
@@ -32,6 +40,8 @@ async def admin_dashboard(
 async def admin_blogs_list(
     request: Request, service_factory=Depends(get_service_factory)
 ):
+    if not _require_admin(request):
+        return _redirect_login()
     # Using repository directly through service for joinedload, or we could add a method to service
     blogs = service_factory.blog.repo.get_all_blogs()
     return templates.TemplateResponse(
@@ -49,6 +59,8 @@ async def admin_blogs_list(
 async def admin_blogs_create(
     request: Request, service_factory=Depends(get_service_factory)
 ):
+    if not _require_admin(request):
+        return _redirect_login()
     all_authors = service_factory.user.get_all()
     all_keywords = service_factory.keyword.get_all()
     return templates.TemplateResponse(
@@ -67,6 +79,8 @@ async def admin_blogs_create(
 async def admin_blogs_edit(
     blog_id: int, request: Request, service_factory=Depends(get_service_factory)
 ):
+    if not _require_admin(request):
+        return _redirect_login()
     blog = service_factory.blog.get_by_id(blog_id)
     all_authors = service_factory.user.get_all()
     all_keywords = service_factory.keyword.get_all()
@@ -94,6 +108,8 @@ async def admin_blogs_save(
     keyword_tags: List[str] = Form([]),
     service_factory=Depends(get_service_factory),
 ):
+    if not _require_admin(request):
+        return _redirect_login()
     blog_data = {
         "title": title,
         "content": content,

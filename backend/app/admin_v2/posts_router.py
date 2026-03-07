@@ -6,6 +6,13 @@ from typing import Optional, List
 from app.core.dependencies import get_service_factory
 from app.v1.posts.schemas import PostCreate, PostUpdate
 
+from app.core.auth import is_admin_logged_in
+def _redirect_login():
+    return RedirectResponse(url="/admin_v2/login", status_code=303)
+
+def _require_admin(request: Request) -> bool:
+    return is_admin_logged_in(request)
+
 router = APIRouter(prefix="/admin_v2", tags=["Admin V2"])
 templates = Jinja2Templates(directory="app/templates")
 
@@ -26,6 +33,8 @@ def _parse_img_urls(raw: Optional[str]) -> List[str]:
 
 @router.get("/posts", response_class=HTMLResponse)
 async def admin_posts_list(request: Request, service_factory=Depends(get_service_factory)):
+    if not _require_admin(request):
+        return _redirect_login()
     posts = service_factory.post.get_all()
     return templates.TemplateResponse(
         "admin_v2/posts/list.html",
@@ -35,6 +44,8 @@ async def admin_posts_list(request: Request, service_factory=Depends(get_service
 
 @router.get("/posts/create", response_class=HTMLResponse)
 async def admin_posts_create(request: Request, service_factory=Depends(get_service_factory)):
+    if not _require_admin(request):
+        return _redirect_login()
     return templates.TemplateResponse(
         "admin_v2/posts/edit.html",
         {"request": request, "post": None, "active_page": "posts", "img_urls_text": ""},
@@ -43,6 +54,8 @@ async def admin_posts_create(request: Request, service_factory=Depends(get_servi
 
 @router.get("/posts/edit/{post_id}", response_class=HTMLResponse)
 async def admin_posts_edit(post_id: int, request: Request, service_factory=Depends(get_service_factory)):
+    if not _require_admin(request):
+        return _redirect_login()
     post = service_factory.post.get_by_id(post_id)
     img_urls = getattr(post, "img_urls", None) or []
     img_urls_text = "\n".join(img_urls) if isinstance(img_urls, list) else str(img_urls)
@@ -65,6 +78,8 @@ async def admin_posts_save(
     facebook_url: Optional[str] = Form(None),
     service_factory=Depends(get_service_factory),
 ):
+    if not _require_admin(request):
+        return _redirect_login()
     data = {
         "title": title.strip(),
         "description": _clean_text(description),
