@@ -7,6 +7,13 @@ from fastapi.templating import Jinja2Templates
 from app.core.dependencies import get_service_factory
 from app.v1.public_events.schemas import PublicEventCreate, PublicEventUpdate
 
+from app.core.auth import is_admin_logged_in
+def _redirect_login():
+    return RedirectResponse(url="/admin_v2/login", status_code=303)
+
+def _require_admin(request: Request) -> bool:
+    return is_admin_logged_in(request)
+
 router = APIRouter(prefix="/admin_v2", tags=["Admin V2"])
 templates = Jinja2Templates(directory="app/templates")
 
@@ -47,6 +54,8 @@ def _parse_tags(tags_str: Optional[str]) -> List[str]:
 
 @router.get("/events", response_class=HTMLResponse)
 async def admin_events_list(request: Request, service_factory=Depends(get_service_factory)):
+    if not _require_admin(request):
+        return _redirect_login()
     events = service_factory.public_event.get_all()
 
     for e in events:
@@ -65,6 +74,8 @@ async def admin_events_list(request: Request, service_factory=Depends(get_servic
 
 @router.get("/events/create", response_class=HTMLResponse)
 async def admin_events_create(request: Request, service_factory=Depends(get_service_factory)):
+    if not _require_admin(request):
+        return _redirect_login()
     return templates.TemplateResponse(
         "admin_v2/events/edit.html",
         {
@@ -78,6 +89,8 @@ async def admin_events_create(request: Request, service_factory=Depends(get_serv
 
 @router.get("/events/edit/{event_id}", response_class=HTMLResponse)
 async def admin_events_edit(event_id: int, request: Request, service_factory=Depends(get_service_factory)):
+    if not _require_admin(request):
+        return _redirect_login()
     event = service_factory.public_event.get_by_id(event_id)
     tags_str = ", ".join(event.tags) if getattr(event, "tags", None) else ""
 
@@ -110,6 +123,8 @@ async def admin_events_save(
     tags: Optional[str] = Form(None),
     service_factory=Depends(get_service_factory),
 ):
+    if not _require_admin(request):
+        return _redirect_login()
     data = {
         "title": title.strip(),
         "description": _clean_text(description),

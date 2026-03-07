@@ -7,30 +7,59 @@ from starlette.responses import RedirectResponse
 from app.core.config import settings
 
 
-class AdminAuth(AuthenticationBackend):
-    """Simple password-based authentication for SQLAdmin."""
+def set_admin_session(request: Request) -> None:
+    token = secrets.token_hex(32)
+    request.session.update(
+        {
+            "admin_token": token,
+            "admin_user": {
+                "username": settings.ADMIN_USERNAME,
+                "role_name": "admin",
+                "status": "active",
+            },
+        }
+    )
 
+
+def clear_admin_session(request: Request) -> None:
+    request.session.clear()
+
+
+def is_admin_logged_in(request: Request) -> bool:
+    session = request.scope.get("session") or {}
+    admin_user = session.get("admin_user")
+
+    if not admin_user:
+        return False
+
+    return (
+        admin_user.get("role_name") == "admin"
+        and admin_user.get("status") == "active"
+    )
+
+
+class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
-        username = form.get("username")
-        password = form.get("password")
 
-        if username == settings.ADMIN_USERNAME and password == settings.ADMIN_PASSWORD:
-            # Generate a session token and store in session
-            token = secrets.token_hex(32)
-            request.session.update({"admin_token": token})
+        username = (form.get("username") or "").strip()
+        password = (form.get("password") or "").strip()
+
+        if (
+            username == settings.ADMIN_USERNAME
+            and password == settings.ADMIN_PASSWORD
+        ):
+            set_admin_session(request)
             return True
 
         return False
 
     async def logout(self, request: Request) -> bool:
-        request.session.clear()
+        clear_admin_session(request)
         return True
 
     async def authenticate(self, request: Request) -> RedirectResponse | bool:
-        token = request.session.get("admin_token")
-
-        if not token:
+        if not is_admin_logged_in(request):
             return RedirectResponse(request.url_for("admin:login"), status_code=302)
 
         return True

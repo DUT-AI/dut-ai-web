@@ -7,12 +7,27 @@
 <div class="space-y-6">
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
-      <p class="text-sm text-slate-500 font-medium tracking-wide">Hiển thị danh sách tất cả người dùng trong hệ thống</p>
+      <p class="text-sm text-slate-500 font-medium tracking-wide">
+        Hiển thị danh sách tất cả người dùng trong hệ thống
+      </p>
     </div>
-    <a href="/admin_v2/users/create" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl transition-all font-bold text-sm shadow-lg shadow-indigo-200">
-      <i class="fa-solid fa-plus text-xs"></i>
-      Tạo người dùng mới
-    </a>
+
+    <div class="flex items-center gap-3">
+      <form action="/admin_v2/users/sync" method="POST">
+        <button
+          type="submit"
+          class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl transition-all font-bold text-sm shadow-lg shadow-orange-200"
+        >
+          <i class="fa-solid fa-rotate"></i>
+          Đồng bộ dữ liệu
+        </button>
+      </form>
+
+      <a href="/admin_v2/users/create" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl transition-all font-bold text-sm shadow-lg shadow-indigo-200">
+        <i class="fa-solid fa-plus text-xs"></i>
+        Tạo người dùng mới
+      </a>
+    </div>
   </div>
 
   <div class="bg-white rounded-[24px] shadow-sm border border-slate-200 overflow-hidden">
@@ -94,7 +109,6 @@
       </table>
     </div>
 
-    <!-- Footer paging -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/40">
       <p class="text-sm text-slate-500">
         Hiển thị {{ start_index }} đến {{ end_index }} của {{ total }} người dùng
