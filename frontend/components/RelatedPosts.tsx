@@ -5,20 +5,10 @@ import Link from '@/components/Link'
 import { slug } from 'github-slugger'
 import { formatDate } from 'pliny/utils/formatDate'
 import siteMetadata from '@/data/siteMetadata'
-interface PostItem {
-    path: string
-    slug: string
-    date: string
-    title: string
-    summary?: string
-    tags?: string[]
-    images?: string[]
-    authors?: string[]
-    views?: number
-}
+import type { MappedPost } from 'app/api-client'
 
 interface RelatedPostsProps {
-    posts: PostItem[]
+    posts: MappedPost[]
     hideTitle?: boolean
 }
 

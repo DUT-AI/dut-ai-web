@@ -13,23 +13,11 @@ import { useSearchParams } from 'next/navigation'
 import Footer from '@/components/Footer'
 import { allAuthors } from 'contentlayer/generated'
 import RelatedPosts from '@/components/RelatedPosts'
-import type { AuthorStats } from 'app/api-client'
+import type { AuthorStats, MappedPost } from 'app/api-client'
 
 interface PaginationProps {
     totalPages: number
     currentPage: number
-}
-
-interface MappedPost {
-    path: string
-    slug: string
-    date: string
-    title: string
-    summary?: string
-    tags?: string[]
-    images?: string[]
-    authors?: string[]
-    views?: number
 }
 
 interface ListLayoutProps {

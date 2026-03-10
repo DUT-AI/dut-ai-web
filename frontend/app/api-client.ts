@@ -160,8 +160,20 @@ export interface AuthorStats {
     total_views: number
 }
 
+export interface MappedPost {
+    path: string
+    slug: string
+    date: string
+    title: string
+    summary?: string
+    tags?: string[]
+    images?: string[]
+    authors?: string[]
+    views?: number
+}
+
 /** Map ApiBlog → plain post shape để dùng trong BlogListLayout */
-export function mapApiBlogToPost(blog: ApiBlog) {
+export function mapApiBlogToPost(blog: ApiBlog): MappedPost {
     // Strip HTML tags to get plain text excerpt
     const plainContent = blog.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
     return {
