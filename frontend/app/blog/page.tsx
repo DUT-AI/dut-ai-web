@@ -1,6 +1,6 @@
 import { genPageMetadata } from 'app/seo'
 import BlogListLayout from '@/layouts/BlogListLayout'
-import { getBlogs, getTopAuthors, mapApiBlogToPost } from 'app/api-client'
+import { getBlogs, getTopAuthors, getBlogKeywords, mapApiBlogToPost } from 'app/api-client'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,19 +13,18 @@ export const metadata = genPageMetadata({
 })
 
 export default async function BlogPage() {
-  const [apiBlogs, topAuthors] = await Promise.all([
+  const [apiBlogs, topAuthors, keywords] = await Promise.all([
     getBlogs().catch(() => []),
     getTopAuthors(5).catch(() => []),
+    getBlogKeywords().catch(() => []),
   ])
 
   const posts = apiBlogs.map(mapApiBlogToPost)
 
-  // Build tagCounts from keywords in all blogs
+  // Build tagCounts from keywords API
   const tagCounts: Record<string, number> = {}
-  for (const blog of apiBlogs) {
-    for (const kw of blog.keywords ?? []) {
-      tagCounts[kw.keyword_name] = (tagCounts[kw.keyword_name] ?? 0) + 1
-    }
+  for (const kw of keywords) {
+    tagCounts[kw.keyword_name] = kw.number_blog_contain
   }
 
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
