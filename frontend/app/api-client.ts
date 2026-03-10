@@ -133,6 +133,12 @@ export interface PastEvent {
 
 // ── Blog (từ backend /blogs/) ─────────────────────────────────────────────
 
+export interface BlogAuthor {
+    id: number
+    name: string
+    avatar_url?: string
+}
+
 export interface BlogKeyword {
     id: number
     keyword_name: string
@@ -207,4 +213,33 @@ export async function getBlogById(id: number): Promise<ApiBlogDetail> {
 
 export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
     return apiFetch<AuthorStats[]>(`/blogs/top-authors?limit=${limit}`, { revalidate: 300 })
+}
+
+// ── Blog (typed for PostLayoutAPI) ────────────────────────────────────────
+
+export interface BlogPost {
+    id: number
+    slug?: string
+    title: string
+    summary: string
+    content: string
+    image_url?: string
+    views: number
+    authors: BlogAuthor[]
+    keywords: BlogKeyword[]
+    created_at: string
+    updated_at: string
+    related_blogs?: BlogPost[]
+}
+
+export async function getFeaturedBlogs(limit = 5): Promise<BlogPost[]> {
+    return apiFetch<BlogPost[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
+}
+
+export async function getBlogKeywords(): Promise<BlogKeyword[]> {
+    return apiFetch<BlogKeyword[]>('/keywords/', { revalidate: 600 })
+}
+
+export async function getBlogBySlug(slug: string): Promise<BlogPost> {
+    return apiFetch<BlogPost>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
 }
