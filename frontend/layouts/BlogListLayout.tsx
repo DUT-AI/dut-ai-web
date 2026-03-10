@@ -1,28 +1,44 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { slug } from 'github-slugger'
+import { formatDate } from 'pliny/utils/formatDate'
 import Link from '@/components/Link'
+import Tag from '@/components/Tag'
 import Image from '@/components/Image'
+import siteMetadata from '@/data/siteMetadata'
 import { useState, Suspense } from 'react'
 import { Search } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import Footer from '@/components/Footer'
-import { allAuthors, allBlogs } from 'contentlayer/generated'
+import { allAuthors } from 'contentlayer/generated'
 import RelatedPosts from '@/components/RelatedPosts'
+import type { AuthorStats } from 'app/api-client'
 
 interface PaginationProps {
     totalPages: number
     currentPage: number
 }
 
-interface ListLayoutProps {
-    posts: BlogPost[]
+interface MappedPost {
+    path: string
+    slug: string
+    date: string
     title: string
-    initialDisplayPosts?: BlogPost[]
+    summary?: string
+    tags?: string[]
+    images?: string[]
+    authors?: string[]
+    views?: number
+}
+
+interface ListLayoutProps {
+    posts: MappedPost[]
+    title: string
+    initialDisplayPosts?: MappedPost[]
     pagination?: PaginationProps
-    featuredPosts?: BlogPost[]
-    featuredAuthors?: AuthorStats[]
-    tags?: BlogKeyword[]
+    topAuthors?: AuthorStats[]
+    tagCounts?: Record<string, number>
 }
 
 function PaginationInner({ totalPages, currentPage }: PaginationProps) {
@@ -87,7 +103,7 @@ function Pagination(props: PaginationProps) {
     )
 }
 
-// Các màu nền Card cao cấp
+// Các màu nền Card lấy cảm hứng từ Figma
 const gradients = [
     'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#22c55e1a] dark:to-[#eab3081a] bg-linear-to-r from-[#EDFCE9] to-[#FEFBE8]', // Green to Yellow
     'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#64748b1a] dark:to-[#14b8a61a] bg-linear-to-r from-[#EDF5FF] to-[#F1F8FF]', // Slate to Teal
@@ -95,42 +111,34 @@ const gradients = [
     'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#8b5cf61a] dark:to-[#d946ef1a] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
 ]
 
-function formatDate(dateStr: string): string {
-    const d = new Date(dateStr)
-    return d.toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })
-}
-
 function BlogListLayoutInner({
     posts,
     title,
     initialDisplayPosts = [],
     pagination,
-    featuredPosts = [],
-    featuredAuthors = [],
-    tags = [],
+    topAuthors = [],
+    tagCounts: tagCountsProp,
 }: ListLayoutProps) {
     const [searchValue, setSearchValue] = useState('')
+    const pathname = usePathname()
     const searchParams = useSearchParams()
     const activeTagParam = searchParams.get('tag')
-
-
-    // Sort tags by number_blog_contain desc
-    const sortedTags = [...tags].sort((a, b) => b.number_blog_contain - a.number_blog_contain)
+    const tagCounts = tagCountsProp ?? ({} as Record<string, number>)
+    const tagKeys = Object.keys(tagCounts)
+    const sortedTags = tagKeys.sort((a, b) => tagCounts[b] - tagCounts[a])
 
     // Lọc bài viết nếu có tham số tag trên URL
     const basePosts = activeTagParam
-        ? posts.filter((post) =>
-            post.keywords?.some((k) => k.keyword_name.toLowerCase() === activeTagParam.toLowerCase())
-        )
+        ? posts.filter((post) => post.tags?.map((t) => slug(t)).includes(activeTagParam))
         : posts
 
-    // Lấy ra danh sách mặc định tương ứng với biến phân trang
+    // Lấy ra danh sách mặc định tương ứng với biến phân trang (lưu ý: initialDisplayPosts sẽ k đúng nếu dùng query filter nên ta xử lý Client side filter cho query params)
     const queryPaginatedPosts = activeTagParam
         ? basePosts.slice((pagination?.currentPage ? pagination.currentPage - 1 : 0) * 10, (pagination?.currentPage || 1) * 10)
         : initialDisplayPosts
 
     const filteredBlogPosts = basePosts.filter((post) => {
-        const searchContent = post.title + (post.content || '') + post.keywords?.map(k => k.keyword_name).join(' ')
+        const searchContent = post.title + post.summary + post.tags?.join(' ')
         return searchContent.toLowerCase().includes(searchValue.toLowerCase())
     })
 
@@ -141,24 +149,27 @@ function BlogListLayoutInner({
     const totalPagesForTag = activeTagParam ? Math.ceil(basePosts.length / 10) : pagination?.totalPages
     const adjustedPagination = pagination && totalPagesForTag ? { ...pagination, totalPages: totalPagesForTag } : pagination
 
-    // TODO: Replace mockViewCount with real API call for view counts
-    const mockViewCount = (str: string): string => {
-        let hash = 0
-        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash)
-        const major = (Math.abs(hash) % 9) + 1
-        const minor = Math.abs(hash >> 4) % 10
-        return `${major}.${minor}k`
-    }
     const featuredPosts = posts
         .filter((p) => !p.tags?.some((t) => t.toLowerCase() === 'event'))
         .slice(0, 5)
     const featuredAuthors = allAuthors.slice(0, 5)
-    const postCountBySlug = featuredAuthors.reduce<Record<string, number>>((acc, author) => {
-        acc[author.slug] = allBlogs.filter(
-            (b) => !b.draft && b.authors?.includes(author.slug)
-        ).length
-        return acc
-    }, {})
+
+    // Build author view counts from topAuthors API data
+    const authorViewMap: Record<string, number> = {}
+    for (const a of topAuthors) {
+        authorViewMap[a.author] = a.total_views
+    }
+    // Post count per author from the posts list
+    const postCountByName: Record<string, number> = {}
+    for (const post of posts) {
+        for (const author of post.authors ?? []) {
+            postCountByName[author] = (postCountByName[author] ?? 0) + 1
+        }
+    }
+    const formatViews = (n: number): string => {
+        if (n >= 1000) return `${(n / 1000).toFixed(1)}k`
+        return String(n)
+    }
 
 
     return (
@@ -212,14 +223,14 @@ function BlogListLayoutInner({
                                 </div>
                             </div>
 
-                            {/* Categories / Tags */}
+                            {/* Categories */}
                             <div>
                                 <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.15em] mb-5 pl-1">
                                     DANH MỤC
                                 </h3>
 
                                 {/* All Posts Button */}
-                                {!activeTagParam ? (
+                                {!activeTagParam && (pathname === '/blog' || pathname.startsWith('/blog/page')) ? (
                                     <div className="w-full bg-[#FF8A00] hover:bg-[#E67E00] text-white font-bold py-3.5 px-4 rounded-xl mb-6 transition-all text-center cursor-default shadow-lg shadow-orange-500/25">
                                         TẤT CẢ TÀI LIỆU
                                     </div>
@@ -235,21 +246,20 @@ function BlogListLayoutInner({
                                 {/* Tag Pills */}
                                 <div className="flex flex-wrap gap-2">
                                     {sortedTags.map((t) => {
-                                        const tagSlug = slug(t.keyword_name)
+                                        const tagSlug = slug(t)
                                         const isActive = activeTagParam === tagSlug
 
                                         return (
                                             <Link
-                                                key={t.id}
-                                                href={`/blog?tag=${encodeURIComponent(t.keyword_name)}`}
+                                                key={t}
+                                                href={`/blog?tag=${tagSlug}`}
                                                 className={`text-[13px] font-bold rounded-full px-5 py-2.5 transition-all w-fit inline-flex items-center ${isActive
                                                     ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-800'
                                                     : 'bg-white text-blue-500 ring-1 ring-gray-100 dark:bg-gray-800 dark:ring-gray-700 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:ring-gray-200 shadow-sm'
                                                     }`}
                                             >
                                                 <span className="opacity-60 mr-0.5">#</span>
-                                                {t.keyword_name}
-                                                <span className="ml-2 text-[11px] opacity-50">({t.number_blog_contain})</span>
+                                                {t}
                                             </Link>
                                         )
                                     })}
@@ -271,13 +281,13 @@ function BlogListLayoutInner({
                                                 <h4 className="font-bold text-[14px] text-gray-900 dark:text-white truncate">{author.name}</h4>
                                                 <p className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{author.occupation}</p>
                                                 <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
-                                                    {postCountBySlug[author.slug] ?? 0} bài · {mockViewCount(author.slug)} lượt xem
+                                                    {postCountByName[author.name] ?? 0} bài · {formatViews(authorViewMap[author.name] ?? 0)} lượt xem
                                                 </p>
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
 
@@ -287,7 +297,12 @@ function BlogListLayoutInner({
                         {/* Featured Posts Carousel */}
                         {!activeTagParam && !searchValue && (!pagination || pagination.currentPage === 1) && featuredPosts.length > 0 && (
                             <div className="mb-16 -mx-4 sm:mx-0">
-                                <RelatedPosts posts={featuredPosts} title="Bài viết nổi bật" />
+                                <div className="px-4 sm:px-0 mb-6">
+                                    <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">Bài viết nổi bật</h2>
+                                </div>
+                                <div className="relative">
+                                    <RelatedPosts posts={featuredPosts} hideTitle />
+                                </div>
                             </div>
                         )}
 
@@ -303,26 +318,25 @@ function BlogListLayoutInner({
 
                         <div className="flex flex-col space-y-6">
                             {displayPosts.map((post, index) => {
+                                const { path, date, title, summary, tags } = post
                                 const backgroundClass = gradients[index % gradients.length]
+                                const maxTagsDisplay = tags ? tags.slice(0, 1) : [] // Hiển thị 1 tag nổi bật để giống ảnh
 
                                 return (
                                     <article
-                                        key={post.id}
-                                        className={`rounded-[32px] p-8 sm:p-10 ${backgroundClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group cursor-pointer`}
+                                        key={path}
+                                        className={`rounded-[32px] p-8 sm:p-10 ${backgroundClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group`}
                                     >
-                                        {/* Full-card click overlay */}
-                                        <Link href={`/blog/${post.slug || post.id}`} className="absolute inset-0 z-10" aria-hidden="true" />
-
-                                        <div className="flex flex-col h-full relative">
+                                        <div className="flex flex-col h-full relative z-10">
 
                                             {/* Top Row: Date & Tag */}
                                             <div className="flex flex-wrap items-center gap-4 mb-5">
-                                                <time dateTime={post.created_at} className="text-sm font-bold tracking-wide text-gray-500/80 dark:text-gray-400 uppercase">
-                                                    {formatDate(post.created_at)}
+                                                <time dateTime={date} className="text-sm font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
+                                                    {formatDate(date, siteMetadata.locale)}
                                                 </time>
-                                                {post.keywords?.map((keyword, index) => (
-                                                    <Link key={index} href={`/blog?tag=${encodeURIComponent(keyword.keyword_name)}`} className="relative z-20 bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors border border-blue-100/50 dark:border-blue-900/30">
-                                                        <span className="opacity-60 mr-0.5">#</span>{keyword.keyword_name}
+                                                {maxTagsDisplay.map((tag) => (
+                                                    <Link key={tag} href={`/blog?tag=${slug(tag)}`} className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                                                        <span className="opacity-60 mr-0.5">#</span>{tag}
                                                     </Link>
                                                 ))}
                                             </div>
@@ -330,34 +344,19 @@ function BlogListLayoutInner({
                                             {/* Title & Summary */}
                                             <div className="mb-8">
                                                 <h2 className="text-[26px] md:text-[28px] leading-tight font-extrabold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                                    {post.title}
+                                                    <Link href={`/${path}`} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg">
+                                                        <span className="absolute inset-0 z-0" aria-hidden="true" />
+                                                        {title}
+                                                    </Link>
                                                 </h2>
 
-                                                <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl line-clamp-3">
-                                                    {post.summary || post.content?.substring(0, 300)}
+                                                <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl line-clamp-2">
+                                                    {summary}
                                                 </p>
                                             </div>
 
-                                            {/* Authors & CTA */}
-                                            <div className="mt-auto flex items-center justify-between">
-                                                {post.authors?.length > 0 && (
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="flex -space-x-2">
-                                                            {post.authors.slice(0, 3).map((author) => (
-                                                                author.avatar_url ? (
-                                                                    <Image key={author.id} src={author.avatar_url} width={28} height={28} className="rounded-full w-7 h-7 object-cover ring-2 ring-white dark:ring-gray-900" alt={author.name} />
-                                                                ) : (
-                                                                    <div key={author.id} className="w-7 h-7 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white dark:ring-gray-900">
-                                                                        {author.name.charAt(0).toUpperCase()}
-                                                                    </div>
-                                                                )
-                                                            ))}
-                                                        </div>
-                                                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                            {post.authors.map(a => a.name).join(', ')}
-                                                        </span>
-                                                    </div>
-                                                )}
+                                            {/* CTA */}
+                                            <div className="mt-auto">
                                                 <span className="inline-flex items-center text-[15px] font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
                                                     Đọc chi tiết bài viết
                                                     <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

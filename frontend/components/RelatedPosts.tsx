@@ -3,12 +3,23 @@
 import { useRef, useState, useEffect } from 'react'
 import Link from '@/components/Link'
 import { slug } from 'github-slugger'
-import type { BlogPost } from 'app/api-client'
+import { formatDate } from 'pliny/utils/formatDate'
+import siteMetadata from '@/data/siteMetadata'
+interface PostItem {
+    path: string
+    slug: string
+    date: string
+    title: string
+    summary?: string
+    tags?: string[]
+    images?: string[]
+    authors?: string[]
+    views?: number
+}
 
 interface RelatedPostsProps {
-    posts: BlogPost[]
+    posts: PostItem[]
     hideTitle?: boolean
-    title?: string
 }
 
 const gradients = [
@@ -18,13 +29,7 @@ const gradients = [
     'bg-white dark:bg-transparent dark:bg-linear-to-br dark:from-[#8b5cf61a] dark:to-[#d946ef1a] bg-linear-to-r from-[#F4F2FF] to-[#FCEEFE]', // Purple to Fuchsia
 ]
 
-function formatDate(dateStr: string): string {
-    const d = new Date(dateStr)
-    return d.toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })
-}
-
-
-export default function RelatedPosts({ posts, hideTitle, title = "Bài viết liên quan" }: RelatedPostsProps) {
+export default function RelatedPosts({ posts, hideTitle }: RelatedPostsProps) {
     const scrollRef = useRef<HTMLDivElement>(null)
     const [canScrollLeft, setCanScrollLeft] = useState(false)
     const [canScrollRight, setCanScrollRight] = useState(true)
@@ -69,8 +74,8 @@ export default function RelatedPosts({ posts, hideTitle, title = "Bài viết li
     return (
         <div className="w-full">
             {!hideTitle && (
-                <div className="flex items-center justify-between mb-8 px-4 sm:px-0">
-                    <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">{title}</h2>
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Bài viết liên quan</h2>
                     <div className="flex gap-2">
                         <button
                             onClick={() => scrollByAmount('left')}
@@ -104,28 +109,29 @@ export default function RelatedPosts({ posts, hideTitle, title = "Bài viết li
             >
                 {displayPosts.map((post, index) => {
                     const backgroundClass = gradients[index % gradients.length]
+                    const maxTagsDisplay = post.tags ? post.tags.slice(0, 1) : []
 
                     return (
-                        <div key={post.id} className="w-full md:w-[calc(33.333%-16px)] shrink-0 snap-start">
+                        <div key={post.path} className="w-full md:w-[calc(33.333%-16px)] shrink-0 snap-start">
                             <article
                                 className={`rounded-[32px] p-8 ${backgroundClass} transition-transform duration-300 hover:-translate-y-1 relative overflow-hidden group flex flex-col h-full ring-1 ring-gray-100 dark:ring-white/10`}
                             >
-                                <div className="flex flex-col h-full relative z-10 text-pretty">
+                                <div className="flex flex-col h-full relative z-10">
                                     {/* Top Row: Date & Tag */}
-                                    <div className="flex flex-wrap items-center gap-3 mb-6">
-                                        <time dateTime={post.created_at} className="text-xs font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
-                                            {formatDate(post.created_at)}
+                                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                                        <time dateTime={post.date} className="text-xs font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
+                                            {formatDate(post.date, siteMetadata.locale)}
                                         </time>
-                                        {post.keywords?.[0] && (
-                                            <Link href={`/blog?tag=${encodeURIComponent(post.keywords[0].keyword_name)}`} className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors">
-                                                <span className="opacity-60 mr-0.5">#</span>{post.keywords[0].keyword_name}
+                                        {maxTagsDisplay.map((tag) => (
+                                            <Link key={tag} href={`/blog?tag=${slug(tag)}`} className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                                                <span className="opacity-60 mr-0.5">#</span>{tag}
                                             </Link>
-                                        )}
+                                        ))}
                                     </div>
 
                                     {/* Title */}
                                     <h3 className="text-[20px] leading-snug font-extrabold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-3">
-                                        <Link href={`/blog/${post.slug || post.id}`} className="focus:outline-none rounded-lg">
+                                        <Link href={`/${post.path}`} className="focus:outline-none rounded-lg">
                                             <span className="absolute inset-0 z-0" aria-hidden="true" />
                                             {post.title}
                                         </Link>

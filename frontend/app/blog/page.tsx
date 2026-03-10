@@ -1,7 +1,8 @@
 import { genPageMetadata } from 'app/seo'
-import { getBlogs, getFeaturedBlogs, getTopAuthors, getBlogKeywords } from 'app/api-client'
-import type { BlogPost, BlogKeyword, AuthorStats } from 'app/api-client'
 import BlogListLayout from '@/layouts/BlogListLayout'
+import { getBlogs, getTopAuthors, mapApiBlogToPost } from 'app/api-client'
+
+export const dynamic = 'force-dynamic'
 
 const POSTS_PER_PAGE = 10
 
@@ -11,24 +12,20 @@ export const metadata = genPageMetadata({
   keywords: ['blog AI', 'bài viết machine learning', 'học deep learning', 'AI blog tiếng Việt', 'nghiên cứu AI sinh viên'],
 })
 
-export const dynamic = 'force-dynamic'
-
 export default async function BlogPage() {
-  let posts: BlogPost[] = []
-  let featuredPosts: BlogPost[] = []
-  let featuredAuthors: AuthorStats[] = []
-  let tags: BlogKeyword[] = []
-  let error = false
+  const [apiBlogs, topAuthors] = await Promise.all([
+    getBlogs().catch(() => []),
+    getTopAuthors(5).catch(() => []),
+  ])
 
-  try {
-    ;[posts, featuredPosts, featuredAuthors, tags] = await Promise.all([
-      getBlogs(),
-      getFeaturedBlogs(5),
-      getTopAuthors(5),
-      getBlogKeywords(),
-    ])
-  } catch {
-    error = true
+  const posts = apiBlogs.map(mapApiBlogToPost)
+
+  // Build tagCounts from keywords in all blogs
+  const tagCounts: Record<string, number> = {}
+  for (const blog of apiBlogs) {
+    for (const kw of blog.keywords ?? []) {
+      tagCounts[kw.keyword_name] = (tagCounts[kw.keyword_name] ?? 0) + 1
+    }
   }
 
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
@@ -44,9 +41,8 @@ export default async function BlogPage() {
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
       title="All Posts"
-      featuredPosts={featuredPosts}
-      featuredAuthors={featuredAuthors}
-      tags={tags}
+      topAuthors={topAuthors}
+      tagCounts={tagCounts}
     />
   )
 }
