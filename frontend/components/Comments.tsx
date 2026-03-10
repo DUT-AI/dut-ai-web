@@ -1,8 +1,7 @@
 'use client'
 
 import { Comments as CommentsComponent } from 'pliny/comments'
-import { useState, useEffect } from 'react'
-import { useTheme } from 'next-themes'
+import { useState } from 'react'
 import siteMetadata from '@/data/siteMetadata'
 
 export default function Comments({ slug }: { slug: string }) {
