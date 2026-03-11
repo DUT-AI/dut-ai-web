@@ -1,26 +1,16 @@
+import Heading from "./Heading";
+
 export default function RoadmapSection() {
     return (
-        <section id="roadmap" className="px-6 py-20 md:px-12 max-w-[1200px] mx-auto">
+        <section id="roadmap" className="px-6 md:px-12 max-w-[1200px] mx-auto">
             {/* Header */}
-            <div className="mb-20 flex flex-col items-center text-center">
-                <h2
-                    className="text-[42px] md:text-[60px] leading-[1.2] tracking-[-0.02em] bg-gradient-to-b from-[#003C9F] to-[#C97FA9] bg-clip-text text-transparent uppercase drop-shadow-sm"
-                >
-                    ROADMAP TO AI ENGINEER
-                </h2>
-                <div className="mt-6 flex items-center gap-2 rounded-full border border-white/40 bg-white/60 px-6 py-2 shadow-[0_4px_10px_rgba(25,25,112,0.05)] backdrop-blur-xl dark:bg-gray-800/60 dark:border-gray-700/60">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />
-                    <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-[#2563EB]">
-                        Lộ trình Hoạt động tại DUT AI
-                    </span>
-                </div>
-            </div>
+            <Heading heading="ROADMAP TO" subHeading="AI ENGINEER" description="Lộ trình học tập và phát triển bản thân tại DUT AI." badge="ROADMAP" isSubHeadingEnter={true} />
 
             <div className="relative flex flex-col gap-16 md:pl-8">
                 {/* Phase 01 */}
                 <div className="relative z-10 w-full">
                     {/* Glowing Timeline Vertical Line */}
-                    <div className="absolute left-[10px] top-[40px] bottom-[-40px] w-[4px] bg-gradient-to-b from-[#8FA8F3] via-[#DBEAFE] to-transparent shadow-[0_0_12px_#3B82F6] rounded-full hidden md:block opacity-60 -z-10" />
+                    <div className="absolute left-[10px] top-[40px] bottom-[-40px] w-[4px] bg-linear-to-b from-[#8FA8F3] via-[#DBEAFE] to-transparent shadow-[0_0_12px_#3B82F6] rounded-full hidden md:block opacity-60 -z-10" />
 
                     {/* Phase Header */}
                     <div className="mb-8 flex items-center gap-6 relative md:-left-[26px]">

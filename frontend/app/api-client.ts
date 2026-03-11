@@ -73,10 +73,10 @@ export async function getIntroduction(id: number): Promise<Introduction> {
     return apiFetch<Introduction>(`/introductions/${id}`, { revalidate: 600 })
 }
 
-// ── Members ───────────────────────────────────────────────────────────────
+// ── Members (backend endpoint: /users) ────────────────────────────────────
 
 export async function getMembers(): Promise<Member[]> {
-    return apiFetch<Member[]>('/members', { revalidate: 300 })
+    return apiFetch<Member[]>('/users', { revalidate: 300 })
 }
 
 // ── Public Events (Workshops & Seminars) ─────────────────────────────────
@@ -145,101 +145,62 @@ export interface BlogKeyword {
     number_blog_contain: number
 }
 
-export interface ApiBlog {
-    id: number
-    title: string
-    content: string
-    authors?: string | string[]
-    keywords: BlogKeyword[]
-    image_url?: string
-    views: number
-    created_at: string
-    updated_at: string
-}
-
-export interface ApiBlogDetail extends ApiBlog {
-    related_blogs: ApiBlog[]
-}
-
-export interface AuthorStats {
-    author: string
-    total_views: number
-}
-
-export interface MappedPost {
-    path: string
-    slug: string
-    date: string
-    title: string
-    summary?: string
-    tags?: string[]
-    images?: string[]
-    authors?: string[]
-    views?: number
-}
-
-/** Map ApiBlog → plain post shape để dùng trong BlogListLayout */
-export function mapApiBlogToPost(blog: ApiBlog): MappedPost {
-    // Strip HTML tags to get plain text excerpt
-    const plainContent = blog.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
-    return {
-        path: `blog/${blog.id}`,
-        slug: `${blog.id}`,
-        date: blog.created_at,
-        title: blog.title,
-        summary: plainContent.slice(0, 200),
-        tags: blog.keywords.map((k) => k.keyword_name),
-        images: blog.image_url ? [blog.image_url] : [],
-        authors: Array.isArray(blog.authors)
-            ? blog.authors
-            : blog.authors
-                ? [blog.authors]
-                : ['default'],
-        views: blog.views,
-    }
-}
-
-export async function getBlogs(params?: { title?: string; keyword?: string }): Promise<ApiBlog[]> {
-    const qs = new URLSearchParams()
-    if (params?.title) qs.set('title', params.title)
-    if (params?.keyword) qs.set('keyword', params.keyword)
-    const query = qs.toString() ? `?${qs}` : ''
-    return apiFetch<ApiBlog[]>(`/blogs/${query}`, { revalidate: 300 })
-}
-
-export async function getBlogById(id: number): Promise<ApiBlogDetail> {
-    return apiFetch<ApiBlogDetail>(`/blogs/${id}`, { revalidate: 300 })
-}
-
-export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
-    return apiFetch<AuthorStats[]>(`/blogs/top-authors?limit=${limit}`, { revalidate: 300 })
-}
-
-// ── Blog (typed for PostLayoutAPI) ────────────────────────────────────────
-
-export interface BlogPost {
+export interface Blog {
     id: number
     slug?: string
     title: string
     summary: string
-    content: string
+    content?: string
     image_url?: string
     views: number
     authors: BlogAuthor[]
     keywords: BlogKeyword[]
     created_at: string
     updated_at: string
-    related_blogs?: BlogPost[]
+    related_blogs?: Blog[]
 }
 
-export async function getFeaturedBlogs(limit = 5): Promise<BlogPost[]> {
-    return apiFetch<BlogPost[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
+export interface AuthorStats {
+    id: number
+    name: string
+    avatar_url?: string
+    total_views: number
+    post_count: number
+}
+
+export async function getBlogs(params?: { title?: string; keyword?: string }): Promise<Blog[]> {
+    const searchParams = new URLSearchParams()
+    if (params?.title) searchParams.set('title', params.title)
+    if (params?.keyword) searchParams.set('keyword', params.keyword)
+    const qs = searchParams.toString()
+    return apiFetch<Blog[]>(`/blogs/${qs ? `?${qs}` : ''}`, { revalidate: 300 })
+}
+
+export async function getFeaturedBlogs(limit = 5): Promise<Blog[]> {
+    return apiFetch<Blog[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
+}
+
+export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
+    return apiFetch<AuthorStats[]>(`/blogs/top-authors?limit=${limit}`, { revalidate: 300 })
 }
 
 export async function getBlogKeywords(): Promise<BlogKeyword[]> {
     return apiFetch<BlogKeyword[]>('/keywords/', { revalidate: 600 })
 }
 
-export async function getBlogBySlug(slug: string): Promise<BlogPost> {
-    return apiFetch<BlogPost>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
+export async function getBlogBySlug(slug: string): Promise<Blog> {
+    return apiFetch<Blog>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
+}
+
+// ── Homepage ───────────────────────────────────────────────────────────────
+
+export interface HomePageData {
+    latest_blogs: Blog[]
+    latest_events: PublicEvent[]
+    latest_projects: Project[]
+    latest_posts: Post[]
+}
+
+export async function getHomePageData(): Promise<HomePageData> {
+    return apiFetch<HomePageData>('/homepage', { revalidate: 300 })
 }

@@ -1,6 +1,6 @@
+import { getBlogs, getFeaturedBlogs, getTopAuthors, getBlogKeywords } from 'app/api-client'
 import BlogListLayout from '@/layouts/BlogListLayout'
 import { notFound } from 'next/navigation'
-import { getBlogs, getTopAuthors, getBlogKeywords, mapApiBlogToPost } from 'app/api-client'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,21 +10,14 @@ export default async function Page(props: { params: Promise<{ page: string }> })
   const params = await props.params
   const pageNumber = parseInt(params.page as string)
 
-  const [apiBlogs, topAuthors, keywords] = await Promise.all([
+  const [posts, featuredPosts, featuredAuthors, tags] = await Promise.all([
     getBlogs().catch(() => []),
+    getFeaturedBlogs(5).catch(() => []),
     getTopAuthors(5).catch(() => []),
     getBlogKeywords().catch(() => []),
   ])
 
-  const posts = apiBlogs.map(mapApiBlogToPost)
-
-  // Build tagCounts from keywords API
-  const tagCounts: Record<string, number> = {}
-  for (const kw of keywords) {
-    tagCounts[kw.keyword_name] = kw.number_blog_contain
-  }
-
-  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE) || 1
 
   if (pageNumber <= 0 || pageNumber > totalPages || isNaN(pageNumber)) {
     return notFound()
@@ -34,6 +27,7 @@ export default async function Page(props: { params: Promise<{ page: string }> })
     POSTS_PER_PAGE * (pageNumber - 1),
     POSTS_PER_PAGE * pageNumber
   )
+
   const pagination = {
     currentPage: pageNumber,
     totalPages,
@@ -44,9 +38,10 @@ export default async function Page(props: { params: Promise<{ page: string }> })
       posts={posts}
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
-      title="All Posts"
-      topAuthors={topAuthors}
-      tagCounts={tagCounts}
+      featuredPosts={featuredPosts}
+      featuredAuthors={featuredAuthors}
+      tags={tags}
     />
   )
 }
+

@@ -120,7 +120,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
   const articleLd = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
+    '@type': 'Bloging',
     headline: post.title,
     description: post.summary,
     image: post.image_url || siteMetadata.socialBanner,

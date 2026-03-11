@@ -1,4 +1,5 @@
-import { Authors, allAuthors } from 'contentlayer/generated'
+import { getMembers } from 'app/api-client'
+import type { Member } from 'app/api-client'
 import { genPageMetadata } from 'app/seo'
 import Image from 'next/image'
 import Link from '@/components/Link'
@@ -92,13 +93,13 @@ const glassCardLight = {} as React.CSSProperties
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function LeadershipCard({
-  author,
+  member,
   badge,
 }: {
-  author: Authors
+  member: Member
   badge: string
 }) {
-  const { name, avatar, occupation, email, github, linkedin } = author
+  const { name, avatar_url, email, github, linkedin } = member
   const socials = [
     email && { href: `mailto:${email}`, icon: SOCIAL_ICONS.email, label: 'Email' },
     github && { href: github, icon: SOCIAL_ICONS.github, label: 'GitHub' },
@@ -111,8 +112,8 @@ function LeadershipCard({
     >
       {/* Avatar */}
       <div className="relative mb-4 h-24 w-24 overflow-hidden rounded-full border-4 border-indigo-200/40 dark:border-white/30 shadow-xl">
-        {avatar ? (
-          <Image src={avatar} alt={name} fill className="object-cover" unoptimized />
+        {avatar_url ? (
+          <Image src={avatar_url} alt={name} fill className="object-cover" unoptimized />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-indigo-100/60 dark:bg-white/20 text-3xl">👤</div>
         )}
@@ -126,9 +127,7 @@ function LeadershipCard({
       >
         {badge}
       </span>
-      {occupation && (
-        <p className="mb-3 text-xs text-slate-500 dark:text-white/60">{occupation}</p>
-      )}
+
       {/* Socials */}
       {socials.length > 0 && (
         <div className="flex items-center gap-2">
@@ -167,11 +166,19 @@ function MembersGridSkeleton() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function AboutPage() {
-  // Ban chủ nhiệm
-  const president = allAuthors.find((p) => p.slug === 'default') as Authors
-  const pctHocthu = allAuthors.find((p) => p.slug === 'pct-hocthu') as Authors
-  const pctSkien = allAuthors.find((p) => p.slug === 'pct-skien') as Authors
+export default async function AboutPage() {
+  let members: Member[] = []
+  try {
+    members = await getMembers()
+  } catch (error) {
+    console.error('Failed to fetch members:', error)
+  }
+
+  // Ban chủ nhiệm (Admins)
+  const admins = members.filter((m) => m.role_name?.toLowerCase() === 'admin')
+  const president = admins[0]
+  const pctHocthu = admins[1]
+  const pctSkien = admins[2]
 
   return (
     <div className="about-page min-h-screen pb-16">
@@ -390,9 +397,9 @@ export default function AboutPage() {
             <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Ban chủ nhiệm</h2>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
-            {president && <LeadershipCard author={president} badge="Chủ nhiệm" />}
-            {pctHocthu && <LeadershipCard author={pctHocthu} badge="PCT. Học thuật" />}
-            {pctSkien && <LeadershipCard author={pctSkien} badge="PCT. Sự kiện" />}
+            {president && <LeadershipCard member={president} badge="Chủ nhiệm" />}
+            {pctHocthu && <LeadershipCard member={pctHocthu} badge="PCT. Học thuật" />}
+            {pctSkien && <LeadershipCard member={pctSkien} badge="PCT. Sự kiện" />}
           </div>
         </section>
 

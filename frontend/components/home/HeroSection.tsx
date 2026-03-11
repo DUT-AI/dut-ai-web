@@ -19,7 +19,7 @@ const Mascot = () => {
 }
 export default function HeroSection() {
     return (
-        <section className="relative py-16 md:py-24 md:pt-40 max-w-7xl mx-auto">
+        <section className="relative pt-40 max-w-7xl mx-auto">
             {/* Background blobs */}
             <div className="pointer-events-none absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-[#BFDBFE] opacity-40 blur-[120px] dark:opacity-10" />
             <div className="pointer-events-none absolute -bottom-24 -right-24 h-[420px] w-[420px] rounded-full bg-[#FCE7F3] opacity-40 blur-[120px] dark:opacity-10" />

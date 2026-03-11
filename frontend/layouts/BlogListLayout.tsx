@@ -7,13 +7,13 @@ import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import Image from '@/components/Image'
 import siteMetadata from '@/data/siteMetadata'
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import Footer from '@/components/Footer'
-import { allAuthors } from 'contentlayer/generated'
+import { getBlogs } from 'app/api-client'
+import type { Blog, BlogKeyword, AuthorStats } from 'app/api-client'
 import RelatedPosts from '@/components/RelatedPosts'
-import type { AuthorStats, MappedPost } from 'app/api-client'
 
 interface PaginationProps {
     totalPages: number
@@ -21,12 +21,12 @@ interface PaginationProps {
 }
 
 interface ListLayoutProps {
-    posts: MappedPost[]
-    title: string
-    initialDisplayPosts?: MappedPost[]
+    posts: Blog[]
+    initialDisplayPosts?: Blog[]
     pagination?: PaginationProps
-    topAuthors?: AuthorStats[]
-    tagCounts?: Record<string, number>
+    featuredPosts?: Blog[]
+    featuredAuthors?: AuthorStats[]
+    tags?: BlogKeyword[]
 }
 
 function PaginationInner({ totalPages, currentPage }: PaginationProps) {
@@ -101,64 +101,72 @@ const gradients = [
 
 function BlogListLayoutInner({
     posts,
-    title,
     initialDisplayPosts = [],
     pagination,
-    topAuthors = [],
-    tagCounts: tagCountsProp,
+    featuredPosts = [],
+    featuredAuthors = [],
+    tags = [],
 }: ListLayoutProps) {
     const [searchValue, setSearchValue] = useState('')
+    const [apiSearchResults, setApiSearchResults] = useState<Blog[] | null>(null)
+    const [isSearching, setIsSearching] = useState(false)
+
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const activeTagParam = searchParams.get('tag')
-    const tagCounts = tagCountsProp ?? ({} as Record<string, number>)
-    const tagKeys = Object.keys(tagCounts)
-    const sortedTags = tagKeys.sort((a, b) => tagCounts[b] - tagCounts[a])
+    const sortedTags = tags.sort((a, b) => b.number_blog_contain - a.number_blog_contain)
 
-    // Lọc bài viết nếu có tham số tag trên URL
-    const basePosts = activeTagParam
-        ? posts.filter((post) => post.tags?.map((t) => slug(t)).includes(activeTagParam))
+    // Gọi API tìm kiếm thay vì filter cứng ở client
+    useEffect(() => {
+        if (!searchValue.trim() && !activeTagParam) {
+            setApiSearchResults(null)
+            setIsSearching(false)
+            return
+        }
+
+        setIsSearching(true)
+        const delayDebounceFn = setTimeout(async () => {
+            try {
+                // Call the API with the search value and keyword
+                const params: any = {}
+                if (searchValue.trim()) params.title = searchValue
+                if (activeTagParam) params.keyword = activeTagParam
+
+                const results = await getBlogs(params)
+                setApiSearchResults(results)
+            } catch (error) {
+                console.error("Failed to fetch search results:", error)
+                setApiSearchResults([])
+            } finally {
+                setIsSearching(false)
+            }
+        }, searchValue.trim() ? 300 : 0) // No delay needed if only switching tags
+
+        return () => clearTimeout(delayDebounceFn)
+    }, [searchValue, activeTagParam])
+
+    // Nếu đang tìm kiếm hoặc lọc qua tag, ta sẽ dùng list trả về từ API. Ngược lại dùng list mặc định truyền từ server
+    const basePosts = (searchValue || activeTagParam)
+        ? (apiSearchResults || [])
         : posts
 
-    // Lấy ra danh sách mặc định tương ứng với biến phân trang (lưu ý: initialDisplayPosts sẽ k đúng nếu dùng query filter nên ta xử lý Client side filter cho query params)
-    const queryPaginatedPosts = activeTagParam
+    // Pagination logic: Nếu có search chữ thì show hết không phân trang, nếu chỉ có tag (hoặc không gì cả) thì phân trang list đang có
+    const queryPaginatedPosts = activeTagParam && !searchValue
         ? basePosts.slice((pagination?.currentPage ? pagination.currentPage - 1 : 0) * 10, (pagination?.currentPage || 1) * 10)
         : initialDisplayPosts
 
-    const filteredBlogPosts = basePosts.filter((post) => {
-        const searchContent = post.title + post.summary + post.tags?.join(' ')
-        return searchContent.toLowerCase().includes(searchValue.toLowerCase())
-    })
-
-    const displayPosts =
-        queryPaginatedPosts.length > 0 && !searchValue ? queryPaginatedPosts : filteredBlogPosts
+    const displayPosts = searchValue
+        ? basePosts // Show all search results without pagination
+        : queryPaginatedPosts
 
     // Nếu có activeTag, cần tính toán lại Pagination
     const totalPagesForTag = activeTagParam ? Math.ceil(basePosts.length / 10) : pagination?.totalPages
     const adjustedPagination = pagination && totalPagesForTag ? { ...pagination, totalPages: totalPagesForTag } : pagination
 
-    const featuredPosts = posts
-        .filter((p) => !p.tags?.some((t) => t.toLowerCase() === 'event'))
-        .slice(0, 5)
-    const featuredAuthors = allAuthors.slice(0, 5)
-
-    // Build author view counts from topAuthors API data
-    const authorViewMap: Record<string, number> = {}
-    for (const a of topAuthors) {
-        authorViewMap[a.author] = a.total_views
-    }
-    // Post count per author from the posts list
-    const postCountByName: Record<string, number> = {}
-    for (const post of posts) {
-        for (const author of post.authors ?? []) {
-            postCountByName[author] = (postCountByName[author] ?? 0) + 1
-        }
-    }
     const formatViews = (n: number): string => {
         if (n >= 1000) return `${(n / 1000).toFixed(1)}k`
         return String(n)
     }
-
 
     return (
         <div className="min-h-screen blog-list-page dark:bg-[#0B0F19] pb-12 pt-8 sm:pt-16 relative z-0">
@@ -234,20 +242,19 @@ function BlogListLayoutInner({
                                 {/* Tag Pills */}
                                 <div className="flex flex-wrap gap-2">
                                     {sortedTags.map((t) => {
-                                        const tagSlug = slug(t)
-                                        const isActive = activeTagParam === tagSlug
+                                        const isActive = activeTagParam === t.keyword_name
 
                                         return (
                                             <Link
-                                                key={t}
-                                                href={`/blog?tag=${tagSlug}`}
+                                                key={t.id}
+                                                href={`/blog?tag=${t.keyword_name}`}
                                                 className={`text-[13px] font-bold rounded-full px-5 py-2.5 transition-all w-fit inline-flex items-center ${isActive
                                                     ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-800'
                                                     : 'bg-white text-blue-500 ring-1 ring-gray-100 dark:bg-gray-800 dark:ring-gray-700 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:ring-gray-200 shadow-sm'
                                                     }`}
                                             >
                                                 <span className="opacity-60 mr-0.5">#</span>
-                                                {t}
+                                                {t.keyword_name + ` (${t.number_blog_contain})`}
                                             </Link>
                                         )
                                     })}
@@ -261,15 +268,14 @@ function BlogListLayoutInner({
                                 </h3>
                                 <div className="flex flex-col space-y-4">
                                     {featuredAuthors.map(author => (
-                                        <div key={author.name} className="flex items-center gap-3 bg-white dark:bg-gray-900/50 p-3 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-800 hover:ring-blue-100 dark:hover:ring-gray-700 transition-all">
-                                            {author.avatar && (
-                                                <Image src={author.avatar} width={40} height={40} className="rounded-full w-10 h-10 object-cover" alt={author.name} />
+                                        <div key={author.id} className="flex items-center gap-3 bg-white dark:bg-gray-900/50 p-3 rounded-2xl shadow-sm ring-1 ring-gray-100 dark:ring-gray-800 hover:ring-blue-100 dark:hover:ring-gray-700 transition-all">
+                                            {author.avatar_url && (
+                                                <Image src={author.avatar_url} width={40} height={40} className="rounded-full w-10 h-10 object-cover" alt={author.name} />
                                             )}
                                             <div className="flex-1 min-w-0">
                                                 <h4 className="font-bold text-[14px] text-gray-900 dark:text-white truncate">{author.name}</h4>
-                                                <p className="text-[12px] text-gray-500 dark:text-gray-400 truncate">{author.occupation}</p>
                                                 <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
-                                                    {postCountByName[author.name] ?? 0} bài · {formatViews(authorViewMap[author.name] ?? 0)} lượt xem
+                                                    {author.post_count ?? 0} bài · {formatViews(author.total_views ?? 0)} lượt xem
                                                 </p>
                                             </div>
                                         </div>
@@ -295,10 +301,15 @@ function BlogListLayoutInner({
                         )}
 
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">Danh sách bài viết</h2>
+                            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                                {searchValue ? `Kết quả tìm kiếm cho "${searchValue}"` : 'Danh sách bài viết'}
+                            </h2>
+                            {isSearching && (
+                                <div className="text-sm text-gray-500 dark:text-gray-400">Đang tìm kiếm...</div>
+                            )}
                         </div>
 
-                        {!filteredBlogPosts.length && (
+                        {!isSearching && displayPosts.length === 0 && (
                             <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-[32px] ring-1 ring-gray-100 dark:ring-gray-800">
                                 <p className="text-gray-500 dark:text-gray-400 text-lg">Không tìm thấy bài viết nào phù hợp.</p>
                             </div>
@@ -306,9 +317,13 @@ function BlogListLayoutInner({
 
                         <div className="flex flex-col space-y-6">
                             {displayPosts.map((post, index) => {
-                                const { path, date, title, summary, tags } = post
+                                const path = `blog/${post.slug || post.id}`
+                                const date = post.created_at
+                                const title = post.title
+                                const summary = post.summary
+                                const tags = post.keywords?.map(k => k.keyword_name) || []
                                 const backgroundClass = gradients[index % gradients.length]
-                                const maxTagsDisplay = tags ? tags.slice(0, 1) : [] // Hiển thị 1 tag nổi bật để giống ảnh
+                                const maxTagsDisplay = tags
 
                                 return (
                                     <article
