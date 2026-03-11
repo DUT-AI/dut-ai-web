@@ -11,13 +11,6 @@ from app.v1.projects.models import Project, ProjectMember
 from app.v1.projects.schemas import ProjectCreate, ProjectUpdate
 from app.v1.users.models import User
 
-from app.core.auth import is_admin_logged_in
-def _redirect_login():
-    return RedirectResponse(url="/admin_v2/login", status_code=303)
-
-def _require_admin(request: Request) -> bool:
-    return is_admin_logged_in(request)
-
 router = APIRouter(prefix="/admin_v2", tags=["Admin V2"])
 templates = Jinja2Templates(directory="app/templates")
 
@@ -119,8 +112,7 @@ async def admin_projects_list(
     request: Request,
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
     projects = service_factory.project.get_all()
 
     # Gắn thumbnail đầu tiên để list dễ render
@@ -143,8 +135,7 @@ async def admin_projects_create(
     request: Request,
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
     users = []
     with SessionLocal() as session:
         db_users = session.query(User).order_by(User.id.desc()).all()
@@ -176,8 +167,7 @@ async def admin_projects_edit(
     request: Request,
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
     project = service_factory.project.get_by_id(project_id)
 
     users = []
@@ -225,8 +215,7 @@ async def admin_projects_save(
     project_members: Optional[str] = Form("[]"),
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
     normalized_data = {
         "title": title.strip(),
         "description": normalize_multiline_text(description),
