@@ -2,13 +2,6 @@ import Link from '@/components/Link'
 import SparkleIcon from '@/components/SparkleIcon'
 import Image from 'next/image'
 import StatCounter from '@/components/home/StatCounter'
-import { Alfa_Slab_One } from 'next/font/google'
-
-const alfaSlabOne = Alfa_Slab_One({
-    weight: '400',
-    subsets: ['latin', 'vietnamese'],
-    display: 'swap',
-})
 
 const Mascot = () => {
     return (
@@ -16,8 +9,8 @@ const Mascot = () => {
             <Image
                 src="/static/images/linh_vat_tach_nen.png"
                 alt="DUT AI Mascot"
-                width={546}
-                height={546}
+                width={450}
+                height={450}
                 className="w-full h-auto object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
                 priority
             />
@@ -26,7 +19,7 @@ const Mascot = () => {
 }
 export default function HeroSection() {
     return (
-        <section className="relative py-16 md:py-24 md:pt-40 max-w-7xl mx-auto">
+        <section className="relative pt-40 max-w-7xl mx-auto">
             {/* Background blobs */}
             <div className="pointer-events-none absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-[#BFDBFE] opacity-40 blur-[120px] dark:opacity-10" />
             <div className="pointer-events-none absolute -bottom-24 -right-24 h-[420px] w-[420px] rounded-full bg-[#FCE7F3] opacity-40 blur-[120px] dark:opacity-10" />
@@ -49,8 +42,14 @@ export default function HeroSection() {
                         </div>
 
                         {/* Headline */}
-                        <h1 className={`text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm ${alfaSlabOne.className}`}>
-                            Câu lạc bộ Trí tuệ nhân tạo DUT
+                        <h1 className="text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm whitespace-nowrap">
+                            Câu lạc bộ
+                        </h1>
+                        <h1 className="text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm whitespace-nowrap">
+                            Trí tuệ nhân tạo
+                        </h1>
+                        <h1 className="text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm whitespace-nowrap">
+                            DUT
                         </h1>
 
                         <div className="mt-8 border-l-2 border-[#191970]/10 pl-6 ml-2 lg:ml-0 dark:border-gray-600 max-w-lg text-left">

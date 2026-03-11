@@ -5,9 +5,9 @@
  */
 
 // Use internal Docker network URL for server-side fetch, public URL for client-side
-const BASE = typeof window === 'undefined' 
-  ? (process.env.INTERNAL_API_URL || 'http://backend:8002/api/v1')
-  : (process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1')
+const BASE = typeof window === 'undefined'
+    ? (process.env.INTERNAL_API_URL || 'http://backend:8002/api/v1')
+    : (process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1')
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -131,7 +131,7 @@ export interface PastEvent {
     facebook_url?: string
 }
 
-// ── Blogs ─────────────────────────────────────────────────────────────────
+// ── Blog (từ backend /blogs/) ─────────────────────────────────────────────
 
 export interface BlogAuthor {
     id: number
@@ -145,18 +145,19 @@ export interface BlogKeyword {
     number_blog_contain: number
 }
 
-export interface BlogPost {
+export interface Blog {
     id: number
     slug?: string
     title: string
     summary: string
-    content: string
+    content?: string
     image_url?: string
     views: number
     authors: BlogAuthor[]
     keywords: BlogKeyword[]
     created_at: string
     updated_at: string
+    related_blogs?: Blog[]
 }
 
 export interface AuthorStats {
@@ -167,16 +168,16 @@ export interface AuthorStats {
     post_count: number
 }
 
-export async function getBlogs(params?: { title?: string; keyword?: string }): Promise<BlogPost[]> {
+export async function getBlogs(params?: { title?: string; keyword?: string }): Promise<Blog[]> {
     const searchParams = new URLSearchParams()
     if (params?.title) searchParams.set('title', params.title)
     if (params?.keyword) searchParams.set('keyword', params.keyword)
     const qs = searchParams.toString()
-    return apiFetch<BlogPost[]>(`/blogs/${qs ? `?${qs}` : ''}`, { revalidate: 300 })
+    return apiFetch<Blog[]>(`/blogs/${qs ? `?${qs}` : ''}`, { revalidate: 300 })
 }
 
-export async function getFeaturedBlogs(limit = 5): Promise<BlogPost[]> {
-    return apiFetch<BlogPost[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
+export async function getFeaturedBlogs(limit = 5): Promise<Blog[]> {
+    return apiFetch<Blog[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
 }
 
 export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
@@ -187,6 +188,19 @@ export async function getBlogKeywords(): Promise<BlogKeyword[]> {
     return apiFetch<BlogKeyword[]>('/keywords/', { revalidate: 600 })
 }
 
-export async function getBlogBySlug(slug: string): Promise<BlogPost> {
-    return apiFetch<BlogPost>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
+export async function getBlogBySlug(slug: string): Promise<Blog> {
+    return apiFetch<Blog>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
+}
+
+// ── Homepage ───────────────────────────────────────────────────────────────
+
+export interface HomePageData {
+    latest_blogs: Blog[]
+    latest_events: PublicEvent[]
+    latest_projects: Project[]
+    latest_posts: Post[]
+}
+
+export async function getHomePageData(): Promise<HomePageData> {
+    return apiFetch<HomePageData>('/homepage', { revalidate: 300 })
 }

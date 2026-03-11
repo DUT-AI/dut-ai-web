@@ -10,11 +10,11 @@ import TableOfContents from '@/components/TableOfContents'
 import Footer from '@/components/Footer'
 import RelatedPosts from '@/components/RelatedPosts'
 import SocialShare from '@/components/SocialShare'
-import type { BlogPost } from 'app/api-client'
+import type { Blog } from 'app/api-client'
 import { slug } from 'github-slugger'
 
 interface LayoutProps {
-    post: BlogPost & { related_blogs?: BlogPost[] }
+    post: Blog & { related_blogs?: Blog[] }
     children: ReactNode
 }
 
@@ -175,7 +175,7 @@ export default function PostLayoutAPI({ post, children }: LayoutProps) {
 
                 {/* Bài viết liên quan */}
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-24 mb-12 w-full">
-                    <RelatedPosts posts={relatedPosts} hideTitle={true} title='Các bài viết liên quan' />
+                    <RelatedPosts posts={relatedPosts} hideTitle={true} />
                 </div>
             </div>
 

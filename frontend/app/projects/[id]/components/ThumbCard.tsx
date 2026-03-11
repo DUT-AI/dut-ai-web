@@ -1,6 +1,5 @@
 import type { Project } from 'app/api-client'
 import Image from '@/components/Image'
-import { jakarta } from './styles'
 
 interface ThumbCardProps {
   project: Project
@@ -47,13 +46,12 @@ export default function ThumbCard({ project, active, onClick, cardW = 280 }: Thu
       <div className="absolute bottom-0 left-0 right-0 p-5 text-left">
         <h3
           className="text-[22px] font-bold leading-[1.2] text-white sm:text-[26px] lg:text-[30px]"
-          style={jakarta}
         >
           {project.title}
         </h3>
         <p
           className="mt-0.5 text-sm text-[#CBD5E1] lg:text-base"
-          style={{ ...jakarta, lineHeight: '1.55em' }}
+          style={{ lineHeight: '1.55em' }}
         >
           {project.description && project.description.length > 50
             ? project.description.slice(0, 50) + '…'

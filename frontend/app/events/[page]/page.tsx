@@ -3,6 +3,19 @@ import type { PublicEvent, Post, PastEvent } from 'app/api-client'
 import EventsListLayout from '@/layouts/EventsListLayout'
 import { genPageMetadata } from 'app/seo'
 
+// Safely parse img_urls that backend may return as Python-style string
+function parseImgUrls(urls: string[] | string | undefined | null): string[] {
+    if (!urls) return []
+    if (Array.isArray(urls)) {
+        return urls.flatMap((u) => {
+            if (typeof u !== 'string') return []
+            if (u.startsWith('http')) return [u]
+            return (u.match(/https?:\/\/[^'" ,\]]+/g) || [])
+        })
+    }
+    return (urls.match(/https?:\/\/[^'" ,\]]+/g) || [])
+}
+
 const EVENTS_PER_PAGE = 5
 
 export const generateMetadata = async ({ params }: { params: Promise<{ page: string }> }) => {
@@ -47,7 +60,7 @@ export default async function EventsPage({ params }: { params: Promise<{ page: s
             type: 'post' as const,
             title: p.title,
             summary: p.summary || p.description,
-            cover: p.img_urls?.[0],
+            cover: parseImgUrls(p.img_urls)[0],
             date: p.events_date || p.created_at,
             facebook_url: p.facebook_url,
         })),

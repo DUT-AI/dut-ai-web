@@ -8,7 +8,7 @@ router = APIRouter(prefix="/homepage", tags=["Homepage"])
 
 @router.get("", response_model=HomepageResponse)
 def get_homepage(
-    limit: int = Query(default=5, ge=1, le=20, description="Số lượng items mỗi loại"),
+    limit: int = Query(default=9, ge=1, le=20, description="Số lượng items mỗi loại"),
     service_factory=Depends(get_service_factory),
 ):
     """Trả về dữ liệu trang chủ thông qua HomepageService."""

@@ -18,18 +18,19 @@ class AuthorBrief(BaseModel):
 class BlogBase(BaseModel):
     title: str
     summary: Optional[str] = None
-    content: str
     image_url: Optional[str] = None
 
 
 # Schema để tạo mới
 class BlogCreate(BlogBase):
+    content: str
     author_ids: List[int] = []
     keywords: List[str] = []
 
 
 # Schema để cập nhật
 class BlogUpdate(BlogBase):
+    content: Optional[str] = None
     author_ids: Optional[List[int]] = None
     keywords: Optional[List[str]] = None
 
@@ -49,6 +50,7 @@ class BlogResponse(BlogBase):
 
 # Schema chi tiết với bài viết liên quan
 class BlogDetailResponse(BlogResponse):
+    content: str
     related_blogs: list["BlogResponse"] = []
 
 

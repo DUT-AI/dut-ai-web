@@ -36,9 +36,6 @@
       "@/lib/*": [
         "lib/*"
       ],
-      "contentlayer/generated": [
-        "./.contentlayer/generated"
-      ],
       "pliny/*": [
         "node_modules/pliny/*"
       ]
@@ -56,9 +53,6 @@
     "**/*.mjs",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.json",
-    ".contentlayer/generated",
-    ".contentlayer/generated/**/*.json",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

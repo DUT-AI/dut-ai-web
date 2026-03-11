@@ -3,6 +3,19 @@ import { getPublicEvents, getPosts } from 'app/api-client'
 import type { PublicEvent, Post, PastEvent } from 'app/api-client'
 import EventsListLayout from '@/layouts/EventsListLayout'
 
+// Safely parse img_urls that backend may return as Python-style string
+function parseImgUrls(urls: string[] | string | undefined | null): string[] {
+    if (!urls) return []
+    if (Array.isArray(urls)) {
+        return urls.flatMap((u) => {
+            if (typeof u !== 'string') return []
+            if (u.startsWith('http')) return [u]
+            return (u.match(/https?:\/\/[^'" ,\]]+/g) || [])
+        })
+    }
+    return (urls.match(/https?:\/\/[^'" ,\]]+/g) || [])
+}
+
 export const metadata = genPageMetadata({
     title: 'Sự kiện | DUT AI Club',
     description: 'Tất cả sự kiện, workshop, cuộc thi và hoạt động của DUT AI Club tại Đà Nẵng.',
@@ -40,7 +53,7 @@ export default async function EventsPage() {
             type: 'post' as const,
             title: p.title,
             summary: p.summary || p.description,
-            cover: p.img_urls?.[0],
+            cover: parseImgUrls(p.img_urls)[0],
             date: p.events_date || p.created_at,
             facebook_url: p.facebook_url,
         })),

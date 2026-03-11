@@ -1,4 +1,4 @@
-import { glassClass, jakarta } from './styles'
+import { glassClass } from './styles'
 
 export type TabKey = 'features' | 'demo' | 'tech' | 'team'
 
@@ -32,11 +32,11 @@ export default function CategoryTabs({ activeTab, onTabChange }: CategoryTabsPro
             <div>
               <p
                 className="whitespace-pre-line text-sm font-bold leading-tight text-slate-800 dark:text-white sm:text-base"
-                style={{ ...jakarta, lineHeight: '1.25em' }}
+                style={{ lineHeight: '1.25em' }}
               >
                 {tab.label}
               </p>
-              <p className="mt-1 text-xs text-slate-500 dark:text-[#F1F5F9] sm:text-sm" style={jakarta}>
+              <p className="mt-1 text-xs text-slate-500 dark:text-[#F1F5F9] sm:text-sm">
                 Chi tiết
               </p>
             </div>

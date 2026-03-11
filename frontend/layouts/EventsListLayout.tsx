@@ -22,6 +22,23 @@ interface EventsListLayoutProps {
     error?: boolean
 }
 
+// ── Safely parse img_urls that backend may return as Python-style string ──────
+function parseImgUrls(urls: string[] | string | undefined | null): string[] {
+    if (!urls) return []
+    // Already a proper array — filter out junk entries like '[]' or non-http
+    if (Array.isArray(urls)) {
+        return urls.flatMap((u) => {
+            if (typeof u !== 'string') return []
+            if (u.startsWith('http')) return [u]
+            // element itself might be a stringified list (edge case)
+            return (u.match(/https?:\/\/[^'" ,\]]+/g) || [])
+        })
+    }
+    // String — extract every http(s) URL via regex regardless of format
+    // Handles: JSON arrays, Python repr lists, plain URLs
+    return (urls.match(/https?:\/\/[^'" ,\]]+/g) || [])
+}
+
 // ── Facebook SVG icon ──────────────────────────────────────────────────────────
 const FacebookIcon = ({ className = 'h-5 w-5' }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -237,7 +254,7 @@ function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagin
     }) ?? publicEvents[0] ?? null
 
     // Memorable events
-    const memorableEvents = posts.filter((p) => (p.img_urls && p.img_urls.length > 0))
+    const memorableEvents = posts.filter((p) => parseImgUrls(p.img_urls).length > 0)
 
     // Sorted past events
     const allPastEvents: PastEvent[] = [
@@ -371,18 +388,18 @@ function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagin
                                 const Text = (
                                     <div className="flex flex-col justify-center">
                                         {year && <span className="mb-3 inline-block w-fit rounded-full px-3 py-1 text-xs font-bold bg-[#5c6bc0]/10 text-[#5c6bc0]">Kỷ niệm {year}</span>}
-                                        <h3 className="mb-3 text-3xl font-extrabold text-slate-900 dark:text-white">{ev.title}</h3>
-                                        <p className="mb-4 text-sm text-slate-600 dark:text-white/70 line-clamp-3">{ev.summary || ev.description}</p>
+                                        <h3 className="mb-4 text-3xl md:text-4xl font-extrabold leading-tight text-slate-900 dark:text-white">{ev.title}</h3>
+                                        <p className="mb-5 text-sm text-slate-600 dark:text-white/70 line-clamp-4">{ev.summary || ev.description}</p>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-sm font-bold text-pink-500">Xem tất cả {ev.img_urls?.length} ảnh</span>
+                                            <span className="text-sm font-bold text-pink-500">Xem tất cả {parseImgUrls(ev.img_urls).length} ảnh</span>
                                             {fbLink && <a href={fbLink} target="_blank" rel="noreferrer"><FacebookIcon className="text-blue-600" /></a>}
                                         </div>
                                     </div>
                                 )
-                                const Photos = <PhotoStack images={ev.img_urls || []} flip={!isLeft} />
+                                const Photos = <PhotoStack images={parseImgUrls(ev.img_urls)} flip={!isLeft} />
 
                                 return (
-                                    <div key={ev.id} className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+                                    <div key={ev.id} className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
                                         {isLeft ? <>{Photos}{Text}</> : <>{Text}{Photos}</>}
                                     </div>
                                 )

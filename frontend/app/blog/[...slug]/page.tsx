@@ -15,13 +15,11 @@ import rehypePrettyCode from 'rehype-pretty-code'
 import siteMetadata from '@/data/siteMetadata'
 import 'katex/dist/katex.min.css'
 
-// Options for Shiki syntax highlighting
 const prettyCodeOptions = {
   theme: 'github-dark',
   keepBackground: true,
 }
 
-// Custom components for MDX
 const mdxComponents = {
   Image,
   a: ({ href, children, ...props }: any) => {
@@ -49,10 +47,9 @@ export async function generateStaticParams() {
   try {
     const posts = await getBlogs()
     return posts.map((post) => ({
-      slug: post.slug?.split('/') || [post.id.toString()],
+      slug: [String(post.id)],
     }))
-  } catch (error) {
-    console.error('Error generating static params:', error)
+  } catch {
     return []
   }
 }
@@ -62,15 +59,12 @@ export async function generateMetadata({ params }: PageProps) {
   const slug = slugParts?.join('/') || ''
   try {
     const post = await getBlogBySlug(slug)
-    const authorNames = post.authors?.map((author: any) => author.name)
+    const authorNames = post.authors?.map((a: any) => a.name)
     const keywordList = post.keywords?.map((kw: any) => kw.keyword_name)
-
     return {
       title: post.title,
       description: post.summary,
-      alternates: {
-        canonical: `${siteMetadata.siteUrl}/blog/${slug}`,
-      },
+      alternates: { canonical: `${siteMetadata.siteUrl}/blog/${slug}` },
       openGraph: {
         title: post.title,
         description: post.summary,
@@ -85,7 +79,6 @@ export async function generateMetadata({ params }: PageProps) {
         card: 'summary_large_image',
         title: post.title,
         description: post.summary,
-        site: siteMetadata.x,
         images: post.image_url ? [post.image_url] : [siteMetadata.socialBanner],
       },
       keywords: keywordList,
@@ -103,15 +96,12 @@ export default async function BlogDetailPage({ params }: PageProps) {
   let post
   try {
     post = await getBlogBySlug(slug)
-  } catch (error) {
+  } catch {
     notFound()
   }
 
-  if (!post) {
-    notFound()
-  }
+  if (!post) notFound()
 
-  // Compile MDX on the server
   const { content } = await compileMDX({
     source: post.content,
     options: {
@@ -128,10 +118,9 @@ export default async function BlogDetailPage({ params }: PageProps) {
     components: mdxComponents,
   })
 
-  // JSON-LD for Search Engines
   const articleLd = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
+    '@type': 'Bloging',
     headline: post.title,
     description: post.summary,
     image: post.image_url || siteMetadata.socialBanner,
@@ -140,147 +129,46 @@ export default async function BlogDetailPage({ params }: PageProps) {
     author: post.authors?.map((a: any) => ({
       '@type': 'Person',
       name: a.name,
-      url: `${siteMetadata.siteUrl}/about`, // Fallback for author bio
+      url: `${siteMetadata.siteUrl}/about`,
     })),
     publisher: {
       '@type': 'Organization',
       name: siteMetadata.title,
-      logo: {
-        '@type': 'ImageObject',
-        url: `${siteMetadata.siteUrl}${siteMetadata.siteLogo}`,
-      },
+      logo: { '@type': 'ImageObject', url: `${siteMetadata.siteUrl}${siteMetadata.siteLogo}` },
     },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `${siteMetadata.siteUrl}/blog/${slug}`,
-    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteMetadata.siteUrl}/blog/${slug}` },
   }
 
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Trang chủ',
-        item: siteMetadata.siteUrl,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Blog',
-        item: `${siteMetadata.siteUrl}/blog`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: post.title,
-        item: `${siteMetadata.siteUrl}/blog/${slug}`,
-      },
+      { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: siteMetadata.siteUrl },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${siteMetadata.siteUrl}/blog` },
+      { '@type': 'ListItem', position: 3, name: post.title, item: `${siteMetadata.siteUrl}/blog/${slug}` },
     ],
   }
 
   return (
     <PostLayoutAPI post={post}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <style dangerouslySetInnerHTML={{
         __html: `
-                /* --- Remove backticks added by Tailwind Typography --- */
-                .prose :not(pre) > code::before,
-                .prose :not(pre) > code::after {
-                    content: "" !important;
-                }
-
-                /* --- Premium Inline Code Style --- */
-                .prose :not(pre) > code {
-                    background-color: #f0f7ff; /* blue-50ish */
-                    color: #1d4ed8; /* blue-700 */
-                    padding: 0.15em 0.4em;
-                    border-radius: 0.4rem;
-                    font-size: 0.9em;
-                    font-weight: 600;
-                    font-family: var(--font-mono);
-                    border: 1px solid #dbeafe; /* blue-100 */
-                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-                    white-space: nowrap;
-                }
-                .dark .prose :not(pre) > code {
-                    background-color: rgba(30, 58, 138, 0.25); /* blue-900/25 */
-                    color: #60a5fa; /* blue-400 */
-                    border-color: rgba(30, 58, 138, 0.5);
-                    box-shadow: none;
-                }
-
-                /* --- Heading Optimizations --- */
-                .prose h1, .prose h2, .prose h3, .prose h4 {
-                    scroll-margin-top: 120px;
-                }
-
-                .prose h2 code, .prose h3 code, .prose h4 code {
-                    background: transparent !important;
-                    border: none !important;
-                    color: inherit !important;
-                    font-size: inherit !important;
-                    padding: 0 !important;
-                    font-weight: inherit !important;
-                }
-
-                /* --- Heading Anchors (similar to Contentlayer) --- */
-                .subheading-anchor {
-                    opacity: 0;
-                    margin-left: 0.5rem;
-                    text-decoration: none !important;
-                    transition: all 0.2s;
-                    color: #3b82f6 !important;
-                }
-                .subheading-anchor::after {
-                    content: "#";
-                }
-                h2:hover .subheading-anchor,
-                h3:hover .subheading-anchor,
-                h4:hover .subheading-anchor {
-                    opacity: 1;
-                }
-
-                /* --- Article Layout Improvements --- */
-                .prose {
-                    max-width: none;
-                }
-
-                /* --- Premium Aside/Callout Style --- */
-                .prose aside {
-                    margin: 2.5rem 0;
-                    padding: 0.5rem 0.5rem 0.5rem 1rem;
-                    border-radius: 1.25rem;
-                    border-left: 5px solid #3b82f6;
-                    background-color: #f0f7ff;
-                    position: relative;
-                    color: #1e40af;
-                    font-style: italic;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-                }
-
-                .dark .prose aside {
-                    background-color: rgba(30, 58, 138, 0.25);
-                    border-color: #3b82f6;
-                    color: #dbeafe;
-                    box-shadow: none;
-                }
-
-                /* --- Code Block Overrides --- */
-                .prose pre {
-                    padding-right: 3rem !important; /* Make room for the copy button */
-                    position: relative;
-                }
-            `}} />
+          .prose :not(pre) > code::before, .prose :not(pre) > code::after { content: "" !important; }
+          .prose :not(pre) > code { background-color: #f0f7ff; color: #1d4ed8; padding: 0.15em 0.4em; border-radius: 0.4rem; font-size: 0.9em; font-weight: 600; border: 1px solid #dbeafe; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03); white-space: nowrap; }
+          .dark .prose :not(pre) > code { background-color: rgba(30,58,138,0.25); color: #60a5fa; border-color: rgba(30,58,138,0.5); box-shadow: none; }
+          .prose h1, .prose h2, .prose h3, .prose h4 { scroll-margin-top: 120px; }
+          .prose h2 code, .prose h3 code, .prose h4 code { background: transparent !important; border: none !important; color: inherit !important; font-size: inherit !important; padding: 0 !important; font-weight: inherit !important; }
+          .subheading-anchor { opacity: 0; margin-left: 0.5rem; text-decoration: none !important; transition: all 0.2s; color: #3b82f6 !important; }
+          .subheading-anchor::after { content: "#"; }
+          h2:hover .subheading-anchor, h3:hover .subheading-anchor, h4:hover .subheading-anchor { opacity: 1; }
+          .prose { max-width: none; }
+          .prose aside { margin: 2.5rem 0; padding: 0.5rem 0.5rem 0.5rem 1rem; border-radius: 1.25rem; border-left: 5px solid #3b82f6; background-color: #f0f7ff; color: #1e40af; font-style: italic; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+          .dark .prose aside { background-color: rgba(30,58,138,0.25); border-color: #3b82f6; color: #dbeafe; box-shadow: none; }
+          .prose pre { padding-right: 3rem !important; position: relative; }
+        `
+      }} />
       {content}
     </PostLayoutAPI>
   )
