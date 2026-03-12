@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request, Depends, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.core.auth import is_admin_logged_in, set_admin_session, clear_admin_session
+from app.core.auth import  set_admin_session, clear_admin_session
 from app.core.config import settings
 from app.core.dependencies import get_service_factory
 from app.v1.users.schemas import UserCreate, UserUpdate
@@ -21,25 +21,15 @@ def _clean_text(value: Optional[str]) -> Optional[str]:
     return value if value else None
 
 
-def _require_admin(request: Request) -> bool:
-    return is_admin_logged_in(request)
-
-
-def _redirect_login():
-    return RedirectResponse(url="/admin_v2/login", status_code=303)
-
 
 @router.get("/", response_class=HTMLResponse)
 async def admin_v2_root(request: Request):
-    if not _require_admin(request):
-        return _redirect_login()
+
     return RedirectResponse(url="/admin_v2/users", status_code=303)
 
 
 @router.get("/login", response_class=HTMLResponse)
 async def admin_v2_login_page(request: Request):
-    if _require_admin(request):
-        return RedirectResponse(url="/admin_v2/users", status_code=303)
     return templates.TemplateResponse(
         "admin_v2/login.html",
         {
@@ -87,8 +77,7 @@ async def admin_users_list(
     page: int = Query(1, ge=1),
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
 
     all_users = service_factory.user.get_all() or []
     all_users = sorted(all_users, key=lambda u: getattr(u, "id", 0))
@@ -126,8 +115,7 @@ async def admin_users_create(
     request: Request,
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
 
     return templates.TemplateResponse(
         "admin_v2/users/edit.html",
@@ -146,8 +134,7 @@ async def admin_users_edit(
     request: Request,
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
 
     user = service_factory.user.get_by_id(user_id)
 
@@ -173,8 +160,7 @@ async def admin_users_save(
     status: Optional[str] = Form("active"),
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
 
     name = name.strip()
     email = email.strip()
@@ -205,8 +191,7 @@ async def admin_users_delete(
     request: Request,
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
 
     service_factory.user.delete(user_id)
     return RedirectResponse(url="/admin_v2/users", status_code=303)
@@ -217,8 +202,7 @@ async def admin_users_sync(
     request: Request,
     service_factory=Depends(get_service_factory),
 ):
-    if not _require_admin(request):
-        return _redirect_login()
+
 
     service_factory.user.sync_users()
     return RedirectResponse(url="/admin_v2/users", status_code=303)

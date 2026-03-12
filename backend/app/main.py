@@ -5,6 +5,7 @@ from sqladmin import Admin
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.auth import AdminAuth
+from app.core.auth import AdminAuthMiddleware
 from app.core.config import settings
 from app.core.database import engine
 from app.v1.v1_admin import register_admin_views
@@ -18,6 +19,17 @@ from app.admin_v2.keywords_router import router as admin_keywords_router
 from app.admin_v2.users_router import router as users_router
 
 app = FastAPI(title="DUT-AI FastAPI Backend")
+
+
+app.add_middleware(
+    AdminAuthMiddleware,
+    protected_prefix="/admin_v2",
+    excluded_paths={
+        "/admin_v2/login",
+        "/admin_v2/logout",
+    },
+)
+
 
 app.add_middleware(
     SessionMiddleware,
