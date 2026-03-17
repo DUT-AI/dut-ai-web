@@ -12,30 +12,27 @@ import TechStackPanel from './components/TechStackPanel'
 import TeamPanel from './components/TeamPanel'
 
 export default function ProjectsClient({
-  projects,
+  project,
   members,
-  initialProjectId,
 }: {
-  projects: Project[]
+  project: Project
   members: Member[]
-  initialProjectId?: number
 }) {
-  const initialIndex = initialProjectId ? projects.findIndex((p) => p.id === initialProjectId) : 0
-  const [selected, setSelected] = useState(initialIndex >= 0 ? initialIndex : 0)
+  const projects = [project]
+  const [selected, setSelected] = useState(0)
   const [activeTab, setActiveTab] = useState<TabKey>('features')
   const current = projects[selected]
 
-  const MOCK_MEMBERS: Member[] = [
-    { id: 101, name: 'Phước Nguyên', role_name: 'Project Manager', avatar_url: 'https://i.pravatar.cc/150?u=1' },
-    { id: 102, name: 'Bảo Trâm', role_name: 'Business Analyst', avatar_url: 'https://i.pravatar.cc/150?u=2' },
-    { id: 103, name: 'Anh Quân', role_name: 'Designer', avatar_url: 'https://i.pravatar.cc/150?u=3' },
-    { id: 104, name: 'Minh Tuấn', role_name: 'Frontend Developer', avatar_url: 'https://i.pravatar.cc/150?u=4' },
-    { id: 105, name: 'Hải Đăng', role_name: 'Backend Developer', avatar_url: 'https://i.pravatar.cc/150?u=5' },
-    { id: 106, name: 'Hoàng Long', role_name: 'AI Developer', avatar_url: 'https://i.pravatar.cc/150?u=6' },
-    { id: 107, name: 'Đức Huy', role_name: 'Frontend Developer', avatar_url: 'https://i.pravatar.cc/150?u=7' },
-  ]
+  const projectMembers: Member[] = project.members?.map((member) => ({
+    id: member.id,
+    name: member.user_name || 'Member',
+    role_name: member.role || 'Member',
+    avatar_url: member.user_avatar_url || undefined,
+  })) || []
 
-  const groupedMembers = MOCK_MEMBERS.reduce((acc, m) => {
+  const effectiveMembers = projectMembers.length > 0 ? projectMembers : members
+
+  const groupedMembers = effectiveMembers.reduce((acc, m) => {
     const role = m.role_name || 'Khác'
     if (!acc[role]) acc[role] = []
     acc[role].push(m)
@@ -64,7 +61,7 @@ export default function ProjectsClient({
       <ThumbCarousel projects={projects} selected={selected} onSelect={setSelected} />
 
       {/* 2 — Featured project detail (two-column) */}
-      <FeaturedDetail project={current} members={members} />
+      <FeaturedDetail project={current} members={effectiveMembers} />
 
       {/* 3 — Category tab pills */}
       <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
@@ -81,7 +78,7 @@ export default function ProjectsClient({
         {activeTab === 'demo' && (
           <DemoPanel
             project={current}
-            members={members}
+            members={effectiveMembers}
             projects={projects}
             selected={selected}
           />

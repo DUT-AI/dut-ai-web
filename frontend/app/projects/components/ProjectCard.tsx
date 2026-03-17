@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Project } from 'app/api-client'
 import Image from 'next/image'
+import { buildProjectPath } from '../project-route'
 
 export default function ProjectCard({ project }: { project: Project }) {
     // Use image_url from API, or imgSrc, or a default fallback
@@ -8,7 +9,7 @@ export default function ProjectCard({ project }: { project: Project }) {
 
     return (
         <Link
-            href={`/projects/${project.id}`}
+            href={buildProjectPath(project)}
             className="group flex flex-col p-4 overflow-hidden rounded-[2.5rem] bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-xl transition-all hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-white/40 h-full"
         >
             {/* Image container */}
