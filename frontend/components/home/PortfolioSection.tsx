@@ -69,7 +69,7 @@ export default function PortfolioSection({ projects }: { projects: Project[] }) 
             )}
 
             <div className="mt-10 text-center">
-                <ButtonLink href="/projects" content="Xem tất cả dự án →" />
+                <ButtonLink href="/projects" content="Xem tất cả dự án" />
             </div>
         </section>
     )
