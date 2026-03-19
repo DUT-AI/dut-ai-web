@@ -61,7 +61,7 @@ class AdminAuth(AuthenticationBackend):
 
     async def authenticate(self, request: Request) -> RedirectResponse | bool:
         if not is_admin_logged_in(request):
-            return RedirectResponse(request.url_for("admin:login"), status_code=302)
+            return RedirectResponse(url=request.url_for("admin:login").path, status_code=302)
 
         return True
     

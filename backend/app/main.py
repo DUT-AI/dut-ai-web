@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqladmin import Admin
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.core.auth import AdminAuth
 from app.core.auth import AdminAuthMiddleware
@@ -45,6 +46,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 authentication_backend = AdminAuth(secret_key=settings.SECRET_KEY)
@@ -65,9 +68,11 @@ app.include_router(admin_posts_router)
 app.include_router(admin_keywords_router)
 app.include_router(users_router)
 
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to DUT-AI FastAPI Backend"}
+
 
 @app.get("/health")
 def health_check():

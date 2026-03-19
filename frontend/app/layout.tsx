@@ -6,8 +6,6 @@ import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
-import SectionContainer from '@/components/SectionContainer'
-import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
@@ -79,10 +77,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${plusJakartaSans.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <link rel="icon" type="image/jpeg" href={`${basePath}/static/images/logo.jpg`} />
-      <link rel="apple-touch-icon" href={`${basePath}/static/images/logo.jpg`} />
-      <link rel="shortcut icon" href={`${basePath}/static/images/logo.jpg`} />
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
+      <meta name="apple-mobile-web-app-title" content="DUT AI" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body className="bg-[#F5F9FD] pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white" suppressHydrationWarning>
