@@ -29,6 +29,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package-lock.json ./package-lock.json
 
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV INTERNAL_API_URL=https://dut-ai-web-api.dutai.site/api/v1
 
 RUN npm run build
 

@@ -1,6 +1,6 @@
 # Makefile for DUT-AI Web
 
-.PHONY: help api frontend migrate setup
+.PHONY: help api frontend migrate setup build-be build-fe
 
 help:
 	@echo "Available commands:"
@@ -39,3 +39,9 @@ db-up:
 db-down:
 	@read -p "Enter revision to downgrade to (e.g., -1): " rev; \
 	cd backend && uv run alembic downgrade "$$rev"
+
+build-be:
+	docker compose up backend -d --build
+
+build-fe:
+	docker compose up frontend -d --build

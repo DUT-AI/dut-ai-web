@@ -1,4 +1,4 @@
-import { getHomePageData } from 'app/api-client'
+import { getHomePageData, type HomePageData } from 'app/api-client'
 import Footer from '@/components/Footer'
 import HeroSection from '@/components/home/HeroSection'
 import RoadmapSection from '@/components/home/RoadmapSection'
@@ -9,7 +9,19 @@ import BlogSection from '@/components/home/BlogSection'
 import CTASection from '@/components/home/CTASection'
 
 export default async function Page() {
-  const data = await getHomePageData()
+  let data: HomePageData = {
+    latest_blogs: [],
+    latest_events: [],
+    latest_projects: [],
+    latest_posts: [],
+  }
+
+  try {
+    data = await getHomePageData()
+  } catch (error) {
+    console.error('Failed to fetch homepage data during build/render:', error)
+  }
+
   const latestPosts = data.latest_posts ?? []
   const latestEvents = data.latest_events ?? []
   const latestBlogs = data.latest_blogs ?? []

@@ -173,7 +173,7 @@ export async function getBlogs(params?: { title?: string; keyword?: string }): P
     if (params?.title) searchParams.set('title', params.title)
     if (params?.keyword) searchParams.set('keyword', params.keyword)
     const qs = searchParams.toString()
-    return apiFetch<Blog[]>(`/blogs/${qs ? `?${qs}` : ''}`, { revalidate: 300 })
+    return apiFetch<Blog[]>(`/blogs${qs ? `?${qs}` : ''}`, { revalidate: 300 })
 }
 
 export async function getFeaturedBlogs(limit = 5): Promise<Blog[]> {
@@ -185,7 +185,7 @@ export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
 }
 
 export async function getBlogKeywords(): Promise<BlogKeyword[]> {
-    return apiFetch<BlogKeyword[]>('/keywords/', { revalidate: 600 })
+    return apiFetch<BlogKeyword[]>('/keywords', { revalidate: 600 })
 }
 
 export async function getBlogBySlug(slug: string): Promise<Blog> {
