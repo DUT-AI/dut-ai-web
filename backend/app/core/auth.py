@@ -1,6 +1,5 @@
 import secrets
 
-from sqladmin.authentication import AuthenticationBackend
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -38,38 +37,11 @@ def is_admin_logged_in(request: Request) -> bool:
         and admin_user.get("status") == "active"
     )
 
-
-class AdminAuth(AuthenticationBackend):
-    async def login(self, request: Request) -> bool:
-        form = await request.form()
-
-        username = (form.get("username") or "").strip()
-        password = (form.get("password") or "").strip()
-
-        if (
-            username == settings.ADMIN_USERNAME
-            and password == settings.ADMIN_PASSWORD
-        ):
-            set_admin_session(request)
-            return True
-
-        return False
-
-    async def logout(self, request: Request) -> bool:
-        clear_admin_session(request)
-        return True
-
-    async def authenticate(self, request: Request) -> RedirectResponse | bool:
-        if not is_admin_logged_in(request):
-            return RedirectResponse(url=request.url_for("admin:login").path, status_code=302)
-
-        return True
-    
 class AdminAuthMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app,
-        protected_prefix: str = "/admin_v2",
+        protected_prefix: str = "/admin",
         excluded_paths: set[str] | None = None,
     ):
         super().__init__(app)
@@ -84,6 +56,6 @@ class AdminAuthMiddleware(BaseHTTPMiddleware):
 
         if is_protected and not is_excluded:
             if not is_admin_logged_in(request):
-                return RedirectResponse(url="/admin_v2/login", status_code=303)
+                return RedirectResponse(url="/admin/login", status_code=303)
 
         return await call_next(request)
