@@ -144,7 +144,7 @@ export default function MembersGrid() {
                             <div className="about-member-avatar shadow-sm">
                                 {hasRealAvatar ? (
                                     <Image
-                                        src={m.avatar_url}
+                                        src={m.avatar_url!}
                                         alt={m.name}
                                         fill
                                         sizes="56px"
