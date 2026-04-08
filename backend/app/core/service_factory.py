@@ -8,7 +8,7 @@ from app.v1.keywords.service import KeywordService
 from app.v1.homepage.service import HomepageService
 from app.v1.public_events.service import PublicEventService
 from app.v1.posts.service import PostService
-from app.admin_v2.service import AdminService
+from app.admin.service import AdminService
 from .repository_factory import RepositoryFactory
 
 

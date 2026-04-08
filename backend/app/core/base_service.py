@@ -32,11 +32,14 @@ class BaseService(Generic[ModelType, CreateSchema, UpdateSchema]):
         return instance
 
     def create(self, data: CreateSchema) -> ModelType:
-        return self.repo.create(**data.model_dump())
+        return self.repo.create(**data.model_dump(exclude_none=True))
 
     def update(self, id: int, data: UpdateSchema) -> ModelType:
         instance = self.get_by_id(id)
-        return self.repo.update(instance, **data.model_dump(exclude_unset=True))
+        return self.repo.update(
+            instance,
+            **data.model_dump(exclude_unset=True, exclude_none=True)
+        )
 
     def delete(self, id: int) -> None:
         instance = self.get_by_id(id)

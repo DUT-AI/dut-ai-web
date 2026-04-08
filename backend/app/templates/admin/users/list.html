@@ -1,0 +1,164 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Quản lý người dùng - DUT-AI{% endblock %}
+{% block page_title %}Quản lý người dùng{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <p class="text-sm text-slate-500 font-medium tracking-wide">
+        Hiển thị danh sách tất cả người dùng trong hệ thống
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <form action="/admin/users/sync" method="POST">
+        <button
+          type="submit"
+          class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl transition-all font-bold text-sm shadow-lg shadow-orange-200"
+        >
+          <i class="fa-solid fa-rotate"></i>
+          Đồng bộ dữ liệu
+        </button>
+      </form>
+
+      <a href="/admin/users/create" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl transition-all font-bold text-sm shadow-lg shadow-indigo-200">
+        <i class="fa-solid fa-plus text-xs"></i>
+        Tạo người dùng mới
+      </a>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-[24px] shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto hide-scrollbar">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-50/50 border-b border-slate-200">
+            <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">ID</th>
+            <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Người dùng</th>
+            <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Email</th>
+            <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Vai trò</th>
+            <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Trạng thái</th>
+            <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">Hành động</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-slate-100">
+          {% for u in users %}
+          <tr class="hover:bg-slate-50/50 transition-all group">
+            <td class="px-6 py-5">
+              <span class="text-sm font-bold text-slate-600">{{ u.id }}</span>
+            </td>
+
+            <td class="px-6 py-5">
+              <div class="flex items-center gap-4">
+                <div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center text-slate-500 font-bold">
+                  {{ (u.name[0] if u.name else 'U')|upper }}
+                </div>
+                <div class="max-w-sm">
+                  <h3 class="font-bold text-slate-800 text-sm line-clamp-1 group-hover:text-indigo-600 transition-colors">
+                    {{ u.name }}
+                  </h3>
+                </div>
+              </div>
+            </td>
+
+            <td class="px-6 py-5">
+              <span class="text-sm text-slate-600 font-medium">{{ u.email }}</span>
+            </td>
+
+            <td class="px-6 py-5">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold ring-1 ring-inset ring-slate-200">
+                {{ u.role_name or '—' }}
+              </span>
+            </td>
+
+            <td class="px-6 py-5">
+              {% set st = (u.status or 'inactive') %}
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset
+                {% if st == 'active' %}
+                  bg-emerald-50 text-emerald-700 ring-emerald-200
+                {% else %}
+                  bg-rose-50 text-rose-700 ring-rose-200
+                {% endif %}
+              ">
+                {{ st }}
+              </span>
+            </td>
+
+            <td class="px-6 py-5">
+              <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all">
+                <a href="/admin/users/edit/{{ u.id }}" class="p-2 text-slate-400 hover:text-indigo-600 transition-all" title="Chỉnh sửa">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                <button onclick='confirmDelete({{ u.id }}, {{ u.name|tojson }})' class="p-2 text-slate-400 hover:text-rose-500 transition-all" title="Xóa">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+              Chưa có người dùng nào
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/40">
+      <p class="text-sm text-slate-500">
+        Hiển thị {{ start_index }} đến {{ end_index }} của {{ total }} người dùng
+      </p>
+
+      <div class="flex items-center gap-2">
+        <a href="/admin/users?page={{ page - 1 }}"
+           class="px-3 py-2 rounded-xl text-sm font-semibold border border-slate-200 transition-all
+           {% if page <= 1 %}pointer-events-none opacity-40 bg-slate-100 text-slate-400{% else %}bg-white text-slate-600 hover:bg-slate-50{% endif %}">
+          Prev
+        </a>
+
+        {% for p in range(1, total_pages + 1) %}
+          {% if p == page %}
+            <span class="min-w-[40px] text-center px-3 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white">
+              {{ p }}
+            </span>
+          {% else %}
+            <a href="/admin/users?page={{ p }}"
+               class="min-w-[40px] text-center px-3 py-2 rounded-xl text-sm font-semibold border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all">
+              {{ p }}
+            </a>
+          {% endif %}
+        {% endfor %}
+
+        <a href="/admin/users?page={{ page + 1 }}"
+           class="px-3 py-2 rounded-xl text-sm font-semibold border border-slate-200 transition-all
+           {% if page >= total_pages %}pointer-events-none opacity-40 bg-slate-100 text-slate-400{% else %}bg-white text-slate-600 hover:bg-slate-50{% endif %}">
+          Next
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function confirmDelete(id, name) {
+  if (confirm(`Bạn có chắc muốn xóa người dùng "${name}" không? Hành động này không thể hoàn tác.`)) {
+    try {
+      const response = await fetch(`/admin/users/delete/${id}`, { method: 'POST' });
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert("Lỗi khi xóa người dùng!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi kết nối máy chủ!");
+    }
+  }
+}
+</script>
+{% endblock %}
