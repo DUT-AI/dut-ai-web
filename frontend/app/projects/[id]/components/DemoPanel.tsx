@@ -63,6 +63,31 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
             {project.description || 'Xem trước giao diện và trải nghiệm thực tế của dự án.'}
           </p>
 
+          {(project.demo_url || project.video_url) && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {project.demo_url && project.demo_url !== 'None' && (
+                <a
+                  href={project.demo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+                >
+                  Live Demo
+                </a>
+              )}
+              {project.video_url && project.video_url !== 'None' && (
+                <a
+                  href={project.video_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-700 backdrop-blur-sm transition-colors hover:bg-white/20 dark:text-white"
+                >
+                  Video
+                </a>
+              )}
+            </div>
+          )}
+
           {/* Dot indicators */}
           <div className="mt-6 flex gap-2">
             {projects.slice(0, Math.min(5, total)).map((_, i) => (

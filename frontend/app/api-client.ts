@@ -15,11 +15,25 @@ export interface Project {
     id: number
     title: string
     description: string
+    slug?: string
+    features?: string | null
+    technologies?: string | null
+    demo_url?: string | null
+    video_url?: string | null
+    members?: ProjectMember[]
     href?: string
     imgSrc?: string
     image_url?: string
     github_url?: string
     tags?: string[]
+}
+
+export interface ProjectMember {
+    id: number
+    user_id?: number
+    user_name?: string
+    user_avatar_url?: string | null
+    role?: string
 }
 
 export interface Introduction {

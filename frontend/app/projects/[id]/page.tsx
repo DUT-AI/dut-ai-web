@@ -1,8 +1,10 @@
-import { getProjects, getMembers, Project, Member } from 'app/api-client'
+import { getProject, getMembers, Project, Member } from 'app/api-client'
 import { genPageMetadata } from 'app/seo'
 import NextImage from 'next/image'
 import ProjectsClient from './ProjectsClient'
 import Footer from '@/components/Footer'
+import { notFound } from 'next/navigation'
+import { parseProjectIdFromParam } from '../project-route'
 
 export const metadata = genPageMetadata({
   title: 'Projects',
@@ -19,16 +21,23 @@ export const dynamic = 'force-dynamic'
 
 export default async function Projects(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const initialProjectId = parseInt(params.id, 10)
+  const projectId = parseProjectIdFromParam(params.id)
+  if (!projectId) {
+    notFound()
+  }
 
-  let projects: Project[] = []
+  let project: Project | null = null
   let members: Member[] = []
   let error = false
 
   try {
-    ;[projects, members] = await Promise.all([getProjects(), getMembers()])
+    ;[project, members] = await Promise.all([getProject(projectId), getMembers()])
   } catch {
-    error = true
+    notFound()
+  }
+
+  if (!project) {
+    notFound()
   }
 
   return (
@@ -132,7 +141,7 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
         )}
 
         {/* Empty */}
-        {projects.length === 0 && !error && (
+        {!project && !error && (
           <div className="flex flex-col items-center justify-center py-24 text-slate-400">
             <span className="mb-4 text-6xl">📦</span>
             <p className="text-lg font-semibold">
@@ -142,7 +151,7 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
         )}
 
         {/* Interactive content */}
-        {projects.length > 0 && <ProjectsClient projects={projects} members={members} initialProjectId={initialProjectId} />}
+        {project && <ProjectsClient project={project} members={members} />}
 
         <Footer />
       </div>
