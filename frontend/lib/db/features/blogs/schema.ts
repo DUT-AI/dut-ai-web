@@ -21,7 +21,7 @@ export const blogs = pgTable(
     title: varchar('title', { length: 255 }).notNull(),
     slug: varchar('slug', { length: 500 }),
     summary: text('summary'),
-    content: text('content').notNull(),
+    content: text('content').default(''),
     views: integer('views').default(0),
     imageUrl: varchar('image_url', { length: 1000 }),
     searchVector: tsvector('search_vector'),

@@ -6,15 +6,6 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.core.database import Base, engine
-from app.v1.blogs.models import Blog, Keyword
-from app.v1.blogs.models import Blog, Keyword
-from app.v1.projects.models import Project, ProjectMember
-from app.v1.public_events.models import PublicEvent
-from app.v1.posts.models import Post
-
-
-from app.v1.introductions.models import Introduction
-from app.v1.users.models import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -27,8 +18,6 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

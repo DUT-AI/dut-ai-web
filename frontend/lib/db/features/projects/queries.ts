@@ -95,6 +95,39 @@ export async function createProjectQuery(input: CreateProjectInput): Promise<Pro
   return created!
 }
 
+export async function updateProjectQuery(
+  id: number,
+  input: Partial<CreateProjectInput>
+): Promise<ProjectResponse | null> {
+  await db
+    .update(projects)
+    .set({
+      title: input.title,
+      description: input.description,
+      imageUrl: input.image_url,
+      features: input.features,
+      technologies: input.technologies,
+      demoUrl: input.demo_url,
+      videoUrl: input.video_url,
+    })
+    .where(eq(projects.id, id))
+
+  if (input.members !== undefined) {
+    await db.delete(projectMembers).where(eq(projectMembers.projectId, id))
+    if (input.members.length > 0) {
+      await db.insert(projectMembers).values(
+        input.members.map((m) => ({
+          projectId: id,
+          userId: m.user_id,
+          role: m.role || 'Member',
+        }))
+      )
+    }
+  }
+
+  return getProjectByIdQuery(id)
+}
+
 export async function deleteProjectQuery(id: number): Promise<boolean> {
   const result = await db.delete(projects).where(eq(projects.id, id)).returning()
   return result.length > 0

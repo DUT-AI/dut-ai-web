@@ -23,3 +23,22 @@ export async function getIntroductionByIdQuery(id: number): Promise<Introduction
     order: intro.id,
   }
 }
+
+export async function updateIntroductionQuery(id: number, content: string): Promise<void> {
+  await db
+    .update(introductions)
+    .set({
+      content,
+    })
+    .where(eq(introductions.id, id))
+}
+
+export async function createIntroductionQuery(content: string): Promise<number> {
+  const [created] = await db
+    .insert(introductions)
+    .values({
+      content,
+    })
+    .returning({ id: introductions.id })
+  return created.id
+}

@@ -21,6 +21,5 @@ dependencies = [
     "python-slugify>=8.0.4",
     "sqlalchemy>=2.0.46",
     "sqlalchemy-file>=0.6.0",
-    "starlette-admin>=0.16.0",
     "uvicorn>=0.40.0",
 ]

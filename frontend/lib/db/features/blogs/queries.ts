@@ -1,8 +1,9 @@
 import { desc, eq, ilike, sql } from 'drizzle-orm'
 import { db } from '../../index'
 import { formatDate } from '../../utils'
-import { blogs, blogAuthors } from './schema'
+import { blogs, blogAuthors, blogKeywords } from './schema'
 import { users } from '../users/schema'
+import { keywords } from '../keywords/schema'
 import { BlogResponse, AuthorStatsResponse } from './types'
 
 export async function getBlogsQuery(params?: {
@@ -39,7 +40,7 @@ export async function getBlogsQuery(params?: {
     title: b.title,
     slug: b.slug ?? undefined,
     summary: b.summary ?? '',
-    content: b.content,
+    content: b.content ?? '',
     views: b.views ?? 0,
     image_url: b.imageUrl ?? undefined,
     created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
@@ -59,6 +60,52 @@ export async function getBlogsQuery(params?: {
         number_blog_contain: bk.keyword!.numberBlogContain ?? 0,
       })),
   }))
+}
+
+export async function getBlogByIdQuery(id: number): Promise<BlogResponse | null> {
+  const b = await db.query.blogs.findFirst({
+    where: eq(blogs.id, id),
+    with: {
+      blogAuthors: {
+        with: {
+          user: true,
+        },
+      },
+      blogKeywords: {
+        with: {
+          keyword: true,
+        },
+      },
+    },
+  })
+
+  if (!b) return null
+
+  return {
+    id: b.id,
+    title: b.title,
+    slug: b.slug ?? undefined,
+    summary: b.summary ?? '',
+    content: b.content ?? '',
+    views: b.views ?? 0,
+    image_url: b.imageUrl ?? undefined,
+    created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
+    updated_at: formatDate(b.updatedAt) ?? new Date().toISOString(),
+    authors: b.blogAuthors
+      .filter((ba) => Boolean(ba.user))
+      .map((ba) => ({
+        id: ba.user!.id,
+        name: ba.user!.name ?? 'Author',
+        avatar_url: ba.user!.avatarUrl ?? undefined,
+      })),
+    keywords: b.blogKeywords
+      .filter((bk) => Boolean(bk.keyword))
+      .map((bk) => ({
+        id: bk.keyword!.id,
+        keyword_name: bk.keyword!.keywordName,
+        number_blog_contain: bk.keyword!.numberBlogContain ?? 0,
+      })),
+  }
 }
 
 export async function getBlogBySlugQuery(slug: string): Promise<BlogResponse | null> {
@@ -85,7 +132,7 @@ export async function getBlogBySlugQuery(slug: string): Promise<BlogResponse | n
     title: b.title,
     slug: b.slug ?? undefined,
     summary: b.summary ?? '',
-    content: b.content,
+    content: b.content ?? '',
     views: b.views ?? 0,
     image_url: b.imageUrl ?? undefined,
     created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
@@ -105,6 +152,97 @@ export async function getBlogBySlugQuery(slug: string): Promise<BlogResponse | n
         number_blog_contain: bk.keyword!.numberBlogContain ?? 0,
       })),
   }
+}
+
+export async function createBlogQuery(data: {
+  title: string
+  slug: string
+  summary?: string
+  imageUrl?: string
+  authorIds?: number[]
+  keywordIds?: number[]
+}): Promise<number> {
+  const [created] = await db
+    .insert(blogs)
+    .values({
+      title: data.title,
+      slug: data.slug,
+      summary: data.summary,
+      imageUrl: data.imageUrl,
+      content: '',
+    })
+    .returning({ id: blogs.id })
+
+  if (data.authorIds && data.authorIds.length > 0) {
+    await db.insert(blogAuthors).values(
+      data.authorIds.map((userId) => ({
+        blogId: created.id,
+        userId,
+      }))
+    )
+  }
+
+  if (data.keywordIds && data.keywordIds.length > 0) {
+    await db.insert(blogKeywords).values(
+      data.keywordIds.map((keywordId) => ({
+        blogId: created.id,
+        keywordId,
+      }))
+    )
+  }
+
+  return created.id
+}
+
+export async function updateBlogQuery(
+  id: number,
+  data: {
+    title?: string
+    slug?: string
+    summary?: string
+    imageUrl?: string
+    authorIds?: number[]
+    keywordIds?: number[]
+  }
+): Promise<void> {
+  await db
+    .update(blogs)
+    .set({
+      title: data.title,
+      slug: data.slug,
+      summary: data.summary,
+      imageUrl: data.imageUrl,
+      updatedAt: new Date(),
+    })
+    .where(eq(blogs.id, id))
+
+  if (data.authorIds !== undefined) {
+    await db.delete(blogAuthors).where(eq(blogAuthors.blogId, id))
+    if (data.authorIds.length > 0) {
+      await db.insert(blogAuthors).values(
+        data.authorIds.map((userId) => ({
+          blogId: id,
+          userId,
+        }))
+      )
+    }
+  }
+
+  if (data.keywordIds !== undefined) {
+    await db.delete(blogKeywords).where(eq(blogKeywords.blogId, id))
+    if (data.keywordIds.length > 0) {
+      await db.insert(blogKeywords).values(
+        data.keywordIds.map((keywordId) => ({
+          blogId: id,
+          keywordId,
+        }))
+      )
+    }
+  }
+}
+
+export async function deleteBlogQuery(id: number): Promise<void> {
+  await db.delete(blogs).where(eq(blogs.id, id))
 }
 
 export async function getFeaturedBlogsQuery(limit = 5): Promise<BlogResponse[]> {
