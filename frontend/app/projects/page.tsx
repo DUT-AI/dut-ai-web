@@ -1,4 +1,5 @@
-import { getProjects, Project } from 'app/api-client'
+import { getProjectsCached as getProjects } from '@/lib/db/cached-queries'
+import type { Project } from '@/lib/db/features/projects/types'
 import { genPageMetadata } from 'app/seo'
 import ProjectsListClient from './ProjectsListClient'
 import Footer from '@/components/Footer'

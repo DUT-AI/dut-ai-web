@@ -69,9 +69,6 @@ module.exports = () => {
     basePath,
     reactStrictMode: true,
     trailingSlash: false,
-    eslint: {
-      ignoreDuringBuilds: true,
-    },
     turbopack: {
       root: process.cwd(),
       rules: {
@@ -86,11 +83,11 @@ module.exports = () => {
       remotePatterns: [
         {
           protocol: 'https',
-          hostname: 'picsum.photos',
+          hostname: '**',
         },
         {
-          protocol: 'https',
-          hostname: 'minio.dutai.site',
+          protocol: 'http',
+          hostname: '**',
         },
       ],
       unoptimized,

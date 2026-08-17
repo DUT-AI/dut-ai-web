@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
-import { getBlogs, Blog } from 'app/api-client'
+import { getBlogsCached as getBlogs } from '@/lib/db/cached-queries'
+import type { Blog } from '@/lib/db/features/blogs/types'
 import siteMetadata from '@/data/siteMetadata'
 
 export const dynamic = 'force-dynamic'

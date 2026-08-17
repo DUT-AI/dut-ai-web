@@ -1,6 +1,6 @@
 import { genPageMetadata } from 'app/seo'
-import { getPublicEvents, getPosts } from 'app/api-client'
-import type { PublicEvent, Post, PastEvent } from 'app/api-client'
+import { getPublicEventsCached as getPublicEvents, getPostsCached as getPosts } from '@/lib/db/cached-queries'
+import type { PublicEvent, Post, PastEvent } from '@/lib/db/features/events/types'
 import EventsListLayout from '@/layouts/EventsListLayout'
 
 // Safely parse img_urls that backend may return as Python-style string

@@ -1,4 +1,6 @@
-import { getProject, getMembers, Project, Member } from 'app/api-client'
+import { getProjectByIdCached as getProject, getMembersCached as getMembers } from '@/lib/db/cached-queries'
+import type { Project } from '@/lib/db/features/projects/types'
+import type { Member } from '@/lib/db/features/users/types'
 import { genPageMetadata } from 'app/seo'
 import NextImage from 'next/image'
 import ProjectsClient from './ProjectsClient'

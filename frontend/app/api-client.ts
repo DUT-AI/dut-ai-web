@@ -1,220 +1,146 @@
 /**
- * Typed API client for the DUT AI FastAPI backend.
- * Always calls through Next.js API proxy routes (server-side),
- * so the real backend URL is kept server-side only.
+ * Client-safe Typed API Client for DUT AI Web.
+ * Re-exports domain types using "export type" so TypeScript erases them completely at build time.
+ * Safe to import in both Client Components ('use client') and Server Components.
  */
 
-// Use internal Docker network URL for server-side fetch, public URL for client-side
-const BASE = typeof window === 'undefined'
-    ? (process.env.INTERNAL_API_URL || 'http://backend:8002/api/v1')
-    : (process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1')
+// ── Re-export Domain Types (100% Single Source of Truth from Features) ────
 
-// ── Types ─────────────────────────────────────────────────────────────────
+export type { Member } from '@/lib/db/features/users/types'
+export type {
+  Project,
+  ProjectMember,
+  ProjectMemberDetail,
+  CreateProjectInput,
+} from '@/lib/db/features/projects/types'
+export type { BlogKeyword } from '@/lib/db/features/keywords/types'
+export type {
+  Blog,
+  BlogAuthor,
+  AuthorStats,
+} from '@/lib/db/features/blogs/types'
+export type {
+  PublicEvent,
+  Post,
+  PastEvent,
+} from '@/lib/db/features/events/types'
+export type { Introduction } from '@/lib/db/features/introductions/types'
+export type { HomePageData } from '@/lib/db/features/homepage/types'
 
-export interface Project {
-    id: number
-    title: string
-    description: string
-    slug?: string
-    features?: string | null
-    technologies?: string | null
-    demo_url?: string | null
-    video_url?: string | null
-    members?: ProjectMember[]
-    href?: string
-    imgSrc?: string
-    image_url?: string
-    github_url?: string
-    tags?: string[]
-}
+import type { Member } from '@/lib/db/features/users/types'
+import type { Project } from '@/lib/db/features/projects/types'
+import type { BlogKeyword } from '@/lib/db/features/keywords/types'
+import type { Blog, AuthorStats } from '@/lib/db/features/blogs/types'
+import type { PublicEvent, Post } from '@/lib/db/features/events/types'
+import type { Introduction } from '@/lib/db/features/introductions/types'
+import type { HomePageData } from '@/lib/db/features/homepage/types'
 
-export interface ProjectMember {
-    id: number
-    user_id?: number
-    user_name?: string
-    user_avatar_url?: string | null
-    role?: string
-}
+// ── Client Fetch Helper ────────────────────────────────────────────────────
 
-export interface Introduction {
-    id: number
-    title: string
-    content: string
-    order?: number
-}
-
-export interface Member {
-    id: number
-    name: string
-    role_name: string
-    avatar_url?: string
-    email?: string
-    github?: string
-    linkedin?: string
-}
-
-// ── Fetch helpers (server-side, use API_BASE directly) ────────────────────
+const BASE =
+  typeof window !== 'undefined'
+    ? ''
+    : (process.env.INTERNAL_API_URL || 'http://localhost:3000')
 
 async function apiFetch<T>(path: string, options?: RequestInit & { revalidate?: number }): Promise<T> {
-    const { revalidate = 300, ...fetchOptions } = options ?? {}
-    const res = await fetch(`${BASE}${path}`, {
-        ...fetchOptions,
-        next: { revalidate },
-    })
-    if (!res.ok) {
-        throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`)
-    }
-    return res.json() as Promise<T>
+  const { revalidate = 300, ...fetchOptions } = options ?? {}
+  const res = await fetch(`${BASE}/api${path}`, {
+    ...fetchOptions,
+    next: { revalidate },
+  })
+  if (!res.ok) {
+    throw new Error(`API ${path} failed: ${res.status} ${res.statusText}`)
+  }
+  return res.json() as Promise<T>
 }
 
 // ── Projects ──────────────────────────────────────────────────────────────
 
 export async function getProjects(): Promise<Project[]> {
-    return apiFetch<Project[]>('/projects', { revalidate: 600 })
+  return apiFetch<Project[]>('/projects', { revalidate: 600 })
 }
 
-export async function getProject(id: number): Promise<Project> {
-    return apiFetch<Project>(`/projects/${id}`, { revalidate: 600 })
+export async function getProject(id: number): Promise<Project | null> {
+  try {
+    return await apiFetch<Project>(`/projects/${id}`, { revalidate: 600 })
+  } catch {
+    return null
+  }
 }
 
 // ── Introductions ─────────────────────────────────────────────────────────
 
 export async function getIntroductions(): Promise<Introduction[]> {
-    return apiFetch<Introduction[]>('/introductions', { revalidate: 600 })
+  return apiFetch<Introduction[]>('/introductions', { revalidate: 600 })
 }
 
-export async function getIntroduction(id: number): Promise<Introduction> {
-    return apiFetch<Introduction>(`/introductions/${id}`, { revalidate: 600 })
+export async function getIntroduction(id: number): Promise<Introduction | null> {
+  try {
+    return await apiFetch<Introduction>(`/introductions/${id}`, { revalidate: 600 })
+  } catch {
+    return null
+  }
 }
 
-// ── Members (backend endpoint: /users) ────────────────────────────────────
+// ── Members ───────────────────────────────────────────────────────────────
 
 export async function getMembers(): Promise<Member[]> {
-    return apiFetch<Member[]>('/users', { revalidate: 300 })
+  return apiFetch<Member[]>('/members', { revalidate: 300 })
 }
 
-// ── Public Events (Workshops & Seminars) ─────────────────────────────────
-
-export interface PublicEvent {
-    id: number
-    title: string
-    description?: string
-    summary?: string
-    img_url?: string
-    events_date?: string
-    location?: string
-    register_link?: string
-    facebook_url?: string
-    tags?: string[]
-    created_at: string
-    updated_at: string
-}
+// ── Public Events ─────────────────────────────────────────────────────────
 
 export async function getPublicEvents(): Promise<PublicEvent[]> {
-    return apiFetch<PublicEvent[]>('/public-events', { revalidate: 300 })
+  return apiFetch<PublicEvent[]>('/public-events', { revalidate: 300 })
 }
 
-// ── Posts (Memorable Events) ──────────────────────────────────────────────
-
-export interface Post {
-    id: number
-    title: string
-    description?: string
-    summary?: string
-    img_urls?: string[]
-    hashtag?: string
-    events_date?: string
-    facebook_url?: string
-    created_at: string
-    updated_at: string
-}
+// ── Posts ─────────────────────────────────────────────────────────────────
 
 export async function getPosts(): Promise<Post[]> {
-    return apiFetch<Post[]>('/posts', { revalidate: 300 })
+  return apiFetch<Post[]>('/posts', { revalidate: 300 })
 }
 
-// ── Shared Unified Type ──────────────────────────────────────────────────
-
-export interface PastEvent {
-    id: string
-    type: 'public_event' | 'post'
-    title: string
-    summary?: string
-    cover?: string
-    date?: string
-    facebook_url?: string
-}
-
-// ── Blog (từ backend /blogs/) ─────────────────────────────────────────────
-
-export interface BlogAuthor {
-    id: number
-    name: string
-    avatar_url?: string
-}
-
-export interface BlogKeyword {
-    id: number
-    keyword_name: string
-    number_blog_contain: number
-}
-
-export interface Blog {
-    id: number
-    slug?: string
-    title: string
-    summary: string
-    content?: string
-    image_url?: string
-    views: number
-    authors: BlogAuthor[]
-    keywords: BlogKeyword[]
-    created_at: string
-    updated_at: string
-    related_blogs?: Blog[]
-}
-
-export interface AuthorStats {
-    id: number
-    name: string
-    avatar_url?: string
-    total_views: number
-    post_count: number
-}
+// ── Blogs & Keywords ──────────────────────────────────────────────────────
 
 export async function getBlogs(params?: { title?: string; keyword?: string }): Promise<Blog[]> {
-    const searchParams = new URLSearchParams()
-    if (params?.title) searchParams.set('title', params.title)
-    if (params?.keyword) searchParams.set('keyword', params.keyword)
-    const qs = searchParams.toString()
-    return apiFetch<Blog[]>(`/blogs${qs ? `?${qs}` : ''}`, { revalidate: 300 })
+  const searchParams = new URLSearchParams()
+  if (params?.title) searchParams.set('title', params.title)
+  if (params?.keyword) searchParams.set('keyword', params.keyword)
+  const qs = searchParams.toString()
+  return apiFetch<Blog[]>(`/blogs${qs ? `?${qs}` : ''}`, { revalidate: 300 })
 }
 
 export async function getFeaturedBlogs(limit = 5): Promise<Blog[]> {
-    return apiFetch<Blog[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
+  return apiFetch<Blog[]>(`/blogs/top-viewed?limit=${limit}`, { revalidate: 300 })
 }
 
-export async function getTopAuthors(limit = 5): Promise<AuthorStats[]> {
-    return apiFetch<AuthorStats[]>(`/blogs/top-authors?limit=${limit}`, { revalidate: 300 })
+export async function getTopAuthors(limit = 50): Promise<AuthorStats[]> {
+  return apiFetch<AuthorStats[]>(`/blogs/top-authors?limit=${limit}`, { revalidate: 300 })
+}
+
+export async function getAuthorStats(authorName: string): Promise<AuthorStats | null> {
+  try {
+    const authors = await getTopAuthors()
+    return authors.find((a) => a.name === authorName) ?? null
+  } catch {
+    return null
+  }
 }
 
 export async function getBlogKeywords(): Promise<BlogKeyword[]> {
-    return apiFetch<BlogKeyword[]>('/keywords', { revalidate: 600 })
+  return apiFetch<BlogKeyword[]>('/keywords', { revalidate: 600 })
 }
 
-export async function getBlogBySlug(slug: string): Promise<Blog> {
-    return apiFetch<Blog>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
+export async function getBlogBySlug(slug: string): Promise<Blog | null> {
+  try {
+    return await apiFetch<Blog>(`/blogs/by-slug/${encodeURIComponent(slug)}`, { revalidate: 60 })
+  } catch {
+    return null
+  }
 }
 
 // ── Homepage ───────────────────────────────────────────────────────────────
 
-export interface HomePageData {
-    latest_blogs: Blog[]
-    latest_events: PublicEvent[]
-    latest_projects: Project[]
-    latest_posts: Post[]
-}
-
 export async function getHomePageData(): Promise<HomePageData> {
-    return apiFetch<HomePageData>('/homepage', { revalidate: 300 })
+  return apiFetch<HomePageData>('/homepage', { revalidate: 300 })
 }

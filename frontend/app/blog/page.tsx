@@ -1,5 +1,10 @@
 import { genPageMetadata } from 'app/seo'
-import { getBlogs, getFeaturedBlogs, getTopAuthors, getBlogKeywords } from 'app/api-client'
+import {
+  getBlogsCached as getBlogs,
+  getFeaturedBlogsCached as getFeaturedBlogs,
+  getTopAuthorsCached as getTopAuthors,
+  getBlogKeywordsCached as getBlogKeywords,
+} from '@/lib/db/cached-queries'
 import BlogListLayout from '@/layouts/BlogListLayout'
 
 export const dynamic = 'force-dynamic'

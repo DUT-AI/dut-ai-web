@@ -4,7 +4,7 @@ import Link from '@/components/Link'
 import Image from '@/components/Image'
 import TableWrapper from '@/components/TableWrapper'
 import Pre from '@/components/Pre'
-import { getBlogBySlug, getBlogs } from 'app/api-client'
+import { getBlogBySlugCached as getBlogBySlug, getBlogsCached as getBlogs } from '@/lib/db/cached-queries'
 import PostLayoutAPI from '@/layouts/PostLayoutAPI'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -59,6 +59,9 @@ export async function generateMetadata({ params }: PageProps) {
   const slug = slugParts?.join('/') || ''
   try {
     const post = await getBlogBySlug(slug)
+    if (!post) {
+      return { title: 'Bài viết không tồn tại' }
+    }
     const authorNames = post.authors?.map((a: any) => a.name)
     const keywordList = post.keywords?.map((kw: any) => kw.keyword_name)
     return {

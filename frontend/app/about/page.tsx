@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
-import { getMembers } from 'app/api-client'
-import type { Member } from 'app/api-client'
+import { getMembersCached as getMembers } from '@/lib/db/cached-queries'
+import type { Member } from '@/lib/db/features/users/types'
 import { genPageMetadata } from 'app/seo'
 import MembersGrid from '@/components/MembersGrid'
 import Footer from '@/components/Footer'

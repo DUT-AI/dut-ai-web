@@ -1,57 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { getProjectByIdQuery } from '@/lib/db/queries'
+import { db, projects } from '@/lib/db'
+import { eq } from 'drizzle-orm'
+import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1'
-
-export async function GET(
-    _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params
-        const res = await fetch(`${API_BASE}/projects/${id}`, {
-            next: { revalidate: 600 },
-        })
-        if (!res.ok) {
-            return NextResponse.json({ error: 'Project not found' }, { status: res.status })
-        }
-        const data = await res.json()
-        return NextResponse.json(data)
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-    }
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders() })
 }
 
-export async function PUT(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-    try {
-        const { id } = await params
-        const body = await request.json()
-        const res = await fetch(`${API_BASE}/projects/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        })
-        const data = await res.json()
-        return NextResponse.json(data, { status: res.status })
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  try {
+    const { id } = await params
+    const projectId = parseInt(id, 10)
+    if (isNaN(projectId)) {
+      return errorResponse('Invalid project ID', 400)
     }
+
+    const data = await getProjectByIdQuery(projectId)
+    if (!data) {
+      return errorResponse('Project not found', 404)
+    }
+
+    return jsonResponse(data)
+  } catch (error) {
+    console.error('Failed to get project:', error)
+    return errorResponse('Failed to fetch project', 500)
+  }
 }
 
 export async function DELETE(
-    _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-    try {
-        const { id } = await params
-        const res = await fetch(`${API_BASE}/projects/${id}`, { method: 'DELETE' })
-        if (!res.ok) {
-            return NextResponse.json({ error: 'Failed to delete project' }, { status: res.status })
-        }
-        return NextResponse.json({ success: true })
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  try {
+    const { id } = await params
+    const projectId = parseInt(id, 10)
+    if (isNaN(projectId)) {
+      return errorResponse('Invalid project ID', 400)
     }
+
+    await db.delete(projects).where(eq(projects.id, projectId))
+    return jsonResponse({ message: 'Project deleted successfully' })
+  } catch (error) {
+    console.error('Failed to delete project:', error)
+    return errorResponse('Failed to delete project', 500)
+  }
 }
