@@ -2,15 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-
-interface Member {
-    id: number
-    name: string
-    role_id?: number
-    role_name: string
-    avatar_url?: string | null
-    status?: string
-}
+import type { Member } from '@/lib/db/features/users/types'
 
 const DEFAULT_AVATAR = '/static/images/chiikawa.jpeg'
 const EXCLUDED_ROLES = ['admin', 'leader']
@@ -18,21 +10,21 @@ const PAGE_SIZE = 18
 const ADMIN_ROLE_ID = 1
 const LEADER_ROLE_ID = 2
 
-// Avatar placeholder background gradients — cycling green tones
+// Avatar placeholder background gradients — cycling modern tones
 const AVATAR_GRADIENTS = [
-    'linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%)',
-    'linear-gradient(135deg, #386641 0%, #1e3a1e 100%)',
-    'linear-gradient(135deg, #3d7a5a 0%, #2d5a3d 100%)',
-    'linear-gradient(135deg, #2f5f41 0%, #1a3b28 100%)',
-    'linear-gradient(135deg, #40724d 0%, #264d36 100%)',
+    'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+    'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+    'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)',
+    'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+    'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
 ]
 
 function SkeletonCard() {
     return (
-        <div className="about-member-card animate-pulse">
-            <div className="about-member-avatar bg-indigo-100/70 dark:bg-white/15" />
-            <div className="mt-3 h-2.5 w-16 rounded-full bg-indigo-200 dark:bg-white/20" />
-            <div className="mt-1 h-2 w-10 rounded-full bg-indigo-100 dark:bg-white/15" />
+        <div className="flex flex-col items-center rounded-2xl border border-slate-200/80 bg-white/70 p-4 text-center shadow-sm backdrop-blur-xl animate-pulse dark:border-white/10 dark:bg-slate-900/60">
+            <div className="h-14 w-14 rounded-2xl bg-slate-200 dark:bg-slate-800" />
+            <div className="mt-3 h-3 w-16 rounded bg-slate-200 dark:bg-slate-800" />
+            <div className="mt-1 h-2 w-10 rounded bg-slate-100 dark:bg-slate-800" />
         </div>
     )
 }
@@ -43,7 +35,7 @@ function AvatarPlaceholder({ gradient }: { gradient: string }) {
             className="flex h-full w-full items-center justify-center"
             style={{ background: gradient }}
         >
-            <svg className="h-7 w-7 text-white/80" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="h-6 w-6 text-white/80" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
             </svg>
         </div>
@@ -97,7 +89,7 @@ export default function MembersGrid() {
     if (loading) {
         return (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 md:gap-4">
-                {Array.from({ length: 14 }).map((_, i) => (
+                {Array.from({ length: 12 }).map((_, i) => (
                     <SkeletonCard key={i} />
                 ))}
             </div>
@@ -106,9 +98,9 @@ export default function MembersGrid() {
 
     if (error || members.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-indigo-200/40 bg-white/70 py-16 text-center dark:border-white/18 dark:bg-white/10">
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-slate-200/80 bg-white/70 py-16 text-center shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60">
                 <svg
-                    className="mb-4 h-12 w-12 text-indigo-300 dark:text-white/30"
+                    className="mb-4 h-12 w-12 text-slate-400 dark:text-slate-600"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -121,7 +113,7 @@ export default function MembersGrid() {
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                 </svg>
-                <p className="text-sm font-semibold text-indigo-400 dark:text-white/40">
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
                     {error ?? 'Chưa có thành viên.'}
                 </p>
             </div>
@@ -129,8 +121,8 @@ export default function MembersGrid() {
     }
 
     return (
-        <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
+        <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 md:gap-4">
                 {visibleMembers.map((m, idx) => {
                     const avatarGradient =
                         AVATAR_GRADIENTS[(idx + page * PAGE_SIZE) % AVATAR_GRADIENTS.length]
@@ -138,10 +130,10 @@ export default function MembersGrid() {
                     return (
                         <div
                             key={m.id}
-                            className="about-member-card group transition-all hover:-translate-y-0.5 hover:shadow-xl"
+                            className="group flex flex-col items-center rounded-2xl border border-slate-200/80 bg-white/70 p-4 text-center shadow-sm backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-slate-900/60"
                         >
                             {/* Avatar */}
-                            <div className="about-member-avatar shadow-sm">
+                            <div className="relative h-14 w-14 overflow-hidden rounded-2xl border border-white shadow-sm dark:border-slate-800">
                                 {hasRealAvatar ? (
                                     <Image
                                         src={m.avatar_url!}
@@ -156,30 +148,34 @@ export default function MembersGrid() {
                                 )}
                             </div>
 
-                            <p className="about-member-name line-clamp-2">{m.name}</p>
-                            <span className="about-member-role line-clamp-1">{m.role_name}</span>
+                            <p className="mt-2.5 line-clamp-2 text-xs font-bold text-slate-900 dark:text-white">
+                                {m.name}
+                            </p>
+                            <span className="mt-0.5 line-clamp-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                {m.role_name}
+                            </span>
                         </div>
                     )
                 })}
             </div>
 
             {totalPages > 1 && (
-                <div className="flex justify-center gap-3 pt-1 sm:justify-end">
+                <div className="flex justify-center gap-3 pt-2 sm:justify-end">
                     <button
                         type="button"
                         aria-label="Members previous"
                         onClick={() => setPage((prev) => (prev - 1 + totalPages) % totalPages)}
-                        className="about-nav-btn about-nav-btn-muted"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
-                        <span aria-hidden="true">&larr;</span>
+                        &larr;
                     </button>
                     <button
                         type="button"
                         aria-label="Members next"
                         onClick={() => setPage((prev) => (prev + 1) % totalPages)}
-                        className="about-nav-btn"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-600 bg-blue-600 text-white shadow-md transition hover:bg-blue-700"
                     >
-                        <span aria-hidden="true">&rarr;</span>
+                        &rarr;
                     </button>
                 </div>
             )}

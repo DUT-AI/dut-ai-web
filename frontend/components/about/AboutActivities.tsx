@@ -1,94 +1,52 @@
 const ACTIVITIES = [
     {
         title: 'Workshops',
-        description: 'Chia sẻ kiến thức chuyên sâu từ cơ bản đến nâng cao.',
-        tone: 'indigo',
-        icon: (
-            <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.8}
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-            </svg>
-        ),
+        description: 'Chuỗi buổi học thực hành từ cơ bản đến nâng cao về AI, Machine Learning và Data Science.',
+        icon: '📚',
     },
     {
         title: 'Projects',
-        description: 'Xây dựng các sản phẩm AI thực tế có tác động xã hội.',
-        tone: 'violet',
-        icon: (
-            <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.8}
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                />
-            </svg>
-        ),
+        description: 'Triển khai các dự án AI thực tế, giải quyết các bài toán trong đời sống và cộng đồng.',
+        icon: '💻',
     },
     {
         title: 'Hackathons',
-        description: 'Sân chơi thi đấu lập trình kịch tính và sáng tạo.',
-        tone: 'pink',
-        icon: (
-            <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.8}
-            >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-        ),
+        description: 'Thi đua sáng tạo, xây dựng sản phẩm AI trong thời gian ngắn cùng đồng đội.',
+        icon: '⚡',
     },
     {
         title: 'Research',
-        description: 'Nghiên cứu các xu hướng và bài báo khoa học về AI.',
-        tone: 'green',
-        icon: (
-            <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.8}
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M11 4a7 7 0 100 14 7 7 0 000-14zm0 0v1m0 12v1m7-7h-1M5 11H4m11.95 4.95l-.707-.707M6.757 6.757l-.707-.707m9.9 0l-.707.707m-8.486 8.486l-.707.707"
-                />
-            </svg>
-        ),
+        description: 'Nghiên cứu các chủ đề AI tiên tiến và công bố kết quả trong cộng đồng sinh viên.',
+        icon: '🔬',
     },
 ]
 
 export default function AboutActivities() {
     return (
         <section className="space-y-8">
-            <h2 className="about-section-title text-center">Hoạt động tiêu biểu</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="text-center">
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                    Những gì chúng mình làm
+                </p>
+                <h2 className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">
+                    Hoạt động tiêu biểu
+                </h2>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {ACTIVITIES.map((item) => (
-                    <article key={item.title} className="about-card about-activity-card text-center">
-                        <div className={`about-icon-pill about-icon-pill-${item.tone} mx-auto`}>
+                    <article
+                        key={item.title}
+                        className="flex flex-col items-center rounded-3xl border border-slate-200/80 bg-white/70 p-7 text-center shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-slate-900/60"
+                    >
+                        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-2xl dark:bg-slate-800">
                             {item.icon}
                         </div>
-                        <h3 className="about-activity-title">{item.title}</h3>
-                        <p className="about-activity-copy">{item.description}</p>
+                        <h3 className="mb-2 text-lg font-bold text-slate-900 dark:text-white">
+                            {item.title}
+                        </h3>
+                        <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                            {item.description}
+                        </p>
                     </article>
                 ))}
             </div>

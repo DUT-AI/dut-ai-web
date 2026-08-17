@@ -25,11 +25,12 @@ export const metadata = genPageMetadata({
 
 function MembersGridSkeleton() {
     return (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 md:gap-4">
             {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="about-member-card animate-pulse">
-                    <div className="about-member-avatar bg-indigo-100/70 dark:bg-white/15" />
-                    <div className="mt-3 h-2 w-14 rounded-full bg-indigo-100/80 dark:bg-white/20" />
+                <div key={i} className="flex flex-col items-center rounded-2xl border border-slate-200/80 bg-white/70 p-4 text-center shadow-sm backdrop-blur-xl animate-pulse dark:border-white/10 dark:bg-slate-900/60">
+                    <div className="h-14 w-14 rounded-2xl bg-slate-200 dark:bg-slate-800" />
+                    <div className="mt-3 h-3 w-16 rounded bg-slate-200 dark:bg-slate-800" />
+                    <div className="mt-1 h-2 w-10 rounded bg-slate-100 dark:bg-slate-800" />
                 </div>
             ))}
         </div>
@@ -106,38 +107,48 @@ export default async function AboutPage() {
     const { admins, leaders } = splitMembers(members as RoleAwareMember[])
 
     return (
-        <div className="about-page min-h-screen pb-16">
-            <div className="about-atmosphere" aria-hidden="true">
-                <span className="about-blob about-blob-left" />
-                <span className="about-blob about-blob-right" />
-                <span className="about-blob about-blob-bottom" />
+        <div className="relative min-h-screen pb-16 bg-gradient-to-b from-[#f8faff] via-[#fff5f8] to-[#e6f0fa] dark:from-gray-950 dark:via-gray-900 dark:to-[#0f172a] overflow-hidden">
+            {/* Global Background Blobs */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[5%] -left-[10%] w-[60%] h-[20%] rounded-full bg-blue-100/50 mix-blend-multiply filter blur-[120px] dark:bg-blue-900/10" />
+                <div className="absolute top-[30%] right-[0%] w-[50%] h-[30%] rounded-full bg-pink-100/50 mix-blend-multiply filter blur-[120px] dark:bg-pink-900/10" />
+                <div className="absolute bottom-[20%] -left-[5%] w-[40%] h-[40%] rounded-full bg-blue-200/30 mix-blend-multiply filter blur-[120px] dark:bg-blue-800/10" />
             </div>
 
-            <AboutHero
-                eyebrow="CÂU CHUYỆN CỦA CHÚNG TÔI"
-                titleTop="ABOUT"
-                titleBottom="DUT AI CLUB"
-                description="Nơi những bộ óc sáng tạo gặp gỡ, cùng nhau khám phá và làm chủ sức mạnh của Trí tuệ nhân tạo."
-            />
+            <div className="relative z-10">
+                <AboutHero
+                    eyebrow="CÂU CHUYỆN CỦA CHÚNG TÔI"
+                    titleTop="ABOUT"
+                    titleBottom="DUT AI CLUB"
+                    description="Nơi những bộ óc sáng tạo gặp gỡ, cùng nhau khám phá và làm chủ sức mạnh của Trí tuệ Nhân tạo."
+                />
 
-            <div className="relative mx-auto max-w-6xl space-y-12 px-5 sm:space-y-14 sm:px-6 md:px-12 lg:space-y-16">
-                <AboutIntroCards />
-                <AboutActivities />
-                <AboutVisionMission />
-                <AboutCoreValues />
+                <div className="mx-auto max-w-6xl space-y-16 px-6 sm:px-8 md:px-12">
+                    <AboutIntroCards />
+                    <AboutActivities />
+                    <AboutVisionMission />
+                    <AboutCoreValues />
 
-                {admins.length > 0 && <AboutLeadership leaders={admins} />}
+                    {admins.length > 0 && <AboutLeadership leaders={admins} />}
 
-                {leaders.length > 0 && <AboutLeadersCarousel leaders={leaders} />}
+                    {leaders.length > 0 && <AboutLeadersCarousel leaders={leaders} />}
 
-                <section className="space-y-6">
-                    <h2 className="about-section-title text-center">Thành viên</h2>
-                    <Suspense fallback={<MembersGridSkeleton />}>
-                        <MembersGrid />
-                    </Suspense>
-                </section>
+                    <section className="space-y-6">
+                        <div className="text-center">
+                            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                Những người tạo nên DUT AI
+                            </p>
+                            <h2 className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">
+                                Thành viên
+                            </h2>
+                        </div>
+                        <Suspense fallback={<MembersGridSkeleton />}>
+                            <MembersGrid />
+                        </Suspense>
+                    </section>
 
-                <Footer />
+                    <Footer />
+                </div>
             </div>
         </div>
     )

@@ -7,20 +7,29 @@ type AboutHeroProps = {
 
 export default function AboutHero({ eyebrow, titleTop, titleBottom, description }: AboutHeroProps) {
     return (
-        <section className="about-hero px-5 pt-32 pb-10 sm:px-6 sm:pt-36 sm:pb-12 md:px-12 md:pt-40 md:pb-14 lg:pt-44">
-            <div className="mx-auto max-w-5xl text-center">
-                <div className="about-eyebrow mx-auto mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 sm:mb-5">
-                    <span className="about-eyebrow-dot" aria-hidden="true" />
+        <section className="relative px-6 pt-36 pb-12 text-center md:px-12 md:pt-44 md:pb-16">
+            <div className="mx-auto max-w-4xl">
+                {/* Eyebrow badge */}
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-50/80 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-600 shadow-sm backdrop-blur-md dark:border-blue-400/20 dark:bg-blue-950/40 dark:text-blue-400">
+                    <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
                     <span>{eyebrow}</span>
                 </div>
 
-                <h1 className="about-hero-title">
-                    <span>{titleTop}</span>
+                {/* Main Title */}
+                <h1 className="mt-6 text-5xl font-black uppercase tracking-tight text-slate-900 dark:text-white sm:text-6xl md:text-7xl">
+                    <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent dark:from-blue-400 dark:via-indigo-300 dark:to-cyan-300">
+                        {titleTop}
+                    </span>
                     <br />
-                    <span>{titleBottom}</span>
+                    <span className="bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-white dark:to-slate-300">
+                        {titleBottom}
+                    </span>
                 </h1>
 
-                <p className="about-hero-description mx-auto mt-4 max-w-2xl sm:mt-5">{description}</p>
+                {/* Subtitle */}
+                <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300 md:text-lg">
+                    {description}
+                </p>
             </div>
         </section>
     )
