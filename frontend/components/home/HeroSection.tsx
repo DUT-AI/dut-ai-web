@@ -34,7 +34,7 @@ export default function HeroSection() {
                                 AI Learners
                             </span>
                             <span className="rounded-full bg-white/50 px-4 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-[#191970] shadow-sm ring-1 ring-white/90 backdrop-blur-[10px] dark:bg-gray-800/50 dark:text-white dark:ring-white/20">
-                                2025 EDITION
+                                EDUCATION
                             </span>
                             <span className="rounded-full bg-white/50 px-4 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-[#191970] shadow-sm ring-1 ring-white/90 backdrop-blur-[10px] dark:bg-gray-800/50 dark:text-white dark:ring-white/20">
                                 INNOVATION

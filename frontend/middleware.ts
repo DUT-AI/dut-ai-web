@@ -7,7 +7,9 @@ export function middleware(request: NextRequest) {
   // Check /admin routes
   if (pathname.startsWith('/admin')) {
     const isLoginPage = pathname === '/admin/login'
-    const sessionCookie = request.cookies.get('dut_admin_session')?.value
+    const sessionCookie =
+      request.cookies.get('dut_admin_session')?.value ||
+      request.cookies.get('access_token')?.value
 
     if (!sessionCookie && !isLoginPage) {
       const url = new URL('/admin/login', request.url)

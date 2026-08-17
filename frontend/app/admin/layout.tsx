@@ -36,6 +36,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const isLoginPage = pathname === '/admin/login'
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; avatar?: string; roles?: string[] } | null>(null)
+
+  React.useEffect(() => {
+    // 1. Đọc cookie trước để có data ngay lập tức
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/dut_admin_user=([^;]+)/)
+      if (match && match[1]) {
+        try {
+          const user = JSON.parse(decodeURIComponent(match[1]))
+          setCurrentUser(user)
+        } catch {}
+      }
+    }
+
+    // 2. Gọi API /api/auth/me để cập nhật dữ liệu mới nhất từ server
+    fetch('/api/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((resData) => {
+        if (resData?.is_success && resData?.data) {
+          setCurrentUser(resData.data)
+        }
+      })
+      .catch(() => {})
+  }, [pathname])
 
   if (isLoginPage) {
     return <>{children}</>
@@ -147,9 +171,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="flex items-center gap-3">
             <ThemeSwitch />
-            <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-200/80 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Admin Online</span>
+            <div className="flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-slate-50 py-1 pl-1.5 pr-3 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
+              {currentUser?.avatar ? (
+                <img
+                  src={currentUser.avatar}
+                  alt={currentUser.name}
+                  className="h-6 w-6 rounded-full object-cover border border-blue-500"
+                />
+              ) : (
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse ml-1.5" />
+              )}
+              <div className="flex flex-col text-left">
+                <span className="leading-none text-xs">{currentUser?.name || currentUser?.email || 'User'}</span>
+                {currentUser?.roles && currentUser.roles.length > 0 && (
+                  <div className="flex items-center gap-1 mt-0.5">
+                    {currentUser.roles.map((r, i) => (
+                      <span key={i} className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.2 rounded font-semibold leading-tight">
+                        {r}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>

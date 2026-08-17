@@ -26,7 +26,13 @@ const Header = () => {
   }, [])
 
   const isDark = resolvedTheme === 'dark'
+  const isAdminPage = pathname?.startsWith('/admin')
   const isEventsPage = pathname?.startsWith('/events')
+
+  if (isAdminPage) {
+    return null
+  }
+
   // Only force white text when on events/about page, in dark mode, and not scrolled
   const forceWhite = (isEventsPage) && !scrolled && isDark
 

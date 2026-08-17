@@ -4,8 +4,7 @@ import { useActionState } from 'react'
 import { loginAdminAction } from '../actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ShieldCheck, Lock, User, Sparkles } from 'lucide-react'
-import Image from 'next/image'
+import { ShieldCheck, Lock, Mail } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const [state, formAction, isPending] = useActionState(loginAdminAction, null)
@@ -40,19 +39,20 @@ export default function AdminLoginPage() {
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                Tài khoản
+                Email quản trị
               </label>
               <div className="relative mt-1.5">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                  <User className="h-4 w-4" />
+                  <Mail className="h-4 w-4" />
                 </div>
                 <Input
-                  id="username"
-                  name="username"
-                  type="text"
+                  id="email"
+                  name="email"
+                  type="email"
                   required
-                  placeholder="admin"
+                  placeholder="admin@dutai.site"
                   className="pl-9"
+                  defaultValue="huynhphuocnguyen.dev@gmail.com"
                 />
               </div>
             </div>
