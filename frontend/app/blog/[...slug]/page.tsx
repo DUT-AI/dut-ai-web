@@ -106,8 +106,8 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
   if (!post) notFound()
 
-  // Fetch live content from Quiz API if DB content is empty or slug exists
-  let markdownSource = post.content || ''
+  // Fetch live content from Quiz API
+  let markdownSource = ''
   if (post.slug) {
     const quizLesson = await fetchLessonBySlugFromQuiz(post.slug)
     if (quizLesson?.content) {

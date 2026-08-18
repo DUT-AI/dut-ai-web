@@ -13,7 +13,6 @@ export interface Blog {
   slug?: string
   title: string
   summary: string
-  content?: string
   image_url?: string
   views: number
   authors: BlogAuthor[]

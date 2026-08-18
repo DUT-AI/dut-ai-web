@@ -40,7 +40,6 @@ export async function getBlogsQuery(params?: {
     title: b.title,
     slug: b.slug ?? undefined,
     summary: b.summary ?? '',
-    content: b.content ?? '',
     views: b.views ?? 0,
     image_url: b.imageUrl ?? undefined,
     created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
@@ -86,7 +85,6 @@ export async function getBlogByIdQuery(id: number): Promise<BlogResponse | null>
     title: b.title,
     slug: b.slug ?? undefined,
     summary: b.summary ?? '',
-    content: b.content ?? '',
     views: b.views ?? 0,
     image_url: b.imageUrl ?? undefined,
     created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
@@ -132,7 +130,6 @@ export async function getBlogBySlugQuery(slug: string): Promise<BlogResponse | n
     title: b.title,
     slug: b.slug ?? undefined,
     summary: b.summary ?? '',
-    content: b.content ?? '',
     views: b.views ?? 0,
     image_url: b.imageUrl ?? undefined,
     created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
@@ -169,7 +166,6 @@ export async function createBlogQuery(data: {
       slug: data.slug,
       summary: data.summary,
       imageUrl: data.imageUrl,
-      content: '',
     })
     .returning({ id: blogs.id })
 
