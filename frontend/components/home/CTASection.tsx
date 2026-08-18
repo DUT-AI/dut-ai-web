@@ -4,7 +4,7 @@ import SparkleIcon from '@/components/SparkleIcon'
 
 export default function CTASection() {
     return (
-        <section className="relative w-full py-20 lg:py-32 px-6 md:px-12 flex justify-center">
+        <section className="relative w-full px-6 md:px-12 flex justify-center">
             {/* Soft background blob for pink */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
                 <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[70%] rounded-full bg-pink-200/50 mix-blend-multiply filter blur-[100px] dark:bg-pink-900/20" />

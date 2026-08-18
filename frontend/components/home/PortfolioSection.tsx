@@ -1,94 +1,75 @@
-
 import ButtonLink from '@/components/ButtonLink'
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import Image from 'next/image'
+import type { Project } from 'app/api-client'
+import Heading from './Heading'
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-    subsets: ['latin', 'vietnamese'],
-    display: 'swap',
-})
+const bgColors = ['bg-[#6A8F74]', 'bg-[#D97757]', 'bg-[#1E3A8A]', 'bg-[#9333EA]', 'bg-[#F59E0B]']
 
-const inter = Inter({
-    subsets: ['latin', 'vietnamese'],
-    display: 'swap',
-})
-
-export default function PortfolioSection() {
+export default function PortfolioSection({ projects }: { projects: Project[] }) {
     return (
-        <section className={`px-6 py-16 md:px-12 max-w-[1400px] mx-auto ${plusJakartaSans.className}`}>
+        <section className="px-6 md:px-12 max-w-[1400px] mx-auto">
             {/* Header */}
-            <div className="mb-16 text-center flex flex-col items-center">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] dark:bg-gray-800 dark:border-blue-900/50">
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600">Our Portfolio</span>
-                </div>
-
-                <h2 className={`text-[48px] md:text-[72px] font-extrabold leading-[1] text-[#1E293B] dark:text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] ${inter.className}`}>
-                    Next-Gen
-                </h2>
-                <h2 className={`text-[48px] md:text-[72px] font-extrabold leading-[1.1] bg-gradient-to-r from-blue-600 via-indigo-500 to-fuchsia-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] ${inter.className}`}>
-                    AI Innovations
-                </h2>
-
-                <p className="mx-auto mt-6 max-w-[700px] text-[18px] md:text-[20px] font-medium leading-[1.4] text-[#475569] dark:text-gray-400">
-                    Khám phá những giới hạn giao thoa giữa học máy và sáng tạo con người.<br className="hidden md:block" />
-                    Triển lãm những dự án được phát triển bởi Câu lạc bộ DUT AI.
-                </p>
-            </div>
+            <Heading heading="PORTFOLIO" subHeading="AI INNOVATIONS" description="Khám phá những giới hạn giao thoa giữa học máy và sáng tạo con người. Triển lãm những dự án được phát triển bởi Câu lạc bộ DUT AI." badge="PROJECTS" isSubHeadingEnter={true} />
 
             {/* Project cards */}
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {[
-                    {
-                        num: '1',
-                        tag: 'NLP',
-                        title: 'DUT-AI Chatbot',
-                        desc: 'Hệ thống chatbot thông minh hỗ trợ sinh viên giải đáp thắc mắc về lộ trình học tập và thủ tục hành chính.',
-                        bg: 'bg-[#6A8F74]',
-                    },
-                    {
-                        num: '1',
-                        tag: 'NLP',
-                        title: 'Speakee – AI Speaking Coach',
-                        desc: 'Trợ lý luyện nói thông minh giúp bạn tự tin giao tiếp tiếng Anh mỗi ngày bằng việc luyện tập, nhận phản hồi tức thì và theo dõi tiến bộ cá nhân hóa bằng AI.',
-                        bg: 'bg-[#6A8F74]',
-                    },
-                    {
-                        num: '1',
-                        tag: 'NLP',
-                        title: 'Smart Rescue – Ứng dụng cứu hộ thông minh',
-                        desc: 'Hệ thống cứu hộ khẩn cấp tích hợp định vị GPS thời gian thực, giúp kết nối người gặp sự cố với lực lượng hỗ trợ gần nhất và tối ưu hóa lộ trình di chuyển bằng thuật toán AI.',
-                        bg: 'bg-[#6A8F74]',
-                    },
-                ].map((p, idx) => (
-                    <div key={idx} className="group flex flex-col overflow-hidden rounded-[32px] bg-white p-4 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.1),_0_10px_15px_-3px_rgba(0,0,0,0.1)] ring-1 ring-slate-100 transition-all hover:-translate-y-2 hover:shadow-2xl dark:bg-gray-800 dark:ring-gray-700">
-                        {/* Thumbnail */}
-                        <div className={`relative flex h-[260px] w-full items-center justify-center rounded-[24px] ${p.bg} overflow-hidden`}>
-                            <span className="text-[140px] font-normal leading-none text-white select-none translate-y-2" style={{ fontFamily: 'Georgia, serif' }}>{p.num}</span>
+            {!projects || projects.length === 0 ? (
+                <div className="text-center py-16">
+                    <p className="text-lg text-gray-400 dark:text-gray-500 font-medium">
+                        Chưa có dự án nào được công bố.
+                    </p>
+                </div>
+            ) : (
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    {projects.slice(0, 3).map((p, idx) => {
+                        const bg = bgColors[idx % bgColors.length]
+                        // Determine the main tag to display
+                        const mainTag = p.tags && p.tags.length > 0 ? p.tags[0] : 'AI'
+                        const img = p.image_url || p.imgSrc
 
-                            {/* HOT RELEASE badge */}
-                            <span className="absolute top-4 left-4 rounded-full bg-[#2563EB] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.05em] text-white shadow-md">
-                                Hot Release
-                            </span>
-                        </div>
+                        return (
+                            <div key={p.id} className="group flex flex-col overflow-hidden rounded-[32px] bg-white p-4 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.1),_0_10px_15px_-3px_rgba(0,0,0,0.1)] ring-1 ring-slate-100 transition-all hover:-translate-y-2 hover:shadow-2xl dark:bg-gray-800 dark:ring-gray-700">
+                                {/* Thumbnail */}
+                                <div className={`relative flex h-[260px] w-full items-center justify-center rounded-[24px] ${img ? '' : bg} overflow-hidden`}>
+                                    {img ? (
+                                        <Image
+                                            src={img}
+                                            alt={p.title}
+                                            fill
+                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        />
+                                    ) : (
+                                        <span className="text-[140px] font-normal leading-none text-white select-none translate-y-2">{idx + 1}</span>
+                                    )}
 
-                        {/* Content */}
-                        <div className="flex flex-col p-4 pt-6">
-                            <span className="mb-3 w-fit rounded-md bg-[#2563EB]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.05em] text-[#2563EB]">
-                                {p.tag}
-                            </span>
-                            <h3 className="text-[24px] font-bold leading-[1.33] text-[#1E293B] dark:text-white">
-                                {p.title}
-                            </h3>
-                            <p className="mt-3 text-[14px] leading-[1.625] text-[#475569] dark:text-gray-400">
-                                {p.desc}
-                            </p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                                    {/* HOT RELEASE badge */}
+                                    {idx === 0 && (
+                                        <span className="absolute top-4 left-4 rounded-full bg-[#2563EB] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.05em] text-white shadow-md z-10">
+                                            Hot Release
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex flex-col p-4 pt-6 flex-1">
+                                    <span className="mb-3 w-fit rounded-md bg-[#2563EB]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.05em] text-[#2563EB]">
+                                        {mainTag}
+                                    </span>
+                                    <h3 className="text-[24px] font-bold leading-[1.33] text-[#1E293B] dark:text-white line-clamp-2">
+                                        {p.title}
+                                    </h3>
+                                    <p className="mt-3 text-[14px] leading-[1.625] text-[#475569] dark:text-gray-400 line-clamp-3">
+                                        {p.description}
+                                    </p>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
 
             <div className="mt-10 text-center">
-                <ButtonLink href="/projects" content="Xem tất cả dự án →" />
+                <ButtonLink href="/projects" content="Xem tất cả dự án" />
             </div>
         </section>
     )

@@ -1,6 +1,6 @@
 import type { Project, Member } from 'app/api-client'
 import Image from '@/components/Image'
-import { glassClass, jakarta } from './styles'
+import { glassClass } from './styles'
 
 interface DemoPanelProps {
   project: Project
@@ -43,13 +43,13 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
 
           <h3
             className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl lg:text-[36px]"
-            style={{ ...jakarta, lineHeight: '1.111em' }}
+            style={{ lineHeight: '1.111em' }}
           >
             Demo
           </h3>
           <h4
             className="text-2xl font-bold sm:text-3xl lg:text-[36px]"
-            style={{ ...jakarta, lineHeight: '1.111em', color: '#F97316' }}
+            style={{ lineHeight: '1.111em', color: '#F97316' }}
           >
             Dự án
           </h4>
@@ -58,10 +58,35 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
         <div className="mt-6">
           <p
             className="text-sm leading-relaxed text-slate-600 dark:text-[#F1F5F9] sm:text-base"
-            style={{ ...jakarta, lineHeight: '1.8em' }}
+            style={{ lineHeight: '1.8em' }}
           >
             {project.description || 'Xem trước giao diện và trải nghiệm thực tế của dự án.'}
           </p>
+
+          {(project.demo_url || project.video_url) && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {project.demo_url && project.demo_url !== 'None' && (
+                <a
+                  href={project.demo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+                >
+                  Live Demo
+                </a>
+              )}
+              {project.video_url && project.video_url !== 'None' && (
+                <a
+                  href={project.video_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-700 backdrop-blur-sm transition-colors hover:bg-white/20 dark:text-white"
+                >
+                  Video
+                </a>
+              )}
+            </div>
+          )}
 
           {/* Dot indicators */}
           <div className="mt-6 flex gap-2">
@@ -113,11 +138,11 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
           <div>
             <h4
               className="text-xl font-bold text-white sm:text-2xl"
-              style={{ ...jakarta, lineHeight: '1.333em' }}
+              style={{ lineHeight: '1.333em' }}
             >
               {project.title}
             </h4>
-            <p className="mt-0.5 text-sm text-[#CBD5E1]" style={jakarta}>
+            <p className="mt-0.5 text-sm text-[#CBD5E1]">
               {project.tags && project.tags.length > 0
                 ? project.tags.slice(0, 2).join(' · ')
                 : 'AI Digital Website'}

@@ -1,40 +1,25 @@
 import Link from '@/components/Link'
 import SparkleIcon from '@/components/SparkleIcon'
-import { Alfa_Slab_One } from 'next/font/google'
+import Image from 'next/image'
+import StatCounter from '@/components/home/StatCounter'
 
-const alfaSlabOne = Alfa_Slab_One({
-    weight: '400',
-    subsets: ['latin', 'vietnamese'],
-    display: 'swap',
-})
-
-const Robot = () => {
+const Mascot = () => {
     return (
-        <div className="relative flex flex-col items-center z-10 w-[260px] sm:w-[320px]">
-            {/* The neck/stand */}
-            <div className="absolute -bottom-24 w-[200px] sm:w-[240px] h-[180px] rounded-b-[70px] bg-[#f8f9fa] shadow-[inset_0_-10px_20px_rgba(0,0,0,0.05)] ring-1 ring-black/5 dark:bg-gray-800 dark:ring-white/10 z-0"></div>
-
-            {/* The head */}
-            <div className="relative z-10 w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] rounded-[70px] bg-white shadow-[0_30px_80px_-15px_rgb(0,0,0,0.15)] ring-1 ring-black/5 flex items-center justify-center p-8 dark:bg-gray-800 dark:ring-white/10">
-                {/* Screen */}
-                <div className="w-full h-full rounded-[45px] bg-[#191970] flex flex-col items-center justify-center pt-8 border-[12px] border-[#f0f2f5] shadow-inner dark:border-gray-700">
-                    {/* Eyes container */}
-                    <div className="flex gap-10 w-full justify-center">
-                        {/* Left Eye */}
-                        <div className="w-[35px] h-[50px] sm:w-[45px] sm:h-[65px] rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.8)] animate-pulse"></div>
-                        {/* Right Eye */}
-                        <div className="w-[35px] h-[50px] sm:w-[45px] sm:h-[65px] rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.8)] animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
-                    {/* Mouth */}
-                    <div className="w-[70px] sm:w-[90px] h-[8px] sm:h-[10px] rounded-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] mt-12 opacity-90"></div>
-                </div>
-            </div>
+        <div className="relative flex items-center justify-center z-10 w-[364px] sm:w-[494px] lg:w-[546px]">
+            <Image
+                src="/static/images/linh_vat_tach_nen.png"
+                alt="DUT AI Mascot"
+                width={450}
+                height={450}
+                className="w-full h-auto object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
+                priority
+            />
         </div>
     )
 }
 export default function HeroSection() {
     return (
-        <section className="relative py-16 md:py-24 md:pt-40 max-w-7xl mx-auto">
+        <section className="relative pt-40 max-w-7xl mx-auto">
             {/* Background blobs */}
             <div className="pointer-events-none absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-[#BFDBFE] opacity-40 blur-[120px] dark:opacity-10" />
             <div className="pointer-events-none absolute -bottom-24 -right-24 h-[420px] w-[420px] rounded-full bg-[#FCE7F3] opacity-40 blur-[120px] dark:opacity-10" />
@@ -49,7 +34,7 @@ export default function HeroSection() {
                                 AI Learners
                             </span>
                             <span className="rounded-full bg-white/50 px-4 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-[#191970] shadow-sm ring-1 ring-white/90 backdrop-blur-[10px] dark:bg-gray-800/50 dark:text-white dark:ring-white/20">
-                                2025 EDITION
+                                EDUCATION
                             </span>
                             <span className="rounded-full bg-white/50 px-4 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-[#191970] shadow-sm ring-1 ring-white/90 backdrop-blur-[10px] dark:bg-gray-800/50 dark:text-white dark:ring-white/20">
                                 INNOVATION
@@ -57,8 +42,14 @@ export default function HeroSection() {
                         </div>
 
                         {/* Headline */}
-                        <h1 className={`text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm ${alfaSlabOne.className}`}>
-                            Câu lạc bộ Trí tuệ nhân tạo DUT
+                        <h1 className="text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm whitespace-nowrap">
+                            Câu lạc bộ
+                        </h1>
+                        <h1 className="text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm whitespace-nowrap">
+                            Trí tuệ nhân tạo
+                        </h1>
+                        <h1 className="text-5xl sm:text-6xl lg:text-[90px] leading-[1.33] tracking-[-0.026em] text-[#191970] dark:text-white drop-shadow-sm whitespace-nowrap">
+                            DUT
                         </h1>
 
                         <div className="mt-8 border-l-2 border-[#191970]/10 pl-6 ml-2 lg:ml-0 dark:border-gray-600 max-w-lg text-left">
@@ -92,7 +83,7 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* ── Right: Robot Illustration ── */}
+                    {/* ── Right: Mascot Illustration ── */}
                     <div className="w-full lg:w-[45%] relative flex justify-center py-10 mt-10 lg:mt-0">
                         {/* Decorative icons */}
                         <div className="absolute top-[-10%] right-[100%] sm:right-[85%] flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 dark:bg-gray-800/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md">
@@ -104,23 +95,17 @@ export default function HeroSection() {
                             </svg>
                         </div>
 
-                        {/* Robot Construct */}
-                        <Robot />
+                        {/* Mascot */}
+                        <Mascot />
 
                     </div>
                 </div>
 
                 {/* ── Stats row ── */}
                 <div className="mt-20 md:mt-32 w-full max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
-                    <h3 className="text-[36px] sm:text-[44px] lg:text-[50px] font-bold text-[#DF7DC8] tracking-[0.012em] whitespace-nowrap">
-                        25+ Members
-                    </h3>
-                    <h3 className="text-[36px] sm:text-[44px] lg:text-[50px] font-bold text-[#DF7DC8] tracking-[0.012em] whitespace-nowrap">
-                        10+ Projects
-                    </h3>
-                    <h3 className="text-[36px] sm:text-[44px] lg:text-[50px] font-bold text-[#DF7DC8] tracking-[0.012em] whitespace-nowrap">
-                        5+ Events
-                    </h3>
+                    <StatCounter target={25} suffix="+" label="Members" delay={0} />
+                    <StatCounter target={10} suffix="+" label="Projects" delay={200} />
+                    <StatCounter target={5} suffix="+" label="Events" delay={400} />
                 </div>
             </div>
         </section>

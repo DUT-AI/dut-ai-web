@@ -1,16 +1,32 @@
-import { sortPosts, allCoreContent } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
+import { getHomePageDataCached as getHomePageData } from '@/lib/db/cached-queries'
+import type { HomePageData } from '@/lib/db/features/homepage/types'
 import Footer from '@/components/Footer'
 import HeroSection from '@/components/home/HeroSection'
 import RoadmapSection from '@/components/home/RoadmapSection'
 import PortfolioSection from '@/components/home/PortfolioSection'
 import MomentsSection from '@/components/home/MomentsSection'
 import NewsSection from '@/components/home/NewsSection'
+import BlogSection from '@/components/home/BlogSection'
 import CTASection from '@/components/home/CTASection'
 
 export default async function Page() {
-  const sortedPosts = sortPosts(allBlogs)
-  const posts = allCoreContent(sortedPosts)
+  let data: HomePageData = {
+    latest_blogs: [],
+    latest_events: [],
+    latest_projects: [],
+    latest_posts: [],
+  }
+
+  try {
+    data = await getHomePageData()
+  } catch (error) {
+    console.error('Failed to fetch homepage data during build/render:', error)
+  }
+
+  const latestPosts = data.latest_posts ?? []
+  const latestEvents = data.latest_events ?? []
+  const latestBlogs = data.latest_blogs ?? []
+  const latestProjects = data.latest_projects ?? []
 
   return (
     <div className="min-h-screen pb-16 relative bg-gradient-to-b from-[#f8faff] via-[#fff5f8] to-[#e6f0fa] dark:from-gray-950 dark:via-gray-900 dark:to-[#0f172a]">
@@ -22,12 +38,13 @@ export default async function Page() {
         <div className="absolute bottom-[0%] right-[10%] w-[60%] h-[30%] rounded-full bg-pink-200/40 mix-blend-multiply filter blur-[100px] dark:bg-pink-900/20" />
       </div>
 
-      <div className="relative z-10 w-full">
+      <div className="relative z-10 w-full flex flex-col gap-20 lg:gap-28">
         <HeroSection />
         <RoadmapSection />
-        <PortfolioSection />
-        <MomentsSection />
-        <NewsSection posts={posts.slice(0, 3)} />
+        <PortfolioSection projects={latestProjects} />
+        <MomentsSection posts={latestPosts} />
+        <NewsSection events={latestEvents} />
+        <BlogSection blogs={latestBlogs} />
         <CTASection />
         <Footer />
       </div>

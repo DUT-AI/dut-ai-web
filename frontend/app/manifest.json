@@ -1,0 +1,19 @@
+{
+  "name": "DUT AI - Câu lạc bộ Trí tuệ nhân tạo Đại học Bách Khoa Đà Nẵng",
+  "short_name": "DUT AI",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

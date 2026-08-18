@@ -1,8 +1,12 @@
-import { getProjects, getMembers, Project, Member } from 'app/api-client'
+import { getProjectByIdCached as getProject, getMembersCached as getMembers } from '@/lib/db/cached-queries'
+import type { Project } from '@/lib/db/features/projects/types'
+import type { Member } from '@/lib/db/features/users/types'
 import { genPageMetadata } from 'app/seo'
 import NextImage from 'next/image'
 import ProjectsClient from './ProjectsClient'
 import Footer from '@/components/Footer'
+import { notFound } from 'next/navigation'
+import { parseProjectIdFromParam } from '../project-route'
 
 export const metadata = genPageMetadata({
   title: 'Projects',
@@ -19,23 +23,30 @@ export const dynamic = 'force-dynamic'
 
 export default async function Projects(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const initialProjectId = parseInt(params.id, 10)
+  const projectId = parseProjectIdFromParam(params.id)
+  if (!projectId) {
+    notFound()
+  }
 
-  let projects: Project[] = []
+  let project: Project | null = null
   let members: Member[] = []
   let error = false
 
   try {
-    ;[projects, members] = await Promise.all([getProjects(), getMembers()])
+    ;[project, members] = await Promise.all([getProject(projectId), getMembers()])
   } catch {
-    error = true
+    notFound()
+  }
+
+  if (!project) {
+    notFound()
   }
 
   return (
     <>
       <style>{`
         .projects-detail-page {
-          background: linear-gradient(to bottom, #dde1f0, #e8dde8, #d4dce8);
+          background: #f8fafc;
         }
         .dark .projects-detail-page {
           background: #020617;
@@ -80,6 +91,15 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
       <div
         className="projects-detail-page relative min-h-screen overflow-hidden"
       >
+        {/* Light-mode decorative blobs */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden dark:hidden">
+          <div className="absolute top-[-80px] left-[10%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]"
+            style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }} />
+          <div className="absolute top-[40%] right-[5%] h-[300px] w-[300px] rounded-full opacity-30 blur-[80px]"
+            style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
+          <div className="absolute bottom-[5%] left-[25%] h-[260px] w-[260px] rounded-full opacity-25 blur-[70px]"
+            style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }} />
+        </div>
         {/* ── Hero ── */}
         <section className="relative px-6 pt-10 pb-6 sm:pt-14 md:px-8 md:pt-32 lg:pt-36">
           <div className="mx-auto max-w-[1220px]">
@@ -88,7 +108,6 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
               <h1
                 className="max-w-[725px] pl-8 md:pl-16 text-5xl font-extrabold text-slate-900 dark:text-white sm:text-6xl md:text-7xl lg:text-8xl xl:text-[96px]"
                 style={{
-                  fontFamily: 'var(--font-inter)',
                   lineHeight: '0.96em',
                   letterSpacing: '-0.023em',
                 }}
@@ -116,7 +135,7 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
         {error && (
           <div className="mx-auto max-w-[1220px] px-6 md:px-8">
             <div className="mb-8 overflow-hidden rounded-[40px] border border-white/20 bg-white/10 p-8 text-center backdrop-blur-xl">
-              <p className="text-lg text-slate-600 dark:text-slate-200" style={{ fontFamily: 'var(--font-jakarta)' }}>
+              <p className="text-lg text-slate-600 dark:text-slate-200">
                 Không thể kết nối đến server. Vui lòng thử lại sau.
               </p>
             </div>
@@ -124,17 +143,17 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
         )}
 
         {/* Empty */}
-        {projects.length === 0 && !error && (
+        {!project && !error && (
           <div className="flex flex-col items-center justify-center py-24 text-slate-400">
             <span className="mb-4 text-6xl">📦</span>
-            <p className="text-lg font-semibold" style={{ fontFamily: 'var(--font-jakarta)' }}>
+            <p className="text-lg font-semibold">
               Chưa có dự án nào.
             </p>
           </div>
         )}
 
         {/* Interactive content */}
-        {projects.length > 0 && <ProjectsClient projects={projects} members={members} initialProjectId={initialProjectId} />}
+        {project && <ProjectsClient project={project} members={members} />}
 
         <Footer />
       </div>

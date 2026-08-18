@@ -1,34 +1,36 @@
+import { getBlogs, getFeaturedBlogs, getTopAuthors, getBlogKeywords } from 'app/api-client'
 import BlogListLayout from '@/layouts/BlogListLayout'
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
 import { notFound } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 
 const POSTS_PER_PAGE = 10
 
-export const generateStaticParams = async () => {
-  const totalPages = Math.ceil(allBlogs.length / POSTS_PER_PAGE)
-  const paths = Array.from({ length: totalPages }, (_, i) => ({ page: (i + 1).toString() }))
-
-  return paths
-}
-
 export default async function Page(props: { params: Promise<{ page: string }> }) {
   const params = await props.params
-  const posts = allCoreContent(sortPosts(allBlogs))
   const pageNumber = parseInt(params.page as string)
-  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
 
-  // Return 404 for invalid page numbers or empty pages
+  const [posts, featuredPosts, featuredAuthors, tags] = await Promise.all([
+    getBlogs().catch(() => []),
+    getFeaturedBlogs(5).catch(() => []),
+    getTopAuthors(5).catch(() => []),
+    getBlogKeywords().catch(() => []),
+  ])
+
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE) || 1
+
   if (pageNumber <= 0 || pageNumber > totalPages || isNaN(pageNumber)) {
     return notFound()
   }
+
   const initialDisplayPosts = posts.slice(
     POSTS_PER_PAGE * (pageNumber - 1),
     POSTS_PER_PAGE * pageNumber
   )
+
   const pagination = {
     currentPage: pageNumber,
-    totalPages: totalPages,
+    totalPages,
   }
 
   return (
@@ -36,7 +38,10 @@ export default async function Page(props: { params: Promise<{ page: string }> })
       posts={posts}
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
-      title="All Posts"
+      featuredPosts={featuredPosts}
+      featuredAuthors={featuredAuthors}
+      tags={tags}
     />
   )
 }
+

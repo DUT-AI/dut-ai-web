@@ -1,35 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { getProjectsQuery } from '@/lib/db/queries'
+import { db, projects, projectMembers, NewProject } from '@/lib/db'
+import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1'
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders() })
+}
 
-export async function GET(request: NextRequest) {
-    try {
-        const { searchParams } = new URL(request.url)
-        const query = searchParams.toString()
-        const res = await fetch(`${API_BASE}/projects${query ? `?${query}` : ''}`, {
-            next: { revalidate: 600 }, // cache 10 minutes
-        })
-        if (!res.ok) {
-            return NextResponse.json({ error: 'Failed to fetch projects' }, { status: res.status })
-        }
-        const data = await res.json()
-        return NextResponse.json(data)
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-    }
+export async function GET() {
+  try {
+    const data = await getProjectsQuery()
+    return jsonResponse(data)
+  } catch (error) {
+    console.error('Failed to get projects:', error)
+    return errorResponse('Failed to fetch projects', 500)
+  }
 }
 
 export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json()
-        const res = await fetch(`${API_BASE}/projects`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        })
-        const data = await res.json()
-        return NextResponse.json(data, { status: res.status })
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  try {
+    const body = await request.json()
+    const { title, description, image_url, features, technologies, demo_url, video_url, members } = body
+
+    if (!title) {
+      return errorResponse('Title is required', 400)
     }
+
+    const [newProject] = await db
+      .insert(projects)
+      .values({
+        title,
+        description: description ?? null,
+        imageUrl: image_url ?? null,
+        features: features ?? null,
+        technologies: technologies ?? null,
+        demoUrl: demo_url ?? null,
+        videoUrl: video_url ?? null,
+      })
+      .returning()
+
+    if (Array.isArray(members) && members.length > 0) {
+      await db.insert(projectMembers).values(
+        members.map((m: { user_id: number; role: string }) => ({
+          projectId: newProject.id,
+          userId: m.user_id,
+          role: m.role || 'Member',
+        }))
+      )
+    }
+
+    return jsonResponse(newProject, 201)
+  } catch (error) {
+    console.error('Failed to create project:', error)
+    return errorResponse('Failed to create project', 500)
+  }
 }

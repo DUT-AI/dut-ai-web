@@ -5,11 +5,10 @@ import Link from '@/components/Link'
 import { slug } from 'github-slugger'
 import { formatDate } from 'pliny/utils/formatDate'
 import siteMetadata from '@/data/siteMetadata'
-import { CoreContent } from 'pliny/utils/contentlayer'
-import type { Blog } from 'contentlayer/generated'
+import type { Blog } from 'app/api-client'
 
 interface RelatedPostsProps {
-    posts: CoreContent<Blog>[]
+    posts: Blog[]
     hideTitle?: boolean
 }
 
@@ -97,29 +96,29 @@ export default function RelatedPosts({ posts, hideTitle }: RelatedPostsProps) {
             >
                 {displayPosts.map((post, index) => {
                     const backgroundClass = gradients[index % gradients.length]
-                    const maxTagsDisplay = post.tags ? post.tags.slice(0, 1) : []
+                    const maxTagsDisplay = post.keywords ? post.keywords.slice(0, 1) : []
 
                     return (
-                        <div key={post.path} className="w-full md:w-[calc(33.333%-16px)] shrink-0 snap-start">
+                        <div key={post.id} className="w-full md:w-[calc(33.333%-16px)] shrink-0 snap-start">
                             <article
                                 className={`rounded-[32px] p-8 ${backgroundClass} transition-transform duration-300 hover:-translate-y-1 relative overflow-hidden group flex flex-col h-full ring-1 ring-gray-100 dark:ring-white/10`}
                             >
                                 <div className="flex flex-col h-full relative z-10">
                                     {/* Top Row: Date & Tag */}
                                     <div className="flex flex-wrap items-center gap-3 mb-4">
-                                        <time dateTime={post.date} className="text-xs font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
-                                            {formatDate(post.date, siteMetadata.locale)}
+                                        <time dateTime={post.created_at} className="text-xs font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
+                                            {formatDate(post.created_at, siteMetadata.locale)}
                                         </time>
                                         {maxTagsDisplay.map((tag) => (
-                                            <Link key={tag} href={`/blog?tag=${slug(tag)}`} className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors">
-                                                <span className="opacity-60 mr-0.5">#</span>{tag}
+                                            <Link key={tag.id} href={`/blog?tag=${slug(tag.keyword_name)}`} className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/60 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                                                <span className="opacity-60 mr-0.5">#</span>{tag.keyword_name}
                                             </Link>
                                         ))}
                                     </div>
 
                                     {/* Title */}
                                     <h3 className="text-[20px] leading-snug font-extrabold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-3">
-                                        <Link href={`/${post.path}`} className="focus:outline-none rounded-lg">
+                                        <Link href={`/blog/${post.slug || post.id}`} className="focus:outline-none rounded-lg">
                                             <span className="absolute inset-0 z-0" aria-hidden="true" />
                                             {post.title}
                                         </Link>

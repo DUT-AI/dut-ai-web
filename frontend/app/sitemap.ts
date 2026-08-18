@@ -1,10 +1,11 @@
 import { MetadataRoute } from 'next'
-import { allBlogs } from 'contentlayer/generated'
+import { getBlogsCached as getBlogs } from '@/lib/db/cached-queries'
+import type { Blog } from '@/lib/db/features/blogs/types'
 import siteMetadata from '@/data/siteMetadata'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = siteMetadata.siteUrl.replace(/\/$/, '') // strip trailing slash
 
   const now = new Date().toISOString().split('T')[0]
@@ -19,13 +20,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ]
 
   // Blog posts
-  const blogRoutes: MetadataRoute.Sitemap = allBlogs
-    .filter((post) => !post.draft)
+  let blogs: Blog[] = []
+  try {
+    blogs = await getBlogs()
+  } catch (error) {
+    console.error('Failed to fetch blogs for sitemap:', error)
+  }
+
+  const blogRoutes: MetadataRoute.Sitemap = blogs
     .map((post) => ({
-      url: `${siteUrl}/${post.path}`,
-      lastModified: post.lastmod || post.date,
+      url: `${siteUrl}/blog/${post.slug || post.id}`,
+      lastModified: post.updated_at || post.created_at,
       changeFrequency: 'monthly' as const,
-      priority: post.tags?.includes('event') ? 0.85 : 0.8,
+      priority: post.keywords?.some((k) => k.keyword_name.toLowerCase() === 'event') ? 0.85 : 0.8,
     }))
 
   return [...staticRoutes, ...blogRoutes]

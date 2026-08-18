@@ -1,35 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { getIntroductionsQuery } from '@/lib/db/queries'
+import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1'
-
-export async function GET(request: NextRequest) {
-    try {
-        const { searchParams } = new URL(request.url)
-        const query = searchParams.toString()
-        const res = await fetch(`${API_BASE}/introductions${query ? `?${query}` : ''}`, {
-            next: { revalidate: 600 },
-        })
-        if (!res.ok) {
-            return NextResponse.json({ error: 'Failed to fetch introductions' }, { status: res.status })
-        }
-        const data = await res.json()
-        return NextResponse.json(data)
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-    }
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders() })
 }
 
-export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json()
-        const res = await fetch(`${API_BASE}/introductions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        })
-        const data = await res.json()
-        return NextResponse.json(data, { status: res.status })
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-    }
+export async function GET() {
+  try {
+    const data = await getIntroductionsQuery()
+    return jsonResponse(data)
+  } catch (error) {
+    console.error('Failed to get introductions:', error)
+    return errorResponse('Failed to fetch introductions', 500)
+  }
 }

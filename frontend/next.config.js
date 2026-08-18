@@ -1,10 +1,5 @@
 const path = require('path')
-const dotenv = require('dotenv')
 
-// Load file .env từ thư mục cha (root directory)
-dotenv.config({ path: path.resolve(__dirname, '../.env') })
-
-const { withContentlayer } = require('next-contentlayer2')
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
@@ -68,15 +63,12 @@ const unoptimized = process.env.UNOPTIMIZED ? true : undefined
  * @type {import('next/dist/next-server/server/config').NextConfig}
  **/
 module.exports = () => {
-  const plugins = [withContentlayer, withBundleAnalyzer]
+  const plugins = [withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), {
     output,
     basePath,
     reactStrictMode: true,
-    trailingSlash: true,
-    eslint: {
-      ignoreDuringBuilds: true,
-    },
+    trailingSlash: false,
     turbopack: {
       root: process.cwd(),
       rules: {
@@ -91,11 +83,11 @@ module.exports = () => {
       remotePatterns: [
         {
           protocol: 'https',
-          hostname: 'picsum.photos',
+          hostname: '**',
         },
         {
-          protocol: 'https',
-          hostname: 'minio.dutai.site',
+          protocol: 'http',
+          hostname: '**',
         },
       ],
       unoptimized,
@@ -105,6 +97,16 @@ module.exports = () => {
         {
           source: '/(.*)',
           headers: securityHeaders,
+        },
+      ]
+    },
+    async rewrites() {
+      const baseRaw = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8031/api/v1'
+      const backendBase = baseRaw.replace('/api/v1', '')
+      return [
+        {
+          source: '/admin/:path*',
+          destination: `${backendBase}/admin/:path*`,
         },
       ]
     },

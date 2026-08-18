@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import type { Project } from 'app/api-client'
 import ThumbCard from './ThumbCard'
-import { jakarta } from './styles'
 
 /** How many cards are visible at once (desktop). */
 const VISIBLE = 4
@@ -82,7 +81,7 @@ export default function ThumbCarousel({ projects, selected, onSelect }: ThumbCar
         className="flex items-end justify-between pt-2"
         style={{ opacity: 0, animation: 'fadeInUp 0.55s ease forwards', animationDelay: '0.45s' }}
       >
-        <p style={jakarta}>
+        <p>
           <span
             className="proj-counter text-[48px] font-bold leading-none sm:text-[60px] lg:text-[72px]"
           >

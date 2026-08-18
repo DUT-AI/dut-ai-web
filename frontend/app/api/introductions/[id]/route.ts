@@ -1,57 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { getIntroductionByIdQuery } from '@/lib/db/queries'
+import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://dut-ai-web-api.dutai.site/api/v1'
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders() })
+}
 
 export async function GET(
-    _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-    try {
-        const { id } = await params
-        const res = await fetch(`${API_BASE}/introductions/${id}`, {
-            next: { revalidate: 600 },
-        })
-        if (!res.ok) {
-            return NextResponse.json({ error: 'Introduction not found' }, { status: res.status })
-        }
-        const data = await res.json()
-        return NextResponse.json(data)
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  try {
+    const { id } = await params
+    const introId = parseInt(id, 10)
+    if (isNaN(introId)) {
+      return errorResponse('Invalid introduction ID', 400)
     }
-}
 
-export async function PUT(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params
-        const body = await request.json()
-        const res = await fetch(`${API_BASE}/introductions/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        })
-        const data = await res.json()
-        return NextResponse.json(data, { status: res.status })
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const data = await getIntroductionByIdQuery(introId)
+    if (!data) {
+      return errorResponse('Introduction not found', 404)
     }
-}
 
-export async function DELETE(
-    _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params
-        const res = await fetch(`${API_BASE}/introductions/${id}`, { method: 'DELETE' })
-        if (!res.ok) {
-            return NextResponse.json({ error: 'Failed to delete introduction' }, { status: res.status })
-        }
-        return NextResponse.json({ success: true })
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-    }
+    return jsonResponse(data)
+  } catch (error) {
+    console.error('Failed to get introduction:', error)
+    return errorResponse('Failed to fetch introduction', 500)
+  }
 }

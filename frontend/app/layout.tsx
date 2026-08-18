@@ -2,32 +2,27 @@ import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
-import { Space_Grotesk, Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
-import SectionContainer from '@/components/SectionContainer'
-import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
-
-const space_grotesk = Space_Grotesk({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-space-grotesk',
-})
+import NextTopLoader from 'nextjs-toploader'
 
 const inter = Inter({
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   display: 'swap',
   variable: '--font-inter-var',
+  weight: ['400', '500', '600', '700', '800', '900'],
 })
 
 const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   display: 'swap',
   variable: '--font-jakarta-var',
+  weight: ['400', '500', '600', '700', '800'],
 })
 
 export const metadata: Metadata = {
@@ -68,6 +63,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     images: [siteMetadata.socialBanner],
   },
+  verification: {
+    google: siteMetadata.googleSiteVerification,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -76,16 +74,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${space_grotesk.variable} ${inter.variable} ${plusJakartaSans.variable} scroll-smooth`}
+      className={`${inter.variable} ${plusJakartaSans.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <link rel="icon" type="image/jpeg" href={`${basePath}/static/images/logo.jpg`} />
-      <link rel="apple-touch-icon" href={`${basePath}/static/images/logo.jpg`} />
-      <link rel="shortcut icon" href={`${basePath}/static/images/logo.jpg`} />
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
+      <meta name="apple-mobile-web-app-title" content="DUT AI" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body className="bg-[#F5F9FD] pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white" suppressHydrationWarning>
+        <NextTopLoader
+          color="linear-gradient(to right, #A2D2FF, #FFC2D1)"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={true}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #A2D2FF,0 0 5px #FFC2D1"
+          template='<div class="bar" role="bar"><div class="peg"></div></div> 
+          <div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
+          zIndex={1600}
+          showAtBottom={false}
+        />
         <ThemeProviders>
           <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
           <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>

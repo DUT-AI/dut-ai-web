@@ -9,7 +9,7 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 
 # Install dependencies using npm
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # ---------------------
 # Build stage
@@ -21,7 +21,7 @@ WORKDIR /app
 # Copy source code first, including .env from parent directory
 # Since context is ./ (root), we can copy frontend and .env
 COPY frontend ./
-COPY .env ../.env
+COPY .env ./
 
 # Then overlay node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -29,6 +29,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package-lock.json ./package-lock.json
 
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV INTERNAL_API_URL=https://dut-ai-web-api.dutai.site/api/v1
 
 RUN npm run build
 

@@ -1,8 +1,13 @@
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
-import { notFound } from 'next/navigation'
 import { genPageMetadata } from 'app/seo'
+import {
+  getBlogsCached as getBlogs,
+  getFeaturedBlogsCached as getFeaturedBlogs,
+  getTopAuthorsCached as getTopAuthors,
+  getBlogKeywordsCached as getBlogKeywords,
+} from '@/lib/db/cached-queries'
 import BlogListLayout from '@/layouts/BlogListLayout'
+
+export const dynamic = 'force-dynamic'
 
 const POSTS_PER_PAGE = 10
 
@@ -13,9 +18,13 @@ export const metadata = genPageMetadata({
 })
 
 export default async function BlogPage() {
-  const allPosts = allCoreContent(sortPosts(allBlogs))
-  // Filter out event-tagged posts — those live under /events
-  const posts = allPosts.filter((post) => !post.tags?.includes('event'))
+  const [posts, featuredPosts, featuredAuthors, tags] = await Promise.all([
+    getBlogs().catch(() => []),
+    getFeaturedBlogs(5).catch(() => []),
+    getTopAuthors(5).catch(() => []),
+    getBlogKeywords().catch(() => []),
+  ])
+
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
   const initialDisplayPosts = posts.slice(0, POSTS_PER_PAGE)
   const pagination = {
@@ -28,7 +37,9 @@ export default async function BlogPage() {
       posts={posts}
       initialDisplayPosts={initialDisplayPosts}
       pagination={pagination}
-      title="All Posts"
+      featuredPosts={featuredPosts}
+      featuredAuthors={featuredAuthors}
+      tags={tags}
     />
   )
 }

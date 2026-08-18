@@ -1,4 +1,5 @@
-import { getProjects, Project } from 'app/api-client'
+import { getProjectsCached as getProjects } from '@/lib/db/cached-queries'
+import type { Project } from '@/lib/db/features/projects/types'
 import { genPageMetadata } from 'app/seo'
 import ProjectsListClient from './ProjectsListClient'
 import Footer from '@/components/Footer'
@@ -44,7 +45,7 @@ export default async function ProjectsPage() {
 
                 <h1
                     className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-blue-100 dark:via-white dark:to-pink-200 sm:text-6xl md:text-7xl lg:text-[84px] mb-8"
-                    style={{ fontFamily: 'var(--font-inter)', letterSpacing: '-0.03em', lineHeight: '1.05' }}
+                    style={{ letterSpacing: '-0.03em', lineHeight: '1.05' }}
                 >
                     Next-Gen <br />
                     AI Innovations

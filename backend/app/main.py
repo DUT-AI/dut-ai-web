@@ -1,27 +1,27 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from sqladmin import Admin
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from app.core.database import engine
-from app.v1.v1_admin import register_admin_views
 from app.v1.v1_router import v1_router
 
-app = FastAPI(title="DUT-AI FastAPI Backend")
+app = FastAPI(title="DUT-AI Backend API")
 
-# Static files
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Admin
-admin = Admin(app, engine, templates_dir="app/templates")
-register_admin_views(admin)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
-# API routers
 app.include_router(v1_router, prefix="/api")
 
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to DUT-AI FastAPI Backend"}
+    return {"message": "Welcome to DUT-AI Backend API"}
 
 
 @app.get("/health")
