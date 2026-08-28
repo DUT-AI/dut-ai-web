@@ -31,11 +31,11 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
 
   const [uploading, setUploading] = useState(false)
   const [fetchingQuiz, setFetchingQuiz] = useState(false)
-  const [quizPreview, setQuizPreview] = useState<{ title?: string; summary?: string; content?: string; slug?: string } | null>(null)
+  const [quizPreview, setQuizPreview] = useState<{ name?: string; description?: string; content_md?: string; slug?: string } | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  // Fetch lesson data from quiz.dutai.site
+  // Fetch lesson data through the local API proxy.
   const handleFetchFromQuiz = async () => {
     if (!slug.trim()) {
       alert('Vui lòng nhập slug trước khi tìm nạp!')
@@ -45,17 +45,16 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
     setFetchingQuiz(true)
     setErrorMessage(null)
     try {
-      const res = await fetch(`https://quiz.dutai.site/api/v1/lessons/by-slug/${encodeURIComponent(slug.trim())}`)
+      const res = await fetch(`/api/lessons/by-slug/${encodeURIComponent(slug.trim())}`)
       if (!res.ok) {
         throw new Error(`Không tìm thấy bài học với slug "${slug}" trên quiz.dutai.site`)
       }
       const data = await res.json()
       setQuizPreview(data)
 
-      // Auto-fill title, summary, imageUrl if empty
-      if (!title && data.title) setTitle(data.title)
-      if (!summary && data.summary) setSummary(data.summary)
-      if (!imageUrl && data.image_url) setImageUrl(data.image_url)
+      // Auto-fill fields from the Quiz API response if they are empty.
+      if (!title && data.name) setTitle(data.name)
+      if (!summary && data.description) setSummary(data.description)
     } catch (err: any) {
       setErrorMessage(err.message || 'Lỗi khi gọi API Quiz.')
     } finally {
@@ -193,10 +192,10 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
               <span className="text-xs font-mono text-slate-400">{quizPreview.slug}</span>
             </div>
             <h4 className="mt-2 text-base font-bold text-slate-900 dark:text-white">
-              {quizPreview.title}
+              {quizPreview.name}
             </h4>
             <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
-              {quizPreview.summary}
+              {quizPreview.description}
             </p>
           </div>
         )}
