@@ -110,8 +110,8 @@ export default async function BlogDetailPage({ params }: PageProps) {
   let markdownSource = ''
   if (post.slug) {
     const quizLesson = await fetchLessonBySlugFromQuiz(post.slug)
-    if (quizLesson?.content) {
-      markdownSource = quizLesson.content
+    if (quizLesson?.content_md) {
+      markdownSource = quizLesson.content_md
     }
   }
 
