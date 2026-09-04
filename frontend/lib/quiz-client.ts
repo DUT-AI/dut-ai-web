@@ -1,10 +1,13 @@
 export interface QuizLessonResponse {
-  id: number
-  title: string
+  id: string
+  name: string
   slug: string
-  summary?: string
-  content?: string
-  image_url?: string
+  description?: string
+  content_md?: string
+  module_id?: string
+  order?: number
+  questions?: unknown[]
+  has_game_questions?: boolean
   created_at?: string
   updated_at?: string
 }
@@ -12,7 +15,14 @@ export interface QuizLessonResponse {
 export async function fetchLessonBySlugFromQuiz(slug: string): Promise<QuizLessonResponse | null> {
   try {
     const cleanSlug = slug.trim()
-    const res = await fetch(`https://quiz.dutai.site/api/v1/lessons/by-slug/${encodeURIComponent(cleanSlug)}`, {
+    const headers = new Headers({ Accept: 'application/json' })
+    if (process.env.QUIZ_API_KEY) {
+      headers.set('x-api-key', process.env.QUIZ_API_KEY)
+    }
+
+    const quizApiBaseUrl = process.env.QUIZ_API_BASE_URL || 'https://quiz.dutai.site/api/v1'
+    const res = await fetch(`${quizApiBaseUrl}/lessons/by-slug/${encodeURIComponent(cleanSlug)}`, {
+      headers,
       next: { revalidate: 300 }, // 5 minutes cache
     })
 
