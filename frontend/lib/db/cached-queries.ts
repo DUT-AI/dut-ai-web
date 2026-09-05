@@ -54,6 +54,13 @@ export const getBlogBySlugCached = (slug: string) =>
     { revalidate: 60, tags: ['blogs', `blog-${slug}`] }
   )()
 
+export const getBlogByIdCached = (id: number) =>
+  unstable_cache(
+    async () => rawQueries.getBlogByIdQuery(id),
+    [`cached-blog-${id}`],
+    { revalidate: 60, tags: ['blogs', `blog-${id}`] }
+  )()
+
 export const getFeaturedBlogsCached = (limit = 5) =>
   unstable_cache(
     async () => rawQueries.getFeaturedBlogsQuery(limit),

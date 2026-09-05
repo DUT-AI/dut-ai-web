@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Sparkles, Upload, Loader2, ExternalLink, ArrowLeft } from 'lucide-react'
+import { Sparkles, Upload, Loader2, ExternalLink, ArrowLeft, Download } from 'lucide-react'
 import Link from 'next/link'
 import { saveBlogAction } from './actions'
 import type { Blog } from '@/lib/db/features/blogs/types'
@@ -115,6 +115,13 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     )
   }
+
+  const thumbnailParams = new URLSearchParams({ title })
+  authors
+    .filter((author) => selectedAuthors.includes(author.id))
+    .forEach((author) => thumbnailParams.append('author', author.name))
+  const generatedThumbnailUrl = `/api/og/blog/preview?${thumbnailParams.toString()}`
+  const thumbnailPreviewUrl = imageUrl || generatedThumbnailUrl
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
@@ -235,6 +242,9 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
             Ảnh bìa bài viết (MinIO S3)
           </label>
+          <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+            Upload ảnh riêng nếu muốn. Khi để trống, hệ thống tự tạo thumbnail từ tiêu đề và tác giả.
+          </p>
           <div className="mt-2 flex flex-col sm:flex-row gap-3">
             <Input
               name="imageUrl"
@@ -259,11 +269,32 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
               />
             </label>
           </div>
-          {imageUrl && (
-            <div className="mt-3 relative h-36 w-64 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
-              <img src={imageUrl} alt="Cover preview" className="h-full w-full object-cover" />
+          <div className="mt-4 max-w-2xl">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                {imageUrl ? 'Ảnh tùy chỉnh' : 'Thumbnail tự động'}
+              </span>
+              {!imageUrl && (
+                <a
+                  href={generatedThumbnailUrl}
+                  download="dut-ai-blog-thumbnail.png"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Mở / tải PNG
+                </a>
+              )}
             </div>
-          )}
+            <div className="relative aspect-[1200/630] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+              <img
+                src={thumbnailPreviewUrl}
+                alt="Xem trước ảnh bìa bài viết"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Select Authors */}
