@@ -14,6 +14,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeKatex from 'rehype-katex'
 import rehypePrettyCode from 'rehype-pretty-code'
 import siteMetadata from '@/data/siteMetadata'
+import { getBlogThumbnailUrl } from '@/lib/blog-thumbnail-url'
 import 'katex/dist/katex.min.css'
 
 const prettyCodeOptions = {
@@ -65,6 +66,7 @@ export async function generateMetadata({ params }: PageProps) {
     }
     const authorNames = post.authors?.map((a: any) => a.name)
     const keywordList = post.keywords?.map((kw: any) => kw.keyword_name)
+    const socialImage = post.image_url || getBlogThumbnailUrl(siteMetadata.siteUrl, slug)
     return {
       title: post.title,
       description: post.summary,
@@ -77,13 +79,13 @@ export async function generateMetadata({ params }: PageProps) {
         publishedTime: post.created_at,
         modifiedTime: post.updated_at || post.created_at,
         authors: authorNames,
-        images: post.image_url ? [post.image_url] : [siteMetadata.socialBanner],
+        images: [socialImage],
       },
       twitter: {
         card: 'summary_large_image',
         title: post.title,
         description: post.summary,
-        images: post.image_url ? [post.image_url] : [siteMetadata.socialBanner],
+        images: [socialImage],
       },
       keywords: keywordList,
       authors: authorNames?.map((name: string) => ({ name })),
@@ -136,7 +138,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.summary,
-    image: post.image_url || siteMetadata.socialBanner,
+    image: post.image_url || getBlogThumbnailUrl(siteMetadata.siteUrl, slug),
     datePublished: post.created_at,
     dateModified: post.updated_at || post.created_at,
     author: post.authors?.map((a: any) => ({

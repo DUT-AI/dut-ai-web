@@ -4,6 +4,7 @@ import SparkleIcon from '@/components/SparkleIcon'
 import ButtonLink from '@/components/ButtonLink'
 import type { Blog } from 'app/api-client'
 import Heading from './Heading'
+import { getBlogThumbnailPath } from '@/lib/blog-thumbnail-url'
 
 function formatDate(dateStr: string): string {
     const d = new Date(dateStr)
@@ -33,15 +34,13 @@ export default function BlogSection({ blogs }: { blogs: Blog[] }) {
                     >
                         {/* Image */}
                         <div className="relative w-full aspect-[16/10] bg-linear-to-br from-blue-100 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-                            {featured.image_url && (
-                                <Image
-                                    src={featured.image_url}
-                                    alt={featured.title}
-                                    fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                    sizes="(max-width: 1024px) 100vw, 60vw"
-                                />
-                            )}
+                            <Image
+                                src={featured.image_url || getBlogThumbnailPath(featured.slug || featured.id)}
+                                alt={featured.title}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                sizes="(max-width: 1024px) 100vw, 60vw"
+                            />
                         </div>
 
                         {/* Content */}
