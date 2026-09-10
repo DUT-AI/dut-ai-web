@@ -77,3 +77,5 @@ coverage/
 *.bak
 *.tmp
 .agents
+# Local database backups
+.agent/db-backups/

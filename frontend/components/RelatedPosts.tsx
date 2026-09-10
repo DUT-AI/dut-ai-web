@@ -6,6 +6,8 @@ import { slug } from 'github-slugger'
 import { formatDate } from 'pliny/utils/formatDate'
 import siteMetadata from '@/data/siteMetadata'
 import type { Blog } from 'app/api-client'
+import Image from 'next/image'
+import { getBlogThumbnailPath } from '@/lib/blog-thumbnail-url'
 
 interface RelatedPostsProps {
     posts: Blog[]
@@ -104,6 +106,16 @@ export default function RelatedPosts({ posts, hideTitle }: RelatedPostsProps) {
                                 className={`rounded-[32px] p-8 ${backgroundClass} transition-transform duration-300 hover:-translate-y-1 relative overflow-hidden group flex flex-col h-full ring-1 ring-gray-100 dark:ring-white/10`}
                             >
                                 <div className="flex flex-col h-full relative z-10">
+                                    <div className="relative mb-5 aspect-[1200/630] w-full overflow-hidden rounded-2xl bg-white/50 dark:bg-gray-900/40">
+                                        <Image
+                                            src={post.image_url || getBlogThumbnailPath(post.slug || post.id)}
+                                            alt={`Ảnh bìa ${post.title}`}
+                                            fill
+                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                        />
+                                    </div>
+
                                     {/* Top Row: Date & Tag */}
                                     <div className="flex flex-wrap items-center gap-3 mb-4">
                                         <time dateTime={post.created_at} className="text-xs font-bold tracking-wide text-gray-500/80 dark:text-gray-400">
