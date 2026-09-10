@@ -14,6 +14,7 @@ import Footer from '@/components/Footer'
 import { getBlogs } from 'app/api-client'
 import type { Blog, BlogKeyword, AuthorStats } from 'app/api-client'
 import RelatedPosts from '@/components/RelatedPosts'
+import { getBlogThumbnailPath } from '@/lib/blog-thumbnail-url'
 
 interface PaginationProps {
     totalPages: number
@@ -331,6 +332,16 @@ function BlogListLayoutInner({
                                         className={`rounded-[32px] p-8 sm:p-10 ${backgroundClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group`}
                                     >
                                         <div className="flex flex-col h-full relative z-10">
+
+                                            <div className="relative mb-6 aspect-[1200/630] w-full overflow-hidden rounded-2xl bg-white/50 dark:bg-gray-900/40">
+                                                <Image
+                                                    src={post.image_url || getBlogThumbnailPath(post.slug || post.id)}
+                                                    alt={`Ảnh bìa ${title}`}
+                                                    fill
+                                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                                    sizes="(max-width: 1024px) 100vw, 700px"
+                                                />
+                                            </div>
 
                                             {/* Top Row: Date & Tag */}
                                             <div className="flex flex-wrap items-center gap-4 mb-5">

@@ -4,6 +4,8 @@ import { Plus, Edit2, Trash2, ExternalLink, Eye, Calendar, Sparkles } from 'luci
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { deleteBlogAction } from './actions'
+import Image from 'next/image'
+import { getBlogThumbnailPath } from '@/lib/blog-thumbnail-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,6 +40,7 @@ export default async function AdminBlogsListPage() {
             <thead className="border-b border-slate-100 bg-slate-50/75 text-xs font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
               <tr>
                 <th className="px-6 py-4">ID</th>
+                <th className="px-6 py-4">Ảnh</th>
                 <th className="px-6 py-4">Tiêu đề bài viết</th>
                 <th className="px-6 py-4">Tác giả</th>
                 <th className="px-6 py-4">Từ khóa</th>
@@ -49,6 +52,17 @@ export default async function AdminBlogsListPage() {
               {blogs.map((blog) => (
                 <tr key={blog.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
                   <td className="px-6 py-4 font-mono text-xs text-slate-400">#{blog.id}</td>
+                  <td className="px-6 py-4">
+                    <div className="relative aspect-[1200/630] w-24 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
+                      <Image
+                        src={blog.image_url || getBlogThumbnailPath(blog.slug || blog.id)}
+                        alt={`Ảnh bìa ${blog.title}`}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                      />
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <span className="font-bold text-slate-900 dark:text-white text-base">
                       {blog.title}
@@ -117,7 +131,7 @@ export default async function AdminBlogsListPage() {
 
               {blogs.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
                     Chưa có bài viết blog nào. Nhấn &quot;Thêm bài viết mới&quot; để bắt đầu.
                   </td>
                 </tr>

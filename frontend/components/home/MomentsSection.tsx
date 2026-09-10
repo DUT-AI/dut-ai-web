@@ -38,8 +38,15 @@ export default function MomentsSection({ posts }: { posts: Post[] }) {
                 ) : (
                     <div className="columns-1 sm:columns-2 lg:columns-4 gap-6 space-y-6">
                         {posts.slice(0, 8).map((post, index) => {
-                            // Safe extraction: ensure img_urls is a real array
-                            const urls = Array.isArray(post.img_urls) ? post.img_urls : []
+                            // Handle legacy rows/cache entries where an array element contains
+                            // the full Python-style list representation.
+                            const urls = Array.isArray(post.img_urls)
+                                ? post.img_urls.flatMap((url) =>
+                                    url.startsWith('http')
+                                        ? [url]
+                                        : (url.match(/https?:\/\/[^'" ,\]]+/g) || [])
+                                )
+                                : []
                             const coverImage = urls.length > 0 ? urls[0] : undefined
                             const style = cardStyles[index % cardStyles.length]
                             const tag = post.hashtag && post.hashtag !== 'None' ? post.hashtag : undefined

@@ -57,7 +57,8 @@ export async function saveBlogAction(prevState: any, formData: FormData) {
       })
     }
 
-    revalidateTag('blogs', 'homepage')
+    revalidateTag('blogs', 'max')
+    revalidateTag('homepage', 'max')
   } catch (error: any) {
     console.error('Failed to save blog:', error)
     return { error: error?.message || 'Lỗi khi lưu bài viết.' }
@@ -73,6 +74,7 @@ export async function deleteBlogAction(id: number) {
   }
 
   await deleteBlogQuery(id)
-  revalidateTag('blogs', 'homepage')
+  revalidateTag('blogs', 'max')
+  revalidateTag('homepage', 'max')
   redirect('/admin/blogs')
 }

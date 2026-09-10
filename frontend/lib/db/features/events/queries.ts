@@ -4,6 +4,17 @@ import { formatDate } from '../../utils'
 import { publicEvents, posts } from './schema'
 import { PublicEventResponse, PostResponse } from './types'
 
+function normalizeImageUrls(urls: string[] | null): string[] | undefined {
+  if (!urls) return undefined
+
+  const normalized = urls.flatMap((url) => {
+    if (url.startsWith('http')) return [url]
+    return url.match(/https?:\/\/[^'" ,\]]+/g) || []
+  })
+
+  return normalized.length > 0 ? normalized : undefined
+}
+
 export async function getPublicEventsQuery(): Promise<PublicEventResponse[]> {
   const list = await db
     .select()
@@ -122,7 +133,7 @@ export async function getPostsQuery(): Promise<PostResponse[]> {
     title: p.title,
     description: p.description ?? undefined,
     summary: p.summary ?? undefined,
-    img_urls: p.imgUrls ?? undefined,
+    img_urls: normalizeImageUrls(p.imgUrls),
     hashtag: p.hashtag ?? undefined,
     events_date: formatDate(p.eventsDate),
     facebook_url: p.facebookUrl ?? undefined,
@@ -139,7 +150,7 @@ export async function getPostByIdQuery(id: number): Promise<PostResponse | null>
     title: p.title,
     description: p.description ?? undefined,
     summary: p.summary ?? undefined,
-    img_urls: p.imgUrls ?? undefined,
+    img_urls: normalizeImageUrls(p.imgUrls),
     hashtag: p.hashtag ?? undefined,
     events_date: formatDate(p.eventsDate),
     facebook_url: p.facebookUrl ?? undefined,
