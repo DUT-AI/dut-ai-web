@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getBlogByIdQuery } from '@/lib/db/features/blogs/queries'
-import { getMembersQuery, getBlogKeywordsQuery } from '@/lib/db/queries'
+import { getBlogKeywordsQuery } from '@/lib/db/queries'
+import { getManageUsers } from '@/lib/manage-users'
 import BlogForm from '@/app/admin/blogs/BlogForm'
 
 export const dynamic = 'force-dynamic'
@@ -12,7 +13,7 @@ export default async function EditBlogPage({ params }: { params: Promise<{ id: s
 
   const [blog, authors, keywords] = await Promise.all([
     getBlogByIdQuery(blogId),
-    getMembersQuery().catch(() => []),
+    getManageUsers().catch(() => []),
     getBlogKeywordsQuery().catch(() => []),
   ])
 
@@ -21,7 +22,7 @@ export default async function EditBlogPage({ params }: { params: Promise<{ id: s
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white">
           Chỉnh sửa Bài viết
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

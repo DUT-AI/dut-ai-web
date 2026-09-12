@@ -2,6 +2,8 @@ export interface Member {
   id: number
   name: string
   role_name: string
+  role_names?: string[]
+  role_ids?: number[]
   avatar_url?: string
   email?: string
   phone_number?: string
