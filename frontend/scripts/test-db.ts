@@ -5,7 +5,7 @@ dotenv.config({ path: '../.env' })
 import { db } from '../lib/db'
 import {
   getProjectsQuery,
-  getMembersQuery,
+  getGenerationAlbumsQuery,
   getIntroductionsQuery,
   getPublicEventsQuery,
   getPostsQuery,
@@ -20,8 +20,8 @@ async function testDatabase() {
     const projects = await getProjectsQuery()
     console.log(`✅ Projects fetched: ${projects.length} item(s)`)
 
-    const members = await getMembersQuery()
-    console.log(`✅ Members fetched: ${members.length} item(s)`)
+    const generations = await getGenerationAlbumsQuery({ publishedOnly: false })
+    console.log(`✅ Generation albums fetched: ${generations.length} item(s)`)
 
     const intros = await getIntroductionsQuery()
     console.log(`✅ Introductions fetched: ${intros.length} item(s)`)

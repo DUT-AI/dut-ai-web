@@ -1,5 +1,6 @@
 import { unstable_cache } from 'next/cache'
 import * as rawQueries from './queries'
+import { getManageUsers } from '@/lib/manage-users'
 
 // ── Cached Query Wrappers with Next.js Cache & Revalidation Tags ──────────
 
@@ -10,11 +11,10 @@ export const getProjectsCached = unstable_cache(
 )
 
 export const getProjectByIdCached = (id: number) =>
-  unstable_cache(
-    async () => rawQueries.getProjectByIdQuery(id),
-    [`cached-project-${id}`],
-    { revalidate: 600, tags: ['projects', `project-${id}`] }
-  )()
+  unstable_cache(async () => rawQueries.getProjectByIdQuery(id), [`cached-project-${id}`], {
+    revalidate: 600,
+    tags: ['projects', `project-${id}`],
+  })()
 
 export const getIntroductionsCached = unstable_cache(
   async () => rawQueries.getIntroductionsQuery(),
@@ -22,11 +22,10 @@ export const getIntroductionsCached = unstable_cache(
   { revalidate: 600, tags: ['introductions'] }
 )
 
-export const getMembersCached = unstable_cache(
-  async () => rawQueries.getMembersQuery(),
-  ['cached-members'],
-  { revalidate: 300, tags: ['members', 'users'] }
-)
+export const getMembersCached = unstable_cache(async () => getManageUsers(), ['cached-members'], {
+  revalidate: 300,
+  tags: ['members', 'manage-users'],
+})
 
 export const getPublicEventsCached = unstable_cache(
   async () => rawQueries.getPublicEventsQuery(),
@@ -48,18 +47,16 @@ export const getBlogsCached = (params?: { title?: string; keyword?: string }) =>
   )()
 
 export const getBlogBySlugCached = (slug: string) =>
-  unstable_cache(
-    async () => rawQueries.getBlogBySlugQuery(slug),
-    [`cached-blog-slug-${slug}`],
-    { revalidate: 60, tags: ['blogs', `blog-${slug}`] }
-  )()
+  unstable_cache(async () => rawQueries.getBlogBySlugQuery(slug), [`cached-blog-slug-${slug}`], {
+    revalidate: 60,
+    tags: ['blogs', `blog-${slug}`],
+  })()
 
 export const getBlogByIdCached = (id: number) =>
-  unstable_cache(
-    async () => rawQueries.getBlogByIdQuery(id),
-    [`cached-blog-${id}`],
-    { revalidate: 60, tags: ['blogs', `blog-${id}`] }
-  )()
+  unstable_cache(async () => rawQueries.getBlogByIdQuery(id), [`cached-blog-${id}`], {
+    revalidate: 60,
+    tags: ['blogs', `blog-${id}`],
+  })()
 
 export const getFeaturedBlogsCached = (limit = 5) =>
   unstable_cache(

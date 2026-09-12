@@ -2,18 +2,16 @@ import { desc, eq } from 'drizzle-orm'
 import { db } from '../../index'
 import { projects, projectMembers } from './schema'
 import { ProjectResponse, CreateProjectInput } from './types'
+import { getManageUsersMap } from '@/lib/manage-users'
 
 export async function getProjectsQuery(): Promise<ProjectResponse[]> {
-  const result = await db.query.projects.findMany({
-    orderBy: [desc(projects.id)],
-    with: {
-      members: {
-        with: {
-          user: true,
-        },
-      },
-    },
-  })
+  const [result, users] = await Promise.all([
+    db.query.projects.findMany({
+      orderBy: [desc(projects.id)],
+      with: { members: true },
+    }),
+    getManageUsersMap(),
+  ])
 
   return result.map((p) => ({
     id: p.id,
@@ -26,25 +24,22 @@ export async function getProjectsQuery(): Promise<ProjectResponse[]> {
     video_url: p.videoUrl ?? undefined,
     members: p.members.map((m) => ({
       id: m.id,
-      user_id: m.userId,
-      name: m.user?.name ?? 'Unknown',
-      avatar_url: m.user?.avatarUrl ?? undefined,
+      user_id: m.externalUserId,
+      name: users.get(m.externalUserId)?.name ?? 'Thành viên chưa đồng bộ',
+      avatar_url: users.get(m.externalUserId)?.avatar_url,
       role: m.role,
     })),
   }))
 }
 
 export async function getProjectByIdQuery(id: number): Promise<ProjectResponse | null> {
-  const p = await db.query.projects.findFirst({
-    where: eq(projects.id, id),
-    with: {
-      members: {
-        with: {
-          user: true,
-        },
-      },
-    },
-  })
+  const [p, users] = await Promise.all([
+    db.query.projects.findFirst({
+      where: eq(projects.id, id),
+      with: { members: true },
+    }),
+    getManageUsersMap(),
+  ])
 
   if (!p) return null
 
@@ -59,9 +54,9 @@ export async function getProjectByIdQuery(id: number): Promise<ProjectResponse |
     video_url: p.videoUrl ?? undefined,
     members: p.members.map((m) => ({
       id: m.id,
-      user_id: m.userId,
-      name: m.user?.name ?? 'Unknown',
-      avatar_url: m.user?.avatarUrl ?? undefined,
+      user_id: m.externalUserId,
+      name: users.get(m.externalUserId)?.name ?? 'Thành viên chưa đồng bộ',
+      avatar_url: users.get(m.externalUserId)?.avatar_url,
       role: m.role,
     })),
   }
@@ -85,7 +80,7 @@ export async function createProjectQuery(input: CreateProjectInput): Promise<Pro
     await db.insert(projectMembers).values(
       input.members.map((m) => ({
         projectId: newProject.id,
-        userId: m.user_id,
+        externalUserId: m.user_id,
         role: m.role || 'Member',
       }))
     )
@@ -118,7 +113,7 @@ export async function updateProjectQuery(
       await db.insert(projectMembers).values(
         input.members.map((m) => ({
           projectId: id,
-          userId: m.user_id,
+          externalUserId: m.user_id,
           role: m.role || 'Member',
         }))
       )

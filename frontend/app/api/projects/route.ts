@@ -20,7 +20,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, description, image_url, features, technologies, demo_url, video_url, members } = body
+    const { title, description, image_url, features, technologies, demo_url, video_url, members } =
+      body
 
     if (!title) {
       return errorResponse('Title is required', 400)
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
       await db.insert(projectMembers).values(
         members.map((m: { user_id: number; role: string }) => ({
           projectId: newProject.id,
-          userId: m.user_id,
+          externalUserId: m.user_id,
           role: m.role || 'Member',
         }))
       )

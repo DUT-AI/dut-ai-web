@@ -58,6 +58,13 @@ const securityHeaders = [
 const output = process.env.EXPORT ? 'export' : 'standalone'
 const basePath = process.env.BASE_PATH || undefined
 const unoptimized = process.env.UNOPTIMIZED ? true : undefined
+const allowedDevOrigins = [
+  '100.88.75.9',
+  ...(process.env.ALLOWED_DEV_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+]
 
 /**
  * @type {import('next/dist/next-server/server/config').NextConfig}
@@ -67,6 +74,7 @@ module.exports = () => {
   return plugins.reduce((acc, next) => next(acc), {
     output,
     basePath,
+    allowedDevOrigins,
     reactStrictMode: true,
     trailingSlash: false,
     turbopack: {

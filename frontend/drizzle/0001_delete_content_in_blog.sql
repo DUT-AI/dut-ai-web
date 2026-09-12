@@ -71,4 +71,4 @@ CREATE UNIQUE INDEX "ix_blogs_slug" ON "blogs" USING btree ("slug");--> statemen
 CREATE UNIQUE INDEX "ix_users_email" ON "users" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "ix_users_id" ON "users" USING btree ("id");--> statement-breakpoint
 CREATE INDEX "ix_users_name" ON "users" USING btree ("name");--> statement-breakpoint
-ALTER TABLE "blogs" DROP COLUMN "content";
+ALTER TABLE "blogs" DROP COLUMN IF EXISTS "content";

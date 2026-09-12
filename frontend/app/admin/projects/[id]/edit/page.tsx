@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getProjectByIdQuery } from '@/lib/db/features/projects/queries'
-import { getMembersQuery } from '@/lib/db/queries'
+import { getManageUsers } from '@/lib/manage-users'
 import ProjectForm from '@/app/admin/projects/ProjectForm'
 
 export const dynamic = 'force-dynamic'
@@ -12,7 +12,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
 
   const [project, members] = await Promise.all([
     getProjectByIdQuery(projectId),
-    getMembersQuery().catch(() => []),
+    getManageUsers().catch(() => []),
   ])
 
   if (!project) notFound()
@@ -20,7 +20,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white">
           Chỉnh sửa Dự án
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
