@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import postgres from 'postgres'
 
+dotenv.config({ path: '.env.local' })
 dotenv.config({ path: '../.env' })
 
 const databaseUrl =
@@ -10,9 +11,8 @@ const databaseUrl =
 const sql = postgres(databaseUrl, { connect_timeout: 5 })
 
 try {
-  const localUsers = await sql`select id from users order by id`
-  const projectRefs = await sql`select distinct user_id as id from project_members order by user_id`
-  const blogRefs = await sql`select distinct user_id as id from blog_authors order by user_id`
+  const projectRefs = await sql`select distinct external_user_id as id from project_members order by external_user_id`
+  const blogRefs = await sql`select distinct external_user_id as id from blog_authors order by external_user_id`
   const response = await fetch(
     process.env.DUT_MANAGER_USERS_URL || 'https://manage.dutai.io.vn/api/v1/users',
     { headers: { Authorization: `Bearer ${process.env.DUT_MANAGER_API_KEY}` } }
@@ -24,11 +24,8 @@ try {
 
   console.log(
     JSON.stringify({
-      localUsers: localUsers.length,
       remoteUsers: remoteIds.size,
-      localIdsMissingOnManage: localUsers
-        .map((row) => Number(row.id))
-        .filter((id) => !remoteIds.has(id)),
+      referencedIdsCount: referencedIds.size,
       referencedIdsMissingOnManage: [...referencedIds].filter((id) => !remoteIds.has(id)),
     })
   )

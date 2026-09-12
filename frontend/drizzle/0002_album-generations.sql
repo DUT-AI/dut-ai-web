@@ -31,12 +31,15 @@ CREATE TABLE "generations" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "project_members" DROP CONSTRAINT "project_members_user_id_users_id_fk";
+ALTER TABLE "project_members" DROP CONSTRAINT IF EXISTS "project_members_user_id_users_id_fk";
+ALTER TABLE "project_members" DROP CONSTRAINT IF EXISTS "project_members_user_id_fkey";
 --> statement-breakpoint
-ALTER TABLE "blog_authors" DROP CONSTRAINT "blog_authors_user_id_users_id_fk";
+ALTER TABLE "blog_authors" DROP CONSTRAINT IF EXISTS "blog_authors_user_id_users_id_fk";
+ALTER TABLE "blog_authors" DROP CONSTRAINT IF EXISTS "blog_authors_user_id_fkey";
 --> statement-breakpoint
-DROP INDEX "ix_project_members_user_id";--> statement-breakpoint
-ALTER TABLE "blog_authors" DROP CONSTRAINT "blog_authors_blog_id_user_id_pk";--> statement-breakpoint
+DROP INDEX IF EXISTS "ix_project_members_user_id";--> statement-breakpoint
+ALTER TABLE "blog_authors" DROP CONSTRAINT IF EXISTS "blog_authors_blog_id_user_id_pk";--> statement-breakpoint
+ALTER TABLE "blog_authors" DROP CONSTRAINT IF EXISTS "blog_authors_pkey";--> statement-breakpoint
 ALTER TABLE "project_members" RENAME COLUMN "user_id" TO "external_user_id";--> statement-breakpoint
 ALTER TABLE "blog_authors" RENAME COLUMN "user_id" TO "external_user_id";--> statement-breakpoint
 ALTER TABLE "users" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
