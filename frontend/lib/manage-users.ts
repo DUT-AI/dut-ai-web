@@ -73,7 +73,11 @@ async function getRedis(): Promise<RedisClient | null> {
   } catch (error) {
     console.error('Redis unavailable, using process cache:', error)
     if (global.manageUsersRedis && !global.manageUsersRedis.isOpen) {
-      global.manageUsersRedis.destroy()
+      try {
+        global.manageUsersRedis.destroy()
+      } catch {
+        // ignore if already destroyed/closed
+      }
       global.manageUsersRedis = undefined
     }
     return null
