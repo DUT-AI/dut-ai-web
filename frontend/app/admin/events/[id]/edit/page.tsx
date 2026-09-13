@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: idStr } = await params
-  const eventId = parseInt(idStr, 10)
-  if (isNaN(eventId)) notFound()
+  const eventId = Number(idStr)
+  if (!/^\d+$/.test(idStr) || !Number.isSafeInteger(eventId) || eventId <= 0) notFound()
 
   const event = await getPublicEventByIdQuery(eventId)
   if (!event) notFound()

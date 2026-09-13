@@ -1,11 +1,4 @@
-import {
-  pgTable,
-  serial,
-  varchar,
-  text,
-  timestamp,
-  index,
-} from 'drizzle-orm/pg-core'
+import { pgTable, serial, varchar, text, timestamp, index } from 'drizzle-orm/pg-core'
 
 export const publicEvents = pgTable(
   'public_events',
@@ -15,7 +8,9 @@ export const publicEvents = pgTable(
     description: text('description'),
     summary: text('summary'),
     imgUrl: varchar('img_url', { length: 1000 }),
-    eventsDate: timestamp('events_date', { mode: 'date' }),
+    // PostgreSQL stores this column without a timezone. Keep it as a wall-clock
+    // string so editing an event does not shift the entered local time via UTC.
+    eventsDate: timestamp('events_date', { mode: 'string' }),
     location: varchar('location', { length: 255 }),
     registerLink: varchar('register_link', { length: 1000 }),
     facebookUrl: varchar('facebook_url', { length: 1000 }),
@@ -23,9 +18,7 @@ export const publicEvents = pgTable(
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow(),
   },
-  (table) => [
-    index('ix_public_events_id').on(table.id),
-  ]
+  (table) => [index('ix_public_events_id').on(table.id)]
 )
 
 export const posts = pgTable(
@@ -37,14 +30,12 @@ export const posts = pgTable(
     summary: text('summary'),
     imgUrls: varchar('img_urls').array(),
     hashtag: varchar('hashtag', { length: 255 }),
-    eventsDate: timestamp('events_date', { mode: 'date' }),
+    eventsDate: timestamp('events_date', { mode: 'string' }),
     facebookUrl: varchar('facebook_url', { length: 1000 }),
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow(),
   },
-  (table) => [
-    index('ix_posts_id').on(table.id),
-  ]
+  (table) => [index('ix_posts_id').on(table.id)]
 )
 
 export type PublicEventModel = typeof publicEvents.$inferSelect

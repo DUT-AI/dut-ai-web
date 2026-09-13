@@ -30,28 +30,43 @@ export default function PostForm({ initialPost }: PostFormProps) {
 
   // Handle MinIO Upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0) return
+    e.target.value = ''
 
     setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
+    setErrorMessage(null)
+    const uploadedUrls: string[] = []
+    const failedFiles: string[] = []
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
+    for (const file of files) {
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('folder', 'moments')
 
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Upload failed')
-
-      setImgUrls((prev) => (prev ? `${prev}\n${data.url}` : data.url))
-    } catch (err: any) {
-      alert(`Lỗi upload ảnh MinIO: ${err.message}`)
-    } finally {
-      setUploading(false)
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Upload failed')
+        uploadedUrls.push(data.url)
+      } catch {
+        failedFiles.push(file.name)
+      }
     }
+
+    if (uploadedUrls.length > 0) {
+      setImgUrls((previous) => {
+        const urls = previous.split('\n').map((url) => url.trim()).filter(Boolean)
+        return [...new Set([...urls, ...uploadedUrls])].join('\n')
+      })
+    }
+    if (failedFiles.length > 0) {
+      setErrorMessage(`Không thể upload: ${failedFiles.join(', ')}`)
+    }
+    setUploading(false)
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -81,7 +96,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
           <span>Quay lại danh sách</span>
         </Link>
 
-        <Button type="submit" disabled={isPending} className="gap-2 px-6">
+        <Button type="submit" disabled={isPending || uploading} className="gap-2 px-6">
           {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           <span>{initialPost ? 'Cập nhật khoảnh khắc' : 'Lưu khoảnh khắc'}</span>
         </Button>
@@ -108,6 +123,21 @@ export default function PostForm({ initialPost }: PostFormProps) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Kỷ niệm ngày thành lập DUT AI Club..."
             required
+            maxLength={255}
+            className="mt-2"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            Mô tả chi tiết
+          </label>
+          <Textarea
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Mô tả đầy đủ về hoạt động và những khoảnh khắc trong album..."
+            rows={4}
             className="mt-2"
           />
         </div>
@@ -142,6 +172,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
               <input
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleFileUpload}
                 disabled={uploading}
                 className="hidden"
@@ -189,6 +220,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
             <Input
               name="hashtag"
               value={hashtag}
+              maxLength={255}
               onChange={(e) => setHashtag(e.target.value)}
               placeholder="#dutaiclub #welcome_newbie"
               className="mt-2"
@@ -202,6 +234,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
           </label>
           <Input
             name="facebookUrl"
+            type="url"
             value={facebookUrl}
             onChange={(e) => setFacebookUrl(e.target.value)}
             placeholder="https://facebook.com/dutaiclub/posts/..."

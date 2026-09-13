@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: idStr } = await params
-  const postId = parseInt(idStr, 10)
-  if (isNaN(postId)) notFound()
+  const postId = Number(idStr)
+  if (!/^\d+$/.test(idStr) || !Number.isSafeInteger(postId) || postId <= 0) notFound()
 
   const post = await getPostByIdQuery(postId)
   if (!post) notFound()

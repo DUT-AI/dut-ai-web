@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server'
 import { getPublicEventsQuery } from '@/lib/db/queries'
 import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 

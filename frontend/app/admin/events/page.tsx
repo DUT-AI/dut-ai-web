@@ -1,14 +1,22 @@
 import { getPublicEventsQuery } from '@/lib/db/features/events/queries'
 import Link from 'next/link'
-import { Plus, Edit2, Trash2, Calendar, MapPin, ExternalLink } from 'lucide-react'
+import { Plus, Edit2, Calendar, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { deletePublicEventAction } from './actions'
+import DeleteEventItemButton from './DeleteEventItemButton'
+import type { PublicEvent } from '@/lib/db/features/events/types'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminEventsListPage() {
-  const events = await getPublicEventsQuery().catch(() => [])
+  let events: PublicEvent[] = []
+  let loadError = false
+  try {
+    events = await getPublicEventsQuery()
+  } catch (error) {
+    loadError = true
+    console.error('Failed to load admin events:', error)
+  }
 
   return (
     <div className="space-y-6">
@@ -97,23 +105,25 @@ export default async function AdminEventsListPage() {
                         </Button>
                       </Link>
 
-                      <form action={deletePublicEventAction.bind(null, event.id)}>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="h-8 gap-1 text-xs"
-                          type="submit"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          <span>Xóa</span>
-                        </Button>
-                      </form>
+                      <DeleteEventItemButton
+                        id={event.id}
+                        kind="event"
+                        title={event.title}
+                      />
                     </div>
                   </td>
                 </tr>
               ))}
 
-              {events.length === 0 && (
+              {loadError && (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-red-600 dark:text-red-400">
+                    Không thể tải danh sách sự kiện. Vui lòng thử lại.
+                  </td>
+                </tr>
+              )}
+
+              {!loadError && events.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-slate-400">
                     Chưa có sự kiện nào. Bấm &quot;Thêm sự kiện mới&quot; để tạo.
