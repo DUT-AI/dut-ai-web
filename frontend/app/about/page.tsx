@@ -1,9 +1,7 @@
 import { genPageMetadata } from 'app/seo'
 import Footer from '@/components/Footer'
 import AboutHero from '@/components/about/AboutHero'
-import AboutIntroCards from '@/components/about/AboutIntroCards'
-import AboutActivities from '@/components/about/AboutActivities'
-import AboutVisionMission from '@/components/about/AboutVisionMission'
+import AboutStory from '@/components/about/AboutStory'
 import AboutCoreValues from '@/components/about/AboutCoreValues'
 import GenerationAlbum from '@/components/about/GenerationAlbum'
 import { getGenerationAlbumsQuery } from '@/lib/db/features/organization/queries'
@@ -78,7 +76,7 @@ export default async function AboutPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#f8faff] via-[#fff5f8] to-[#e6f0fa] pb-16 dark:from-gray-950 dark:via-gray-900 dark:to-[#0f172a]">
+    <div className="relative min-h-screen bg-gradient-to-b from-[#f8faff] via-[#fff5f8] to-[#e6f0fa] pb-16 dark:from-gray-950 dark:via-gray-900 dark:to-[#0f172a]">
       <div className="pointer-events-none absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
         <div className="absolute top-[5%] -left-[10%] h-[20%] w-[60%] rounded-full bg-blue-100/50 blur-[120px] dark:bg-blue-900/10" />
         <div className="absolute top-[30%] right-0 h-[30%] w-[50%] rounded-full bg-pink-100/50 blur-[120px] dark:bg-pink-900/10" />
@@ -94,9 +92,7 @@ export default async function AboutPage() {
         />
 
         <div className="mx-auto max-w-7xl space-y-20 px-5 sm:px-8 md:px-12">
-          <AboutIntroCards />
-          <AboutActivities />
-          <AboutVisionMission />
+          <AboutStory />
           <AboutCoreValues />
           <GenerationAlbum albums={albums} />
           <Footer />
