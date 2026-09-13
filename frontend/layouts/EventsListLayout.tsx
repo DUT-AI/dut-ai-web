@@ -65,9 +65,10 @@ const MemberCard = ({ bg }: { bg: string }) => (
     </div>
 )
 
-// ── Scattered photo cards ───────────────────────────────────────────────────
+// ── Scattered photo cards with ArchGallery hover effect ─────────────────────────
 const PhotoStack = ({ images, flip = false }: { images: string[]; flip?: boolean }) => {
     const W = 170, H = 205
+    const [hovered, setHovered] = useState<number | null>(null)
 
     const cards = flip
         ? [
@@ -88,27 +89,49 @@ const PhotoStack = ({ images, flip = false }: { images: string[]; flip?: boolean
     )
 
     return (
-        <div className="relative" style={{ width: 380, height: 340 }}>
-            {cards.map((c, i) => (
-                <div
-                    key={i}
-                    className="absolute overflow-hidden rounded-2xl border-[5px] border-white shadow-2xl transition-transform duration-300 hover:scale-105"
-                    style={{
-                        width: W,
-                        height: H,
-                        top: c.top,
-                        left: c.left,
-                        zIndex: c.z,
-                        transform: `rotate(${c.rotate}deg)`,
-                    }}
-                >
-                    {visible[i] ? (
-                        <Image src={visible[i]} alt="" fill className="object-cover" unoptimized />
-                    ) : (
-                        <MemberCard bg={c.bg} />
-                    )}
-                </div>
-            ))}
+        <div className="relative mx-auto" style={{ width: 380, height: 340 }}>
+            {cards.map((c, i) => {
+                const isHovered = hovered === i
+                return (
+                    <div
+                        key={i}
+                        className="absolute overflow-hidden rounded-2xl border-[5px] border-white shadow-2xl cursor-pointer select-none"
+                        style={{
+                            width: W,
+                            height: H,
+                            top: c.top,
+                            left: c.left,
+                            zIndex: isHovered ? 50 : c.z,
+                            transform: isHovered
+                                ? 'translate(0, -16px) rotate(0deg) scale(1.08)'
+                                : `rotate(${c.rotate}deg) scale(1)`,
+                            transition: 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), z-index 0ms, box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1)',
+                            boxShadow: isHovered
+                                ? '0 20px 35px rgba(0,0,0,0.28), 0 8px 16px rgba(0,0,0,0.15)'
+                                : '0 12px 28px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08)',
+                        }}
+                        onMouseEnter={() => setHovered(i)}
+                        onMouseLeave={() => setHovered(null)}
+                        onFocus={() => setHovered(i)}
+                        onBlur={() => setHovered(null)}
+                        tabIndex={0}
+                    >
+                        {visible[i] ? (
+                            <Image
+                                src={visible[i]}
+                                alt=""
+                                fill
+                                sizes="(max-width: 640px) 280px, 340px"
+                                quality={85}
+                                className="object-cover pointer-events-none"
+                                loading="lazy"
+                            />
+                        ) : (
+                            <MemberCard bg={c.bg} />
+                        )}
+                    </div>
+                )
+            })}
         </div>
     )
 }
@@ -183,7 +206,15 @@ function PastEventsList({ events, pagination }: { events: PastEvent[], paginatio
                         {/* Thumbnail */}
                         <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-[#c5cfc8]">
                             {ev.cover ? (
-                                <Image src={ev.cover} alt={ev.title} fill className="object-cover" unoptimized />
+                                <Image
+                                    src={ev.cover}
+                                    alt={ev.title}
+                                    fill
+                                    sizes="160px"
+                                    quality={85}
+                                    className="object-cover"
+                                    loading="lazy"
+                                />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center">
                                     <svg className="h-8 w-8 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -293,7 +324,14 @@ function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagin
                                 <div className="flex-1">
                                     <div className="relative overflow-hidden rounded-2xl shadow-xl" style={{ minHeight: 340 }}>
                                         {workshopEvent.img_url ? (
-                                            <Image src={workshopEvent.img_url} alt={workshopEvent.title} fill className="object-cover" unoptimized />
+                                            <Image
+                                                src={workshopEvent.img_url}
+                                                alt={workshopEvent.title}
+                                                fill
+                                                priority
+                                                sizes="(max-width: 1024px) 100vw, 700px"
+                                                className="object-cover"
+                                            />
                                         ) : (
                                             <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)' }} />
                                         )}

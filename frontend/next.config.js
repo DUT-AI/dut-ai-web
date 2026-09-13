@@ -90,6 +90,7 @@ module.exports = () => {
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     images: {
+      qualities: [75, 85],
       remotePatterns: [
         {
           protocol: 'https',

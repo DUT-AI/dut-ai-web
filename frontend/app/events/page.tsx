@@ -10,7 +10,7 @@ export const metadata = genPageMetadata({
     keywords: ['sự kiện AI', 'workshop AI Đà Nẵng', 'Welcome Newbie DUT AI', 'hoạt động câu lạc bộ AI', 'cuộc thi AI sinh viên'],
 })
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 const EVENTS_PER_PAGE = 5
 

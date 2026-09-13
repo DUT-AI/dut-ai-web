@@ -75,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang={siteMetadata.language}
       className={`${inter.variable} ${plusJakartaSans.variable} scroll-smooth`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />

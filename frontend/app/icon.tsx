@@ -37,8 +37,8 @@ export default async function Icon() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoSrc}
-            width="28"
-            height="28"
+            width={28}
+            height={28}
             alt="DUT AI Logo"
             style={{
               objectFit: 'contain',
