@@ -12,8 +12,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const postId = parseInt(id, 10)
-    if (isNaN(postId)) {
+    const postId = Number(id)
+    if (!/^\d+$/.test(id) || !Number.isSafeInteger(postId) || postId <= 0) {
       return errorResponse('Invalid post ID', 400)
     }
 

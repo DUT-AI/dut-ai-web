@@ -12,8 +12,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const eventId = parseInt(id, 10)
-    if (isNaN(eventId)) {
+    const eventId = Number(id)
+    if (!/^\d+$/.test(id) || !Number.isSafeInteger(eventId) || eventId <= 0) {
       return errorResponse('Invalid event ID', 400)
     }
 

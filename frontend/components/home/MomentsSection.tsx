@@ -3,6 +3,7 @@ import SparkleIcon from '@/components/SparkleIcon'
 import ButtonLink from '@/components/ButtonLink'
 import type { Post } from 'app/api-client'
 import Heading from './Heading'
+import { parseImageUrls } from '@/lib/db/features/events/timeline'
 
 // Each slot has a unique visual style — matching the original design
 const cardStyles = [
@@ -40,13 +41,7 @@ export default function MomentsSection({ posts }: { posts: Post[] }) {
                         {posts.slice(0, 8).map((post, index) => {
                             // Handle legacy rows/cache entries where an array element contains
                             // the full Python-style list representation.
-                            const urls = Array.isArray(post.img_urls)
-                                ? post.img_urls.flatMap((url) =>
-                                    url.startsWith('http')
-                                        ? [url]
-                                        : (url.match(/https?:\/\/[^'" ,\]]+/g) || [])
-                                )
-                                : []
+                            const urls = parseImageUrls(post.img_urls)
                             const coverImage = urls.length > 0 ? urls[0] : undefined
                             const style = cardStyles[index % cardStyles.length]
                             const tag = post.hashtag && post.hashtag !== 'None' ? post.hashtag : undefined

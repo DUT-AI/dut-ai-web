@@ -3,11 +3,17 @@ import SparkleIcon from '@/components/SparkleIcon'
 import ButtonLink from '@/components/ButtonLink'
 import type { PublicEvent } from 'app/api-client'
 import Heading from './Heading'
+import { parseEventDate } from '@/lib/db/features/events/timeline'
 
 function formatEventDate(dateStr?: string): string {
     if (!dateStr) return ''
-    const d = new Date(dateStr)
-    return d.toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })
+    const date = parseEventDate(dateStr)
+    return date?.toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Asia/Ho_Chi_Minh',
+    }) ?? ''
 }
 
 export default function NewsSection({ events }: { events: PublicEvent[] }) {
