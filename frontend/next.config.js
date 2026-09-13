@@ -111,16 +111,6 @@ module.exports = () => {
         },
       ]
     },
-    async rewrites() {
-      const baseRaw = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8031/api/v1'
-      const backendBase = baseRaw.replace('/api/v1', '')
-      return [
-        {
-          source: '/admin/:path*',
-          destination: `${backendBase}/admin/:path*`,
-        },
-      ]
-    },
     webpack: (config, options) => {
       config.module.rules.push({
         test: /\.svg$/,
