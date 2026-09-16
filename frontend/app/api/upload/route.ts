@@ -4,8 +4,8 @@ import { getAdminSession } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
-const MAX_EVENT_IMAGE_SIZE = 5 * 1024 * 1024
-const ALLOWED_EVENT_IMAGE_TYPES = new Set([
+const MAX_MANAGED_IMAGE_SIZE = 5 * 1024 * 1024
+const ALLOWED_MANAGED_IMAGE_TYPES = new Set([
   'image/jpeg',
   'image/png',
   'image/gif',
@@ -24,20 +24,24 @@ export async function POST(req: NextRequest) {
     const file = formData.get('file') as File | null
     const requestedFolder = formData.get('folder')
     const folder =
-      requestedFolder === 'events' || requestedFolder === 'moments' ? requestedFolder : 'uploads'
+      requestedFolder === 'events' ||
+      requestedFolder === 'moments' ||
+      requestedFolder === 'projects'
+        ? requestedFolder
+        : 'uploads'
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
     if (folder !== 'uploads') {
-      if (!ALLOWED_EVENT_IMAGE_TYPES.has(file.type)) {
+      if (!ALLOWED_MANAGED_IMAGE_TYPES.has(file.type)) {
         return NextResponse.json(
           { error: 'Chỉ hỗ trợ ảnh JPEG, PNG, GIF, WebP hoặc AVIF.' },
           { status: 415 }
         )
       }
-      if (file.size === 0 || file.size > MAX_EVENT_IMAGE_SIZE) {
+      if (file.size === 0 || file.size > MAX_MANAGED_IMAGE_SIZE) {
         return NextResponse.json(
           { error: 'Ảnh phải có dung lượng lớn hơn 0 và không quá 5 MB.' },
           { status: 413 }

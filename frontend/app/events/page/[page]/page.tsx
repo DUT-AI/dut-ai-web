@@ -12,9 +12,13 @@ const EVENTS_PER_PAGE = 5
 
 export const generateMetadata = async ({ params }: { params: Promise<{ page: string }> }) => {
   const { page } = await params
+  const pageNumber = Number(page)
+  const validPage = /^\d+$/.test(page) && Number.isSafeInteger(pageNumber) && pageNumber > 0
   return genPageMetadata({
-    title: `Events — Trang ${page}`,
-    description: 'Tất cả sự kiện của DUT AI Club',
+    title: validPage ? `Sự kiện — Trang ${pageNumber}` : 'Trang sự kiện không tồn tại',
+    description: 'Tất cả sự kiện, workshop, cuộc thi và hoạt động của DUT AI Club tại Đà Nẵng.',
+    path: pageNumber === 1 ? '/events' : `/events/page/${page}`,
+    noIndex: !validPage,
   })
 }
 

@@ -4,11 +4,19 @@ import { Plus, Edit2, Trash2, ExternalLink, Users, Code, Video } from 'lucide-re
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { deleteProjectAction } from './actions'
+import type { Project } from '@/lib/db/features/projects/types'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminProjectsListPage() {
-  const projects = await getProjectsQuery().catch(() => [])
+  let projects: Project[] = []
+  let loadError = false
+  try {
+    projects = await getProjectsQuery()
+  } catch (error) {
+    loadError = true
+    console.error('Failed to load admin projects:', error)
+  }
 
   return (
     <div className="space-y-6">
@@ -145,7 +153,15 @@ export default async function AdminProjectsListPage() {
                 </tr>
               ))}
 
-              {projects.length === 0 && (
+              {loadError && (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-red-600 dark:text-red-400">
+                    Không thể tải danh sách dự án. Vui lòng kiểm tra kết nối và thử lại.
+                  </td>
+                </tr>
+              )}
+
+              {!loadError && projects.length === 0 && (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400">
                     Chưa có dự án nào. Nhấn &quot;Thêm dự án mới&quot; để bắt đầu.

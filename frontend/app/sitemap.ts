@@ -8,15 +8,13 @@ export const dynamic = 'force-dynamic'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = siteMetadata.siteUrl.replace(/\/$/, '') // strip trailing slash
 
-  const now = new Date().toISOString().split('T')[0]
-
   // Static routes with priorities
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${siteUrl}/`, lastModified: now, changeFrequency: 'daily', priority: 1.0 },
-    { url: `${siteUrl}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${siteUrl}/projects`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${siteUrl}/events`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${siteUrl}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${siteUrl}/`, changeFrequency: 'weekly', priority: 1.0 },
+    { url: `${siteUrl}/blog`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/projects`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/events`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/about`, changeFrequency: 'monthly', priority: 0.6 },
   ]
 
   // Blog posts
@@ -27,13 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Failed to fetch blogs for sitemap:', error)
   }
 
-  const blogRoutes: MetadataRoute.Sitemap = blogs
-    .map((post) => ({
-      url: `${siteUrl}/blog/${post.slug || post.id}`,
-      lastModified: post.updated_at || post.created_at,
-      changeFrequency: 'monthly' as const,
-      priority: post.keywords?.some((k) => k.keyword_name.toLowerCase() === 'event') ? 0.85 : 0.8,
-    }))
+  const blogRoutes: MetadataRoute.Sitemap = blogs.map((post) => ({
+    url: `${siteUrl}/blog/${post.slug || post.id}`,
+    lastModified: post.updated_at || post.created_at,
+    changeFrequency: 'monthly' as const,
+    priority: post.keywords?.some((k) => k.keyword_name.toLowerCase() === 'event') ? 0.85 : 0.8,
+  }))
 
   return [...staticRoutes, ...blogRoutes]
 }

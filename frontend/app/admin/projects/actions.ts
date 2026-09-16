@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidateTag } from 'next/cache'
+import { updateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import {
   createProjectQuery,
@@ -65,7 +65,8 @@ export async function saveProjectAction(prevState: any, formData: FormData) {
       })
     }
 
-    revalidateTag('projects', 'homepage')
+    updateTag('projects')
+    updateTag('homepage')
   } catch (error: any) {
     console.error('Failed to save project:', error)
     return { error: error?.message || 'Lỗi khi lưu dự án.' }
@@ -81,6 +82,7 @@ export async function deleteProjectAction(id: number) {
   }
 
   await deleteProjectQuery(id)
-  revalidateTag('projects', 'homepage')
+  updateTag('projects')
+  updateTag('homepage')
   redirect('/admin/projects')
 }
