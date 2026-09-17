@@ -14,7 +14,14 @@ const POSTS_PER_PAGE = 10
 export const metadata = genPageMetadata({
   title: 'Blog',
   description: 'Bài viết về AI, Machine Learning, Deep Learning và công nghệ từ DUT AI Club.',
-  keywords: ['blog AI', 'bài viết machine learning', 'học deep learning', 'AI blog tiếng Việt', 'nghiên cứu AI sinh viên'],
+  keywords: [
+    'blog AI',
+    'bài viết machine learning',
+    'học deep learning',
+    'AI blog tiếng Việt',
+    'nghiên cứu AI sinh viên',
+  ],
+  path: '/blog',
 })
 
 export default async function BlogPage() {

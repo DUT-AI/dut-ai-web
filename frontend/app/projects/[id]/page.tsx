@@ -1,28 +1,64 @@
-import { getProjectByIdCached as getProject, getMembersCached as getMembers } from '@/lib/db/cached-queries'
+import {
+  getProjectByIdCached as getProject,
+  getMembersCached as getMembers,
+} from '@/lib/db/cached-queries'
 import type { Project } from '@/lib/db/features/projects/types'
 import type { Member } from '@/lib/db/features/users/types'
-import { genPageMetadata } from 'app/seo'
+import { absoluteUrl, genPageMetadata, serializeJsonLd } from 'app/seo'
 import NextImage from 'next/image'
 import ProjectsClient from './ProjectsClient'
 import Footer from '@/components/Footer'
 import { notFound } from 'next/navigation'
-import { parseProjectIdFromParam } from '../project-route'
+import { buildProjectPath, parseProjectIdFromParam } from '../project-route'
+import type { Metadata } from 'next'
 
-export const metadata = genPageMetadata({
-  title: 'Projects',
-  description: 'Các dự án AI và công nghệ được phát triển bởi thành viên DUT AI Club.',
-  keywords: [
-    'dự án AI',
-    'AI project sinh viên',
-    'Machine Learning project DUT',
-    'ứng dụng AI Đà Nẵng',
-  ],
-})
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const projectId = parseProjectIdFromParam(id)
+
+  if (!projectId) {
+    return genPageMetadata({
+      title: 'Dự án không tồn tại',
+      path: `/projects/${id}`,
+      noIndex: true,
+    })
+  }
+
+  try {
+    const project = await getProject(projectId)
+    if (!project) {
+      return genPageMetadata({
+        title: 'Dự án không tồn tại',
+        path: `/projects/${id}`,
+        noIndex: true,
+      })
+    }
+
+    return genPageMetadata({
+      title: project.title,
+      description:
+        project.description || 'Dự án AI và công nghệ được phát triển bởi thành viên DUT AI Club.',
+      image: project.image_url || project.imgSrc,
+      keywords: ['dự án AI', 'AI project sinh viên', ...(project.tags || [])],
+      path: buildProjectPath(project),
+    })
+  } catch {
+    return genPageMetadata({
+      title: 'Dự án không tồn tại',
+      path: `/projects/${id}`,
+      noIndex: true,
+    })
+  }
+}
 
 export const dynamic = 'force-dynamic'
 
 export default async function Projects(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+  const params = await props.params
   const projectId = parseProjectIdFromParam(params.id)
   if (!projectId) {
     notFound()
@@ -42,8 +78,23 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
     notFound()
   }
 
+  const projectPath = buildProjectPath(project)
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: absoluteUrl('/') },
+      { '@type': 'ListItem', position: 2, name: 'Dự án', item: absoluteUrl('/projects') },
+      { '@type': 'ListItem', position: 3, name: project.title, item: absoluteUrl(projectPath) },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+      />
       <style>{`
         .projects-detail-page {
           background: #f8fafc;
@@ -88,17 +139,21 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
           color: rgba(255,255,255,0.8);
         }
       `}</style>
-      <div
-        className="projects-detail-page relative min-h-screen overflow-hidden"
-      >
+      <div className="projects-detail-page relative min-h-screen overflow-hidden">
         {/* Light-mode decorative blobs */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden dark:hidden">
-          <div className="absolute top-[-80px] left-[10%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]"
-            style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }} />
-          <div className="absolute top-[40%] right-[5%] h-[300px] w-[300px] rounded-full opacity-30 blur-[80px]"
-            style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }} />
-          <div className="absolute bottom-[5%] left-[25%] h-[260px] w-[260px] rounded-full opacity-25 blur-[70px]"
-            style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }} />
+          <div
+            className="absolute top-[-80px] left-[10%] h-[420px] w-[420px] rounded-full opacity-40 blur-[90px]"
+            style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)' }}
+          />
+          <div
+            className="absolute top-[40%] right-[5%] h-[300px] w-[300px] rounded-full opacity-30 blur-[80px]"
+            style={{ background: 'radial-gradient(circle, #fbcfe8 0%, transparent 70%)' }}
+          />
+          <div
+            className="absolute bottom-[5%] left-[25%] h-[260px] w-[260px] rounded-full opacity-25 blur-[70px]"
+            style={{ background: 'radial-gradient(circle, #bae6fd 0%, transparent 70%)' }}
+          />
         </div>
         {/* ── Hero ── */}
         <section className="relative px-6 pt-10 pb-6 sm:pt-14 md:px-8 md:pt-32 lg:pt-36">
@@ -106,7 +161,7 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
             <div className="flex items-end justify-between gap-8">
               {/* H1 — indented more */}
               <h1
-                className="max-w-[725px] pl-8 md:pl-16 text-5xl font-extrabold text-slate-900 dark:text-white sm:text-6xl md:text-7xl lg:text-8xl xl:text-[96px]"
+                className="max-w-[725px] pl-8 text-5xl font-extrabold text-slate-900 sm:text-6xl md:pl-16 md:text-7xl lg:text-8xl xl:text-[96px] dark:text-white"
                 style={{
                   lineHeight: '0.96em',
                   letterSpacing: '-0.023em',
@@ -146,9 +201,7 @@ export default async function Projects(props: { params: Promise<{ id: string }> 
         {!project && !error && (
           <div className="flex flex-col items-center justify-center py-24 text-slate-400">
             <span className="mb-4 text-6xl">📦</span>
-            <p className="text-lg font-semibold">
-              Chưa có dự án nào.
-            </p>
+            <p className="text-lg font-semibold">Chưa có dự án nào.</p>
           </div>
         )}
 

@@ -10,9 +10,10 @@ import type { GenerationAlbum as GenerationAlbumData } from '@/lib/db/features/o
 import type { Member } from '@/lib/db/features/users/types'
 
 export const metadata = genPageMetadata({
-  title: 'Về chúng mình | DUT AI Club',
+  title: 'Về chúng mình',
   description:
     'Khám phá các thế hệ và những con người đã cùng nhau tạo nên hành trình của DUT AI Club.',
+  path: '/about',
 })
 
 export const dynamic = 'force-dynamic'

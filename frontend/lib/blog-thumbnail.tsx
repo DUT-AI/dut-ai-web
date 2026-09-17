@@ -1,9 +1,12 @@
 import { ImageResponse } from 'next/og'
+import siteMetadata from '@/data/siteMetadata'
 
 export const BLOG_THUMBNAIL_SIZE = {
   width: 1200,
   height: 630,
 } as const
+
+const SITE_HOSTNAME = new URL(siteMetadata.siteUrl).hostname
 
 type BlogThumbnailOptions = {
   title: string
@@ -257,7 +260,7 @@ export function createBlogThumbnail({ title, authors = [] }: BlogThumbnailOption
             </span>
           </div>
           <span style={{ color: palette.muted, fontSize: 17, fontWeight: 700 }}>
-            clb.dutai.site
+            {SITE_HOSTNAME}
           </span>
         </div>
       </div>
