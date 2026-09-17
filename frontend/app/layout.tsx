@@ -2,7 +2,7 @@ import '@/css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import localFont from 'next/font/local'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -12,18 +12,18 @@ import { Metadata } from 'next'
 import NextTopLoader from 'nextjs-toploader'
 import { absoluteUrl, serializeJsonLd } from './seo'
 
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  display: 'swap',
+const inter = localFont({
+  src: '../public/fonts/Inter-Variable.woff2',
   variable: '--font-inter-var',
-  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  weight: '400 900',
 })
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin', 'latin-ext'],
-  display: 'swap',
+const plusJakartaSans = localFont({
+  src: '../public/fonts/PlusJakartaSans-Variable.woff2',
   variable: '--font-jakarta-var',
-  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  weight: '400 800',
 })
 
 export const metadata: Metadata = {
