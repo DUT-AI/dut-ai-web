@@ -34,11 +34,14 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    e.target.value = ''
 
     setUploading(true)
+    setErrorMessage(null)
     try {
       const formData = new FormData()
       formData.append('file', file)
+      formData.append('folder', 'events')
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -49,8 +52,9 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
       if (!res.ok) throw new Error(data.error || 'Upload failed')
 
       setImgUrl(data.url)
-    } catch (err: any) {
-      alert(`Lỗi upload ảnh MinIO: ${err.message}`)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Không thể upload ảnh.'
+      setErrorMessage(`Lỗi upload ảnh MinIO: ${message}`)
     } finally {
       setUploading(false)
     }
@@ -81,7 +85,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
           <span>Quay lại danh sách</span>
         </Link>
 
-        <Button type="submit" disabled={isPending} className="gap-2 px-6">
+        <Button type="submit" disabled={isPending || uploading} className="gap-2 px-6">
           {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           <span>{initialEvent ? 'Cập nhật sự kiện' : 'Lưu sự kiện'}</span>
         </Button>
@@ -108,6 +112,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
             onChange={(e) => setTitle(e.target.value)}
             placeholder="AI Summit 2026 • Workshop Deep Learning..."
             required
+            maxLength={255}
             className="mt-2"
           />
         </div>
@@ -148,6 +153,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
           <div className="mt-2 flex flex-col sm:flex-row gap-3">
             <Input
               name="imgUrl"
+              type="url"
               value={imgUrl}
               onChange={(e) => setImgUrl(e.target.value)}
               placeholder="https://minio.dutai.site/..."
@@ -197,6 +203,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
             <Input
               name="location"
               value={location}
+              maxLength={255}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Hội trường F, Đại học Bách Khoa..."
               className="mt-2"
@@ -211,6 +218,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
             </label>
             <Input
               name="registerLink"
+              type="url"
               value={registerLink}
               onChange={(e) => setRegisterLink(e.target.value)}
               placeholder="https://forms.gle/..."
@@ -224,6 +232,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
             </label>
             <Input
               name="facebookUrl"
+              type="url"
               value={facebookUrl}
               onChange={(e) => setFacebookUrl(e.target.value)}
               placeholder="https://facebook.com/dutaiclub/posts/..."

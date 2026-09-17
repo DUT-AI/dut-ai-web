@@ -24,7 +24,7 @@ export default function Footer() {
                 </div>
 
                 <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white uppercase font-sans">
-                  {siteMetadata.headerTitle} CLUB
+                  {siteMetadata.headerTitle}
                 </span>
               </div>
             </Link>

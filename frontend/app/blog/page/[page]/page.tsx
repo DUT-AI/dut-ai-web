@@ -1,10 +1,24 @@
 import { getBlogs, getFeaturedBlogs, getTopAuthors, getBlogKeywords } from 'app/api-client'
 import BlogListLayout from '@/layouts/BlogListLayout'
 import { notFound } from 'next/navigation'
+import { genPageMetadata } from 'app/seo'
 
 export const dynamic = 'force-dynamic'
 
 const POSTS_PER_PAGE = 10
+
+export async function generateMetadata({ params }: { params: Promise<{ page: string }> }) {
+  const { page } = await params
+  const pageNumber = Number(page)
+  const validPage = /^\d+$/.test(page) && Number.isSafeInteger(pageNumber) && pageNumber > 0
+
+  return genPageMetadata({
+    title: validPage ? `Blog — Trang ${pageNumber}` : 'Trang blog không tồn tại',
+    description: 'Bài viết về AI, Machine Learning, Deep Learning và công nghệ từ DUT AI Club.',
+    path: pageNumber === 1 ? '/blog' : `/blog/page/${page}`,
+    noIndex: !validPage,
+  })
+}
 
 export default async function Page(props: { params: Promise<{ page: string }> }) {
   const params = await props.params
@@ -44,4 +58,3 @@ export default async function Page(props: { params: Promise<{ page: string }> })
     />
   )
 }
-

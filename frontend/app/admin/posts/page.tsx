@@ -1,13 +1,21 @@
 import { getPostsQuery } from '@/lib/db/features/events/queries'
 import Link from 'next/link'
-import { Plus, Edit2, Trash2, Calendar, Image as ImageIcon, ExternalLink } from 'lucide-react'
+import { Plus, Edit2, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { deletePostAction } from '../events/actions'
+import DeleteEventItemButton from '../events/DeleteEventItemButton'
+import type { Post } from '@/lib/db/features/events/types'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPostsListPage() {
-  const posts = await getPostsQuery().catch(() => [])
+  let posts: Post[] = []
+  let loadError = false
+  try {
+    posts = await getPostsQuery()
+  } catch (error) {
+    loadError = true
+    console.error('Failed to load admin moments:', error)
+  }
 
   return (
     <div className="space-y-6">
@@ -82,23 +90,25 @@ export default async function AdminPostsListPage() {
                         </Button>
                       </Link>
 
-                      <form action={deletePostAction.bind(null, post.id)}>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="h-8 gap-1 text-xs"
-                          type="submit"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          <span>Xóa</span>
-                        </Button>
-                      </form>
+                      <DeleteEventItemButton
+                        id={post.id}
+                        kind="moment"
+                        title={post.title}
+                      />
                     </div>
                   </td>
                 </tr>
               ))}
 
-              {posts.length === 0 && (
+              {loadError && (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-red-600 dark:text-red-400">
+                    Không thể tải danh sách khoảnh khắc. Vui lòng thử lại.
+                  </td>
+                </tr>
+              )}
+
+              {!loadError && posts.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-slate-400">
                     Chưa có bài đăng khoảnh khắc nào. Bấm &quot;Thêm khoảnh khắc mới&quot; để tạo.

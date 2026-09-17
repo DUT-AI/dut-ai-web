@@ -11,7 +11,6 @@ import {
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 import { tsvector } from '../../utils'
-import { users } from '../users/schema'
 import { keywords } from '../keywords/schema'
 
 export const blogs = pgTable(
@@ -39,13 +38,9 @@ export const blogAuthors = pgTable(
     blogId: integer('blog_id')
       .notNull()
       .references(() => blogs.id, { onDelete: 'cascade' }),
-    userId: integer('user_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+    externalUserId: integer('external_user_id').notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.blogId, table.userId] }),
-  ]
+  (table) => [primaryKey({ columns: [table.blogId, table.externalUserId] })]
 )
 
 export const blogKeywords = pgTable(
@@ -58,9 +53,7 @@ export const blogKeywords = pgTable(
       .notNull()
       .references(() => keywords.id, { onDelete: 'cascade' }),
   },
-  (table) => [
-    primaryKey({ columns: [table.blogId, table.keywordId] }),
-  ]
+  (table) => [primaryKey({ columns: [table.blogId, table.keywordId] })]
 )
 
 export const blogsRelations = relations(blogs, ({ many }) => ({
@@ -72,10 +65,6 @@ export const blogAuthorsRelations = relations(blogAuthors, ({ one }) => ({
   blog: one(blogs, {
     fields: [blogAuthors.blogId],
     references: [blogs.id],
-  }),
-  user: one(users, {
-    fields: [blogAuthors.userId],
-    references: [users.id],
   }),
 }))
 

@@ -1,4 +1,4 @@
-import 'css/tailwind.css'
+import '@/css/tailwind.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
@@ -10,6 +10,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 import NextTopLoader from 'nextjs-toploader'
+import { absoluteUrl, serializeJsonLd } from './seo'
 
 const inter = localFont({
   src: '../public/fonts/Inter-Variable.woff2',
@@ -35,14 +36,21 @@ export const metadata: Metadata = {
   openGraph: {
     title: siteMetadata.title,
     description: siteMetadata.description,
-    url: './',
+    url: '/',
     siteName: siteMetadata.title,
-    images: [siteMetadata.socialBanner],
-    locale: 'en_US',
+    images: [
+      {
+        url: siteMetadata.socialBanner,
+        width: 1920,
+        height: 1080,
+        alt: 'DUT AI Club',
+      },
+    ],
+    locale: 'vi_VN',
     type: 'website',
   },
   alternates: {
-    canonical: './',
+    canonical: '/',
     types: {
       'application/rss+xml': `${siteMetadata.siteUrl}/feed.xml`,
     },
@@ -60,6 +68,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: siteMetadata.title,
+    description: siteMetadata.description,
     card: 'summary_large_image',
     images: [siteMetadata.socialBanner],
   },
@@ -69,21 +78,49 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const basePath = process.env.BASE_PATH || ''
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${siteMetadata.siteUrl}/#organization`,
+        name: siteMetadata.title,
+        url: siteMetadata.siteUrl,
+        logo: {
+          '@type': 'ImageObject',
+          url: absoluteUrl(siteMetadata.siteLogo),
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${siteMetadata.siteUrl}/#website`,
+        name: siteMetadata.title,
+        url: siteMetadata.siteUrl,
+        description: siteMetadata.description,
+        inLanguage: 'vi-VN',
+        publisher: { '@id': `${siteMetadata.siteUrl}/#organization` },
+      },
+    ],
+  }
 
   return (
     <html
       lang={siteMetadata.language}
       className={`${inter.variable} ${plusJakartaSans.variable} scroll-smooth`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <head>
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
-        <meta name="apple-mobile-web-app-title" content="DUT AI" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
-        <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
-      </head>
-      <body className="bg-[#F5F9FD] pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white" suppressHydrationWarning>
+      <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
+      <meta name="apple-mobile-web-app-title" content="DUT AI" />
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
+      <body
+        className="bg-[#F5F9FD] pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white"
+        suppressHydrationWarning
+      >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+        />
         <NextTopLoader
           color="linear-gradient(to right, #A2D2FF, #FFC2D1)"
           initialPosition={0.08}

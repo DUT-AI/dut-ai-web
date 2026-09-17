@@ -33,7 +33,7 @@ out/
 # ========================
 .env
 .env.local
-.env.*.local
+.env.*
 !.env.example
 !.env.local.example
 
@@ -60,6 +60,7 @@ docker-compose.override.yml
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/package-lock.json
 
 # ========================
 # Testing & Coverage
@@ -76,3 +77,5 @@ coverage/
 *.bak
 *.tmp
 .agents
+# Local database backups
+.agent/db-backups/

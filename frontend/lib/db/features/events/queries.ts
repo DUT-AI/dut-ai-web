@@ -1,8 +1,14 @@
-import { desc, eq } from 'drizzle-orm'
+import { arrayContains, desc, eq } from 'drizzle-orm'
 import { db } from '../../index'
 import { formatDate } from '../../utils'
 import { publicEvents, posts } from './schema'
 import { PublicEventResponse, PostResponse } from './types'
+import { parseImageUrls } from './timeline'
+
+function normalizedImageUrls(urls: string[] | null): string[] | undefined {
+  const normalized = parseImageUrls(urls)
+  return normalized.length > 0 ? normalized : undefined
+}
 
 export async function getPublicEventsQuery(): Promise<PublicEventResponse[]> {
   const list = await db
@@ -16,7 +22,7 @@ export async function getPublicEventsQuery(): Promise<PublicEventResponse[]> {
     description: e.description ?? undefined,
     summary: e.summary ?? undefined,
     img_url: e.imgUrl ?? undefined,
-    events_date: formatDate(e.eventsDate),
+    events_date: e.eventsDate ?? undefined,
     location: e.location ?? undefined,
     register_link: e.registerLink ?? undefined,
     facebook_url: e.facebookUrl ?? undefined,
@@ -35,7 +41,7 @@ export async function getPublicEventByIdQuery(id: number): Promise<PublicEventRe
     description: e.description ?? undefined,
     summary: e.summary ?? undefined,
     img_url: e.imgUrl ?? undefined,
-    events_date: formatDate(e.eventsDate),
+    events_date: e.eventsDate ?? undefined,
     location: e.location ?? undefined,
     register_link: e.registerLink ?? undefined,
     facebook_url: e.facebookUrl ?? undefined,
@@ -47,14 +53,14 @@ export async function getPublicEventByIdQuery(id: number): Promise<PublicEventRe
 
 export async function createPublicEventQuery(data: {
   title: string
-  description?: string
-  summary?: string
-  imgUrl?: string
-  eventsDate?: Date
-  location?: string
-  registerLink?: string
-  facebookUrl?: string
-  tags?: string[]
+  description?: string | null
+  summary?: string | null
+  imgUrl?: string | null
+  eventsDate?: string | null
+  location?: string | null
+  registerLink?: string | null
+  facebookUrl?: string | null
+  tags?: string[] | null
 }): Promise<number> {
   const [created] = await db
     .insert(publicEvents)
@@ -71,6 +77,7 @@ export async function createPublicEventQuery(data: {
     })
     .returning({ id: publicEvents.id })
 
+  if (!created) throw new Error('Không thể tạo sự kiện.')
   return created.id
 }
 
@@ -78,17 +85,17 @@ export async function updatePublicEventQuery(
   id: number,
   data: {
     title?: string
-    description?: string
-    summary?: string
-    imgUrl?: string
-    eventsDate?: Date
-    location?: string
-    registerLink?: string
-    facebookUrl?: string
-    tags?: string[]
+    description: string | null
+    summary: string | null
+    imgUrl: string | null
+    eventsDate: string | null
+    location: string | null
+    registerLink: string | null
+    facebookUrl: string | null
+    tags: string[]
   }
-): Promise<void> {
-  await db
+): Promise<boolean> {
+  const [updated] = await db
     .update(publicEvents)
     .set({
       title: data.title,
@@ -103,28 +110,32 @@ export async function updatePublicEventQuery(
       updatedAt: new Date(),
     })
     .where(eq(publicEvents.id, id))
+    .returning({ id: publicEvents.id })
+
+  return Boolean(updated)
 }
 
-export async function deletePublicEventQuery(id: number): Promise<void> {
-  await db.delete(publicEvents).where(eq(publicEvents.id, id))
+export async function deletePublicEventQuery(id: number): Promise<boolean> {
+  const [deleted] = await db
+    .delete(publicEvents)
+    .where(eq(publicEvents.id, id))
+    .returning({ id: publicEvents.id })
+  return Boolean(deleted)
 }
 
 // ── Posts (Moments) ────────────────────────────────────────────────────────
 
 export async function getPostsQuery(): Promise<PostResponse[]> {
-  const list = await db
-    .select()
-    .from(posts)
-    .orderBy(desc(posts.eventsDate), desc(posts.id))
+  const list = await db.select().from(posts).orderBy(desc(posts.eventsDate), desc(posts.id))
 
   return list.map((p) => ({
     id: p.id,
     title: p.title,
     description: p.description ?? undefined,
     summary: p.summary ?? undefined,
-    img_urls: p.imgUrls ?? undefined,
+    img_urls: normalizedImageUrls(p.imgUrls),
     hashtag: p.hashtag ?? undefined,
-    events_date: formatDate(p.eventsDate),
+    events_date: p.eventsDate ?? undefined,
     facebook_url: p.facebookUrl ?? undefined,
     created_at: formatDate(p.createdAt) ?? new Date().toISOString(),
     updated_at: formatDate(p.updatedAt) ?? new Date().toISOString(),
@@ -139,9 +150,9 @@ export async function getPostByIdQuery(id: number): Promise<PostResponse | null>
     title: p.title,
     description: p.description ?? undefined,
     summary: p.summary ?? undefined,
-    img_urls: p.imgUrls ?? undefined,
+    img_urls: normalizedImageUrls(p.imgUrls),
     hashtag: p.hashtag ?? undefined,
-    events_date: formatDate(p.eventsDate),
+    events_date: p.eventsDate ?? undefined,
     facebook_url: p.facebookUrl ?? undefined,
     created_at: formatDate(p.createdAt) ?? new Date().toISOString(),
     updated_at: formatDate(p.updatedAt) ?? new Date().toISOString(),
@@ -150,12 +161,12 @@ export async function getPostByIdQuery(id: number): Promise<PostResponse | null>
 
 export async function createPostQuery(data: {
   title: string
-  description?: string
-  summary?: string
+  description?: string | null
+  summary?: string | null
   imgUrls?: string[]
-  hashtag?: string
-  eventsDate?: Date
-  facebookUrl?: string
+  hashtag?: string | null
+  eventsDate?: string | null
+  facebookUrl?: string | null
 }): Promise<number> {
   const [created] = await db
     .insert(posts)
@@ -170,6 +181,7 @@ export async function createPostQuery(data: {
     })
     .returning({ id: posts.id })
 
+  if (!created) throw new Error('Không thể tạo khoảnh khắc.')
   return created.id
 }
 
@@ -177,15 +189,15 @@ export async function updatePostQuery(
   id: number,
   data: {
     title?: string
-    description?: string
-    summary?: string
-    imgUrls?: string[]
-    hashtag?: string
-    eventsDate?: Date
-    facebookUrl?: string
+    description: string | null
+    summary: string | null
+    imgUrls: string[]
+    hashtag: string | null
+    eventsDate: string | null
+    facebookUrl: string | null
   }
-): Promise<void> {
-  await db
+): Promise<boolean> {
+  const [updated] = await db
     .update(posts)
     .set({
       title: data.title,
@@ -198,8 +210,30 @@ export async function updatePostQuery(
       updatedAt: new Date(),
     })
     .where(eq(posts.id, id))
+    .returning({ id: posts.id })
+
+  return Boolean(updated)
 }
 
-export async function deletePostQuery(id: number): Promise<void> {
-  await db.delete(posts).where(eq(posts.id, id))
+export async function deletePostQuery(id: number): Promise<boolean> {
+  const [deleted] = await db.delete(posts).where(eq(posts.id, id)).returning({ id: posts.id })
+  return Boolean(deleted)
+}
+
+export async function isEventImageUrlReferencedQuery(url: string): Promise<boolean> {
+  const [eventReference] = await db
+    .select({ id: publicEvents.id })
+    .from(publicEvents)
+    .where(eq(publicEvents.imgUrl, url))
+    .limit(1)
+
+  if (eventReference) return true
+
+  const [postReference] = await db
+    .select({ id: posts.id })
+    .from(posts)
+    .where(arrayContains(posts.imgUrls, [url]))
+    .limit(1)
+
+  return Boolean(postReference)
 }

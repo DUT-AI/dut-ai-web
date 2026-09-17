@@ -1,13 +1,5 @@
-import {
-  pgTable,
-  serial,
-  varchar,
-  text,
-  integer,
-  index,
-} from 'drizzle-orm/pg-core'
+import { pgTable, serial, varchar, text, integer, index } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
-import { users } from '../users/schema'
 
 export const projects = pgTable('projects', {
   id: serial('id').primaryKey(),
@@ -27,14 +19,12 @@ export const projectMembers = pgTable(
     projectId: integer('project_id')
       .notNull()
       .references(() => projects.id, { onDelete: 'cascade' }),
-    userId: integer('user_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+    externalUserId: integer('external_user_id').notNull(),
     role: varchar('role', { length: 100 }).notNull(),
   },
   (table) => [
     index('ix_project_members_project_id').on(table.projectId),
-    index('ix_project_members_user_id').on(table.userId),
+    index('ix_project_members_external_user_id').on(table.externalUserId),
   ]
 )
 
@@ -46,10 +36,6 @@ export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
   project: one(projects, {
     fields: [projectMembers.projectId],
     references: [projects.id],
-  }),
-  user: one(users, {
-    fields: [projectMembers.userId],
-    references: [users.id],
   }),
 }))
 

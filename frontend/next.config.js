@@ -1,4 +1,6 @@
 const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '.env.local') })
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -58,6 +60,13 @@ const securityHeaders = [
 const output = process.env.EXPORT ? 'export' : 'standalone'
 const basePath = process.env.BASE_PATH || undefined
 const unoptimized = process.env.UNOPTIMIZED ? true : undefined
+const allowedDevOrigins = [
+  '100.88.75.9',
+  ...(process.env.ALLOWED_DEV_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+]
 
 /**
  * @type {import('next/dist/next-server/server/config').NextConfig}
@@ -67,6 +76,7 @@ module.exports = () => {
   return plugins.reduce((acc, next) => next(acc), {
     output,
     basePath,
+    allowedDevOrigins,
     reactStrictMode: true,
     trailingSlash: false,
     turbopack: {
@@ -80,6 +90,7 @@ module.exports = () => {
     },
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     images: {
+      qualities: [75, 85],
       remotePatterns: [
         {
           protocol: 'https',
@@ -97,16 +108,6 @@ module.exports = () => {
         {
           source: '/(.*)',
           headers: securityHeaders,
-        },
-      ]
-    },
-    async rewrites() {
-      const baseRaw = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8031/api/v1'
-      const backendBase = baseRaw.replace('/api/v1', '')
-      return [
-        {
-          source: '/admin/:path*',
-          destination: `${backendBase}/admin/:path*`,
         },
       ]
     },

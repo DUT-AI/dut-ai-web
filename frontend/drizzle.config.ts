@@ -1,8 +1,8 @@
 import { defineConfig } from 'drizzle-kit'
 import * as dotenv from 'dotenv'
 
-dotenv.config({ path: '../.env' })
 dotenv.config({ path: '.env.local' })
+dotenv.config({ path: '../.env' })
 
 const user = process.env.POSTGRES_USER || 'dutai'
 const password = process.env.POSTGRES_PASSWORD || 'dutai'

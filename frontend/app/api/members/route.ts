@@ -1,4 +1,4 @@
-import { getMembersQuery } from '@/lib/db/queries'
+import { getManageUsers } from '@/lib/manage-users'
 import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 
 export async function OPTIONS() {
@@ -7,8 +7,19 @@ export async function OPTIONS() {
 
 export async function GET() {
   try {
-    const data = await getMembersQuery()
-    return jsonResponse(data)
+    const data = await getManageUsers()
+    return jsonResponse(
+      data.map(({ id, name, status, role_id, role_name, role_ids, role_names, avatar_url }) => ({
+        id,
+        name,
+        status,
+        role_id,
+        role_name,
+        role_ids,
+        role_names,
+        avatar_url,
+      }))
+    )
   } catch (error) {
     console.error('Failed to get members:', error)
     return errorResponse('Failed to fetch members', 500)

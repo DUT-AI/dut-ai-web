@@ -48,11 +48,14 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    e.target.value = ''
 
     setUploading(true)
+    setErrorMessage(null)
     try {
       const formData = new FormData()
       formData.append('file', file)
+      formData.append('folder', 'projects')
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -89,6 +92,11 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
     e.preventDefault()
     setErrorMessage(null)
 
+    if (uploading) {
+      setErrorMessage('Vui lòng chờ ảnh tải lên hoàn tất trước khi lưu dự án.')
+      return
+    }
+
     const formData = new FormData(e.currentTarget)
     membersList.forEach((m) => {
       formData.append('userIds', String(m.userId))
@@ -115,7 +123,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
           <span>Quay lại danh sách</span>
         </Link>
 
-        <Button type="submit" disabled={isPending} className="gap-2 px-6">
+        <Button type="submit" disabled={isPending || uploading} className="gap-2 px-6">
           {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           <span>{initialProject ? 'Cập nhật dự án' : 'Lưu dự án'}</span>
         </Button>

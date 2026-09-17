@@ -4,7 +4,10 @@ import Link from '@/components/Link'
 import Image from '@/components/Image'
 import TableWrapper from '@/components/TableWrapper'
 import Pre from '@/components/Pre'
-import { getBlogBySlugCached as getBlogBySlug, getBlogsCached as getBlogs } from '@/lib/db/cached-queries'
+import {
+  getBlogBySlugCached as getBlogBySlug,
+  getBlogsCached as getBlogs,
+} from '@/lib/db/cached-queries'
 import { fetchLessonBySlugFromQuiz } from '@/lib/quiz-client'
 import PostLayoutAPI from '@/layouts/PostLayoutAPI'
 import remarkGfm from 'remark-gfm'
@@ -14,6 +17,9 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeKatex from 'rehype-katex'
 import rehypePrettyCode from 'rehype-pretty-code'
 import siteMetadata from '@/data/siteMetadata'
+import { getBlogThumbnailUrl } from '@/lib/blog-thumbnail-url'
+import { genPageMetadata, serializeJsonLd } from 'app/seo'
+import type { Metadata } from 'next'
 import 'katex/dist/katex.min.css'
 
 const prettyCodeOptions = {
@@ -55,41 +61,58 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug: slugParts } = await params
   const slug = slugParts?.join('/') || ''
   try {
     const post = await getBlogBySlug(slug)
     if (!post) {
-      return { title: 'Bài viết không tồn tại' }
+      return genPageMetadata({
+        title: 'Bài viết không tồn tại',
+        path: `/blog/${slug}`,
+        noIndex: true,
+      })
     }
-    const authorNames = post.authors?.map((a: any) => a.name)
-    const keywordList = post.keywords?.map((kw: any) => kw.keyword_name)
-    return {
+    const authorNames = post.authors?.map((author) => author.name)
+    const keywordList = post.keywords?.map((keyword) => keyword.keyword_name)
+    const socialImage = post.image_url || getBlogThumbnailUrl(siteMetadata.siteUrl, slug)
+    const baseMetadata = genPageMetadata({
       title: post.title,
       description: post.summary,
-      alternates: { canonical: `${siteMetadata.siteUrl}/blog/${slug}` },
+      image: socialImage,
+      keywords: keywordList,
+      path: `/blog/${slug}`,
+    })
+
+    return {
+      ...baseMetadata,
       openGraph: {
+        ...baseMetadata.openGraph,
         title: post.title,
         description: post.summary,
         type: 'article',
         url: `${siteMetadata.siteUrl}/blog/${slug}`,
+        siteName: siteMetadata.title,
+        locale: 'vi_VN',
         publishedTime: post.created_at,
         modifiedTime: post.updated_at || post.created_at,
         authors: authorNames,
-        images: post.image_url ? [post.image_url] : [siteMetadata.socialBanner],
+        images: [socialImage],
       },
       twitter: {
         card: 'summary_large_image',
         title: post.title,
         description: post.summary,
-        images: post.image_url ? [post.image_url] : [siteMetadata.socialBanner],
+        images: [socialImage],
       },
-      keywords: keywordList,
       authors: authorNames?.map((name: string) => ({ name })),
     }
   } catch {
-    return { title: 'Bài viết không tồn tại' }
+    return genPageMetadata({
+      title: 'Bài viết không tồn tại',
+      path: `/blog/${slug}`,
+      noIndex: true,
+    })
   }
 }
 
@@ -133,29 +156,52 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
   const articleLd = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.summary,
-    image: post.image_url || siteMetadata.socialBanner,
-    datePublished: post.created_at,
-    dateModified: post.updated_at || post.created_at,
-    author: post.authors?.map((a: any) => ({
-      '@type': 'Person',
-      name: a.name,
-      url: `${siteMetadata.siteUrl}/about`,
-    })),
-    publisher: {
-      '@type': 'Organization',
-      name: siteMetadata.title,
-      logo: { '@type': 'ImageObject', url: `${siteMetadata.siteUrl}${siteMetadata.siteLogo}` },
-    },
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: post.summary,
+        image: post.image_url || getBlogThumbnailUrl(siteMetadata.siteUrl, slug),
+        mainEntityOfPage: `${siteMetadata.siteUrl}/blog/${slug}`,
+        datePublished: post.created_at,
+        dateModified: post.updated_at || post.created_at,
+        author: post.authors?.map((author) => ({
+          '@type': 'Person',
+          name: author.name,
+        })),
+        publisher: { '@id': `${siteMetadata.siteUrl}/#organization` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Trang chủ',
+            item: siteMetadata.siteUrl,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Blog',
+            item: `${siteMetadata.siteUrl}/blog`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: post.title,
+            item: `${siteMetadata.siteUrl}/blog/${slug}`,
+          },
+        ],
+      },
+    ],
   }
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleLd) }}
       />
       <PostLayoutAPI post={post}>{content}</PostLayoutAPI>
     </>

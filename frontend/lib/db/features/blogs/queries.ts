@@ -2,153 +2,86 @@ import { desc, eq, ilike, sql } from 'drizzle-orm'
 import { db } from '../../index'
 import { formatDate } from '../../utils'
 import { blogs, blogAuthors, blogKeywords } from './schema'
-import { users } from '../users/schema'
-import { keywords } from '../keywords/schema'
-import { BlogResponse, AuthorStatsResponse } from './types'
+import { getManageUsersMap } from '@/lib/manage-users'
+import type { BlogResponse, AuthorStatsResponse } from './types'
+
+function mapBlog(b: any, users: Awaited<ReturnType<typeof getManageUsersMap>>): BlogResponse {
+  return {
+    id: b.id,
+    title: b.title,
+    slug: b.slug ?? undefined,
+    summary: b.summary ?? '',
+    views: b.views ?? 0,
+    image_url: b.imageUrl ?? undefined,
+    created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
+    updated_at: formatDate(b.updatedAt) ?? new Date().toISOString(),
+    authors: b.blogAuthors.map((author: any) => {
+      const user = users.get(author.externalUserId)
+      return {
+        id: author.externalUserId,
+        name: user?.name ?? 'Tác giả chưa đồng bộ',
+        avatar_url: user?.avatar_url,
+      }
+    }),
+    keywords: b.blogKeywords
+      .filter((item: any) => Boolean(item.keyword))
+      .map((item: any) => ({
+        id: item.keyword.id,
+        keyword_name: item.keyword.keywordName,
+        number_blog_contain: item.keyword.numberBlogContain ?? 0,
+      })),
+  }
+}
+
+const blogRelations = {
+  blogAuthors: true,
+  blogKeywords: { with: { keyword: true } },
+} as const
 
 export async function getBlogsQuery(params?: {
   title?: string
   keyword?: string
 }): Promise<BlogResponse[]> {
-  const blogList = await db.query.blogs.findMany({
-    where: params?.title ? ilike(blogs.title, `%${params.title}%`) : undefined,
-    orderBy: [desc(blogs.createdAt), desc(blogs.id)],
-    with: {
-      blogAuthors: {
-        with: {
-          user: true,
-        },
-      },
-      blogKeywords: {
-        with: {
-          keyword: true,
-        },
-      },
-    },
-  })
+  const [blogList, users] = await Promise.all([
+    db.query.blogs.findMany({
+      where: params?.title ? ilike(blogs.title, `%${params.title}%`) : undefined,
+      orderBy: [desc(blogs.createdAt), desc(blogs.id)],
+      with: blogRelations,
+    }),
+    getManageUsersMap(),
+  ])
 
-  let filtered = blogList
-  if (params?.keyword) {
-    const kwLower = params.keyword.toLowerCase()
-    filtered = filtered.filter((b) =>
-      b.blogKeywords.some((bk) => bk.keyword?.keywordName?.toLowerCase().includes(kwLower))
-    )
-  }
+  const filtered = params?.keyword
+    ? blogList.filter((blog) =>
+        blog.blogKeywords.some((item) =>
+          item.keyword?.keywordName?.toLowerCase().includes(params.keyword!.toLowerCase())
+        )
+      )
+    : blogList
 
-  return filtered.map((b) => ({
-    id: b.id,
-    title: b.title,
-    slug: b.slug ?? undefined,
-    summary: b.summary ?? '',
-    views: b.views ?? 0,
-    image_url: b.imageUrl ?? undefined,
-    created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
-    updated_at: formatDate(b.updatedAt) ?? new Date().toISOString(),
-    authors: b.blogAuthors
-      .filter((ba) => Boolean(ba.user))
-      .map((ba) => ({
-        id: ba.user!.id,
-        name: ba.user!.name ?? 'Author',
-        avatar_url: ba.user!.avatarUrl ?? undefined,
-      })),
-    keywords: b.blogKeywords
-      .filter((bk) => Boolean(bk.keyword))
-      .map((bk) => ({
-        id: bk.keyword!.id,
-        keyword_name: bk.keyword!.keywordName,
-        number_blog_contain: bk.keyword!.numberBlogContain ?? 0,
-      })),
-  }))
+  return filtered.map((blog) => mapBlog(blog, users))
 }
 
 export async function getBlogByIdQuery(id: number): Promise<BlogResponse | null> {
-  const b = await db.query.blogs.findFirst({
-    where: eq(blogs.id, id),
-    with: {
-      blogAuthors: {
-        with: {
-          user: true,
-        },
-      },
-      blogKeywords: {
-        with: {
-          keyword: true,
-        },
-      },
-    },
-  })
-
-  if (!b) return null
-
-  return {
-    id: b.id,
-    title: b.title,
-    slug: b.slug ?? undefined,
-    summary: b.summary ?? '',
-    views: b.views ?? 0,
-    image_url: b.imageUrl ?? undefined,
-    created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
-    updated_at: formatDate(b.updatedAt) ?? new Date().toISOString(),
-    authors: b.blogAuthors
-      .filter((ba) => Boolean(ba.user))
-      .map((ba) => ({
-        id: ba.user!.id,
-        name: ba.user!.name ?? 'Author',
-        avatar_url: ba.user!.avatarUrl ?? undefined,
-      })),
-    keywords: b.blogKeywords
-      .filter((bk) => Boolean(bk.keyword))
-      .map((bk) => ({
-        id: bk.keyword!.id,
-        keyword_name: bk.keyword!.keywordName,
-        number_blog_contain: bk.keyword!.numberBlogContain ?? 0,
-      })),
-  }
+  const [blog, users] = await Promise.all([
+    db.query.blogs.findFirst({
+      where: eq(blogs.id, id),
+      with: blogRelations,
+    }),
+    getManageUsersMap(),
+  ])
+  return blog ? mapBlog(blog, users) : null
 }
 
 export async function getBlogBySlugQuery(slug: string): Promise<BlogResponse | null> {
-  const b = await db.query.blogs.findFirst({
-    where: eq(blogs.slug, slug),
-    with: {
-      blogAuthors: {
-        with: {
-          user: true,
-        },
-      },
-      blogKeywords: {
-        with: {
-          keyword: true,
-        },
-      },
-    },
-  })
-
-  if (!b) return null
-
-  return {
-    id: b.id,
-    title: b.title,
-    slug: b.slug ?? undefined,
-    summary: b.summary ?? '',
-    views: b.views ?? 0,
-    image_url: b.imageUrl ?? undefined,
-    created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
-    updated_at: formatDate(b.updatedAt) ?? new Date().toISOString(),
-    authors: b.blogAuthors
-      .filter((ba) => Boolean(ba.user))
-      .map((ba) => ({
-        id: ba.user!.id,
-        name: ba.user!.name ?? 'Author',
-        avatar_url: ba.user!.avatarUrl ?? undefined,
-      })),
-    keywords: b.blogKeywords
-      .filter((bk) => Boolean(bk.keyword))
-      .map((bk) => ({
-        id: bk.keyword!.id,
-        keyword_name: bk.keyword!.keywordName,
-        number_blog_contain: bk.keyword!.numberBlogContain ?? 0,
-      })),
-  }
+  const [blog, users] = await Promise.all([
+    db.query.blogs.findFirst({
+      where: eq(blogs.slug, slug),
+      with: blogRelations,
+    }),
+    getManageUsersMap(),
+  ])
+  return blog ? mapBlog(blog, users) : null
 }
 
 export async function createBlogQuery(data: {
@@ -169,22 +102,19 @@ export async function createBlogQuery(data: {
     })
     .returning({ id: blogs.id })
 
-  if (data.authorIds && data.authorIds.length > 0) {
+  if (data.authorIds?.length) {
     await db.insert(blogAuthors).values(
-      data.authorIds.map((userId) => ({
+      data.authorIds.map((externalUserId) => ({
         blogId: created.id,
-        userId,
+        externalUserId,
       }))
     )
   }
 
-  if (data.keywordIds && data.keywordIds.length > 0) {
-    await db.insert(blogKeywords).values(
-      data.keywordIds.map((keywordId) => ({
-        blogId: created.id,
-        keywordId,
-      }))
-    )
+  if (data.keywordIds?.length) {
+    await db
+      .insert(blogKeywords)
+      .values(data.keywordIds.map((keywordId) => ({ blogId: created.id, keywordId })))
   }
 
   return created.id
@@ -215,24 +145,18 @@ export async function updateBlogQuery(
   if (data.authorIds !== undefined) {
     await db.delete(blogAuthors).where(eq(blogAuthors.blogId, id))
     if (data.authorIds.length > 0) {
-      await db.insert(blogAuthors).values(
-        data.authorIds.map((userId) => ({
-          blogId: id,
-          userId,
-        }))
-      )
+      await db
+        .insert(blogAuthors)
+        .values(data.authorIds.map((externalUserId) => ({ blogId: id, externalUserId })))
     }
   }
 
   if (data.keywordIds !== undefined) {
     await db.delete(blogKeywords).where(eq(blogKeywords.blogId, id))
     if (data.keywordIds.length > 0) {
-      await db.insert(blogKeywords).values(
-        data.keywordIds.map((keywordId) => ({
-          blogId: id,
-          keywordId,
-        }))
-      )
+      await db
+        .insert(blogKeywords)
+        .values(data.keywordIds.map((keywordId) => ({ blogId: id, keywordId })))
     }
   }
 }
@@ -242,70 +166,39 @@ export async function deleteBlogQuery(id: number): Promise<void> {
 }
 
 export async function getFeaturedBlogsQuery(limit = 5): Promise<BlogResponse[]> {
-  const featured = await db.query.blogs.findMany({
-    orderBy: [desc(blogs.views), desc(blogs.id)],
-    limit,
-    with: {
-      blogAuthors: {
-        with: {
-          user: true,
-        },
-      },
-      blogKeywords: {
-        with: {
-          keyword: true,
-        },
-      },
-    },
-  })
+  const [featured, users] = await Promise.all([
+    db.query.blogs.findMany({
+      orderBy: [desc(blogs.views), desc(blogs.id)],
+      limit,
+      with: blogRelations,
+    }),
+    getManageUsersMap(),
+  ])
 
-  return featured.map((b) => ({
-    id: b.id,
-    title: b.title,
-    slug: b.slug ?? undefined,
-    summary: b.summary ?? '',
-    views: b.views ?? 0,
-    image_url: b.imageUrl ?? undefined,
-    created_at: formatDate(b.createdAt) ?? new Date().toISOString(),
-    updated_at: formatDate(b.updatedAt) ?? new Date().toISOString(),
-    authors: b.blogAuthors
-      .filter((ba) => Boolean(ba.user))
-      .map((ba) => ({
-        id: ba.user!.id,
-        name: ba.user!.name ?? 'Author',
-        avatar_url: ba.user!.avatarUrl ?? undefined,
-      })),
-    keywords: b.blogKeywords
-      .filter((bk) => Boolean(bk.keyword))
-      .map((bk) => ({
-        id: bk.keyword!.id,
-        keyword_name: bk.keyword!.keywordName,
-        number_blog_contain: bk.keyword!.numberBlogContain ?? 0,
-      })),
-  }))
+  return featured.map((blog) => mapBlog(blog, users))
 }
 
 export async function getTopAuthorsQuery(limit = 50): Promise<AuthorStatsResponse[]> {
-  const rows = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      avatarUrl: users.avatarUrl,
-      totalViews: sql<number>`COALESCE(SUM(${blogs.views}), 0)::int`,
-      postCount: sql<number>`COUNT(${blogs.id})::int`,
-    })
-    .from(users)
-    .innerJoin(blogAuthors, eq(users.id, blogAuthors.userId))
-    .innerJoin(blogs, eq(blogAuthors.blogId, blogs.id))
-    .groupBy(users.id, users.name, users.avatarUrl)
-    .orderBy(desc(sql`SUM(${blogs.views})`))
-    .limit(limit)
+  const [rows, users] = await Promise.all([
+    db
+      .select({
+        id: blogAuthors.externalUserId,
+        totalViews: sql<number>`COALESCE(SUM(${blogs.views}), 0)::int`,
+        postCount: sql<number>`COUNT(${blogs.id})::int`,
+      })
+      .from(blogAuthors)
+      .innerJoin(blogs, eq(blogAuthors.blogId, blogs.id))
+      .groupBy(blogAuthors.externalUserId)
+      .orderBy(desc(sql`SUM(${blogs.views})`))
+      .limit(limit),
+    getManageUsersMap(),
+  ])
 
-  return rows.map((r) => ({
-    id: r.id,
-    name: r.name ?? 'Unknown',
-    avatar_url: r.avatarUrl ?? undefined,
-    total_views: Number(r.totalViews),
-    post_count: Number(r.postCount),
+  return rows.map((row) => ({
+    id: row.id,
+    name: users.get(row.id)?.name ?? 'Tác giả chưa đồng bộ',
+    avatar_url: users.get(row.id)?.avatar_url,
+    total_views: Number(row.totalViews),
+    post_count: Number(row.postCount),
   }))
 }

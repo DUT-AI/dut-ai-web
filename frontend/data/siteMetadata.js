@@ -1,12 +1,15 @@
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://clb.dutai.io.vn').replace(/\/+$/, '')
+
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
   title: 'DUT AI Club',
   author: 'DUT AI Club',
   headerTitle: 'DUT AI CLUB',
-  description: 'Câu lạc bộ AI hàng đầu tại Đại học Bách Khoa - ĐHĐN (DUT), nơi kết nối đam mê nghiên cứu và ứng dụng Artificial Intelligence tại Đà Nẵng.',
+  description:
+    'Câu lạc bộ AI hàng đầu tại Đại học Bách Khoa - ĐHĐN (DUT), nơi kết nối đam mê nghiên cứu và ứng dụng Artificial Intelligence tại Đà Nẵng.',
   language: 'vi',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://clb.dutai.site',
+  siteUrl: SITE_URL,
   siteRepo: 'https://github.com/dutai-club',
   locale: 'vi-VN',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo-no-background.png`,

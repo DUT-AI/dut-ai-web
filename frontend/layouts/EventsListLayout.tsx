@@ -8,6 +8,12 @@ import Image from 'next/image'
 import siteMetadata from '@/data/siteMetadata'
 import Footer from '@/components/Footer'
 import { useTheme } from 'next-themes'
+import {
+    buildPastEvents,
+    getUpcomingPublicEvent,
+    parseEventDate,
+    parseImageUrls,
+} from '@/lib/db/features/events/timeline'
 
 interface PaginationProps {
     totalPages: number
@@ -20,23 +26,7 @@ interface EventsListLayoutProps {
     initialDisplayPosts?: PastEvent[]
     pagination?: PaginationProps
     error?: boolean
-}
-
-// ── Safely parse img_urls that backend may return as Python-style string ──────
-function parseImgUrls(urls: string[] | string | undefined | null): string[] {
-    if (!urls) return []
-    // Already a proper array — filter out junk entries like '[]' or non-http
-    if (Array.isArray(urls)) {
-        return urls.flatMap((u) => {
-            if (typeof u !== 'string') return []
-            if (u.startsWith('http')) return [u]
-            // element itself might be a stringified list (edge case)
-            return (u.match(/https?:\/\/[^'" ,\]]+/g) || [])
-        })
-    }
-    // String — extract every http(s) URL via regex regardless of format
-    // Handles: JSON arrays, Python repr lists, plain URLs
-    return (urls.match(/https?:\/\/[^'" ,\]]+/g) || [])
+    referenceTime: string
 }
 
 // ── Facebook SVG icon ──────────────────────────────────────────────────────────
@@ -75,9 +65,10 @@ const MemberCard = ({ bg }: { bg: string }) => (
     </div>
 )
 
-// ── Scattered photo cards ───────────────────────────────────────────────────
+// ── Scattered photo cards with ArchGallery hover effect ─────────────────────────
 const PhotoStack = ({ images, flip = false }: { images: string[]; flip?: boolean }) => {
     const W = 170, H = 205
+    const [hovered, setHovered] = useState<number | null>(null)
 
     const cards = flip
         ? [
@@ -98,27 +89,49 @@ const PhotoStack = ({ images, flip = false }: { images: string[]; flip?: boolean
     )
 
     return (
-        <div className="relative" style={{ width: 380, height: 340 }}>
-            {cards.map((c, i) => (
-                <div
-                    key={i}
-                    className="absolute overflow-hidden rounded-2xl border-[5px] border-white shadow-2xl transition-transform duration-300 hover:scale-105"
-                    style={{
-                        width: W,
-                        height: H,
-                        top: c.top,
-                        left: c.left,
-                        zIndex: c.z,
-                        transform: `rotate(${c.rotate}deg)`,
-                    }}
-                >
-                    {visible[i] ? (
-                        <Image src={visible[i]} alt="" fill className="object-cover" unoptimized />
-                    ) : (
-                        <MemberCard bg={c.bg} />
-                    )}
-                </div>
-            ))}
+        <div className="relative mx-auto" style={{ width: 380, height: 340 }}>
+            {cards.map((c, i) => {
+                const isHovered = hovered === i
+                return (
+                    <div
+                        key={i}
+                        className="absolute overflow-hidden rounded-2xl border-[5px] border-white shadow-2xl cursor-pointer select-none"
+                        style={{
+                            width: W,
+                            height: H,
+                            top: c.top,
+                            left: c.left,
+                            zIndex: isHovered ? 50 : c.z,
+                            transform: isHovered
+                                ? 'translate(0, -16px) rotate(0deg) scale(1.08)'
+                                : `rotate(${c.rotate}deg) scale(1)`,
+                            transition: 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), z-index 0ms, box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1)',
+                            boxShadow: isHovered
+                                ? '0 20px 35px rgba(0,0,0,0.28), 0 8px 16px rgba(0,0,0,0.15)'
+                                : '0 12px 28px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08)',
+                        }}
+                        onMouseEnter={() => setHovered(i)}
+                        onMouseLeave={() => setHovered(null)}
+                        onFocus={() => setHovered(i)}
+                        onBlur={() => setHovered(null)}
+                        tabIndex={0}
+                    >
+                        {visible[i] ? (
+                            <Image
+                                src={visible[i]}
+                                alt=""
+                                fill
+                                sizes="(max-width: 640px) 280px, 340px"
+                                quality={85}
+                                className="object-cover pointer-events-none"
+                                loading="lazy"
+                            />
+                        ) : (
+                            <MemberCard bg={c.bg} />
+                        )}
+                    </div>
+                )
+            })}
         </div>
     )
 }
@@ -179,7 +192,7 @@ function PastEventsList({ events, pagination }: { events: PastEvent[], paginatio
     return (
         <div>
             {events.map((ev) => {
-                const date = ev.date ? new Date(ev.date).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' }) : ''
+                const date = parseEventDate(ev.date)?.toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' }) ?? ''
                 const fbLink = ev.facebook_url ?? siteMetadata.facebook
 
                 return (
@@ -193,7 +206,15 @@ function PastEventsList({ events, pagination }: { events: PastEvent[], paginatio
                         {/* Thumbnail */}
                         <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-[#c5cfc8]">
                             {ev.cover ? (
-                                <Image src={ev.cover} alt={ev.title} fill className="object-cover" unoptimized />
+                                <Image
+                                    src={ev.cover}
+                                    alt={ev.title}
+                                    fill
+                                    sizes="160px"
+                                    quality={85}
+                                    className="object-cover"
+                                    loading="lazy"
+                                />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center">
                                     <svg className="h-8 w-8 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -239,48 +260,20 @@ function PastEventsList({ events, pagination }: { events: PastEvent[], paginatio
 }
 
 // ── Main layout inner (handles featured + lists) ───────────────────────────
-function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagination, error }: EventsListLayoutProps) {
-    const now = new Date()
-
+function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagination, error, referenceTime }: EventsListLayoutProps) {
     // Workshops & Seminar: find upcoming
     const [mounted, setMounted] = useState(false)
     useEffect(() => {
         setMounted(true)
     }, [])
 
-    const workshopEvent = publicEvents.find((ev) => {
-        const d = ev.events_date ? new Date(ev.events_date) : null
-        return d && d >= now
-    }) ?? publicEvents[0] ?? null
+    const workshopEvent = getUpcomingPublicEvent(publicEvents, referenceTime)
 
     // Memorable events
-    const memorableEvents = posts.filter((p) => parseImgUrls(p.img_urls).length > 0)
+    const memorableEvents = posts.filter((p) => parseImageUrls(p.img_urls).length > 0)
 
     // Sorted past events
-    const allPastEvents: PastEvent[] = [
-        ...publicEvents.map((ev) => ({
-            id: `pe-${ev.id}`,
-            type: 'public_event' as const,
-            title: ev.title,
-            summary: ev.summary || ev.description,
-            cover: ev.img_url,
-            date: ev.events_date || ev.created_at,
-            facebook_url: ev.facebook_url,
-        })),
-        ...posts.map((p) => ({
-            id: `post-${p.id}`,
-            type: 'post' as const,
-            title: p.title,
-            summary: p.summary || p.description,
-            cover: p.img_urls?.[0],
-            date: p.events_date || p.created_at,
-            facebook_url: p.facebook_url,
-        })),
-    ].sort((a, b) => {
-        const da = a.date ? new Date(a.date).getTime() : 0
-        const db = b.date ? new Date(b.date).getTime() : 0
-        return db - da
-    })
+    const allPastEvents = buildPastEvents(publicEvents, posts, referenceTime)
 
     const displayEvents = initialDisplayPosts || allPastEvents.slice(0, 5)
     // Use the passed pagination or calculate default for page 1
@@ -331,7 +324,14 @@ function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagin
                                 <div className="flex-1">
                                     <div className="relative overflow-hidden rounded-2xl shadow-xl" style={{ minHeight: 340 }}>
                                         {workshopEvent.img_url ? (
-                                            <Image src={workshopEvent.img_url} alt={workshopEvent.title} fill className="object-cover" unoptimized />
+                                            <Image
+                                                src={workshopEvent.img_url}
+                                                alt={workshopEvent.title}
+                                                fill
+                                                priority
+                                                sizes="(max-width: 1024px) 100vw, 700px"
+                                                className="object-cover"
+                                            />
                                         ) : (
                                             <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)' }} />
                                         )}
@@ -344,7 +344,7 @@ function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagin
                                             </div>
                                             <h3 className="mb-3 text-2xl font-extrabold leading-tight text-white md:text-3xl">{workshopEvent.title}</h3>
                                             <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
-                                                <span className="flex items-center gap-1"><CalIcon />{workshopEvent.events_date ? new Date(workshopEvent.events_date).toLocaleDateString('vi-VN') : ''}</span>
+                                                <span className="flex items-center gap-1"><CalIcon />{parseEventDate(workshopEvent.events_date)?.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) ?? ''}</span>
                                                 {workshopEvent.location && <span className="flex items-center gap-1"><LocIcon />{workshopEvent.location}</span>}
                                             </div>
                                         </div>
@@ -382,7 +382,7 @@ function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagin
                         <div className="space-y-24">
                             {memorableEvents.slice(0, 4).map((ev, idx) => {
                                 const isLeft = idx % 2 === 0
-                                const year = ev.events_date ? new Date(ev.events_date).getFullYear() : ''
+                                const year = parseEventDate(ev.events_date)?.toLocaleDateString('vi-VN', { year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' }) ?? ''
                                 const fbLink = ev.facebook_url ?? siteMetadata.facebook
 
                                 const Text = (
@@ -391,12 +391,12 @@ function EventsListLayoutInner({ publicEvents, posts, initialDisplayPosts, pagin
                                         <h3 className="mb-4 text-3xl md:text-4xl font-extrabold leading-tight text-slate-900 dark:text-white">{ev.title}</h3>
                                         <p className="mb-5 text-sm text-slate-600 dark:text-white/70 line-clamp-4">{ev.summary || ev.description}</p>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-sm font-bold text-pink-500">Xem tất cả {parseImgUrls(ev.img_urls).length} ảnh</span>
+                                            <span className="text-sm font-bold text-pink-500">Xem tất cả {parseImageUrls(ev.img_urls).length} ảnh</span>
                                             {fbLink && <a href={fbLink} target="_blank" rel="noreferrer"><FacebookIcon className="text-blue-600" /></a>}
                                         </div>
                                     </div>
                                 )
-                                const Photos = <PhotoStack images={parseImgUrls(ev.img_urls)} flip={!isLeft} />
+                                const Photos = <PhotoStack images={parseImageUrls(ev.img_urls)} flip={!isLeft} />
 
                                 return (
                                     <div key={ev.id} className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
