@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Sparkles, Target, Network } from 'lucide-react'
+import { ArrowRight, Sparkles, Target, Network, Compass } from 'lucide-react'
 import { LazyMotion, domAnimation, m, useScroll, useMotionValueEvent } from 'motion/react'
 
 interface StoryItemData {
@@ -66,14 +66,26 @@ const stories: StoryItemData[] = [
     accentColor: '#059669',
     icon: Network,
   },
+  {
+    id: 'community-and-life',
+    stepNumber: '04',
+    title: 'Gắn kết, Sự kiện & Trải nghiệm',
+    subtitle: 'Hơn cả một câu lạc bộ',
+    description:
+      'Không chỉ có những dòng code hay mô hình thuật toán, DUT AI Club còn là ngôi nhà chung với những chuyến dã ngoại, teambuilding, boardgame night và các sự kiện giao lưu sôi nổi. Tại đây, chúng mình cùng học, cùng chơi, sẻ chia kinh nghiệm và lưu giữ những kỷ niệm thanh xuân rực rỡ nhất thời sinh viên Bách Khoa.',
+    image:
+      'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1200&auto=format&fit=crop&q=80',
+    imageAlt: 'Sự kiện, giao lưu kết nối và hoạt động dã ngoại tại DUT AI Club',
+    actionText: 'Khám phá sự kiện',
+    actionHref: '/events',
+    accentColor: '#D97706',
+    icon: Compass,
+  },
 ]
 
 export default function AboutStory() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const card0Ref = useRef<HTMLDivElement>(null)
-  const card1Ref = useRef<HTMLDivElement>(null)
-  const card2Ref = useRef<HTMLDivElement>(null)
-  const cardRefs = [card0Ref, card1Ref, card2Ref]
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const [activeChapter, setActiveChapter] = useState(0)
 
@@ -83,20 +95,17 @@ export default function AboutStory() {
     offset: ['start 25%', 'end 85%'],
   })
 
-  // Smoothly map scroll position to active chapter
+  // Smoothly map scroll position to active chapter dynamically
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    if (latest < 0.35) {
-      setActiveChapter(0)
-    } else if (latest < 0.7) {
-      setActiveChapter(1)
-    } else {
-      setActiveChapter(2)
-    }
+    const totalStories = stories.length
+    const rawIndex = Math.floor(latest * totalStories)
+    const clampedIndex = Math.min(Math.max(rawIndex, 0), totalStories - 1)
+    setActiveChapter(clampedIndex)
   })
 
   const scrollToChapter = (index: number) => {
     setActiveChapter(index)
-    cardRefs[index].current?.scrollIntoView({
+    cardRefs.current[index]?.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
     })
@@ -116,23 +125,18 @@ export default function AboutStory() {
 
         {/* 60/40 Asymmetric Split Screen */}
         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
-          
+
           {/* ========================================================= */}
           {/* LEFT COLUMN: Pinned Visual Stage (Unobstructed Photo)     */}
           {/* ========================================================= */}
           <div className="lg:col-span-7 sticky top-20 sm:top-24 lg:top-28 z-20">
             <div className="relative w-full">
-              
+
               {/* Dynamic Colored Ambient Aura behind the Photo */}
               <div
                 className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[36px] blur-2xl opacity-40 transition-colors duration-700 pointer-events-none"
                 style={{
-                  backgroundColor:
-                    activeChapter === 0
-                      ? 'rgba(37,99,235,0.35)'
-                      : activeChapter === 1
-                      ? 'rgba(2,132,199,0.35)'
-                      : 'rgba(5,150,105,0.35)',
+                  backgroundColor: currentStory.accentColor + '55',
                 }}
               />
 
@@ -195,11 +199,10 @@ export default function AboutStory() {
                       <button
                         key={i}
                         onClick={() => scrollToChapter(i)}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          activeChapter === i
+                        className={`h-2 rounded-full transition-all duration-300 ${activeChapter === i
                             ? 'w-7 bg-white shadow-[0_0_10px_rgba(255,255,255,0.7)]'
                             : 'w-2 bg-white/35 hover:bg-white/60'
-                        }`}
+                          }`}
                         aria-label={`Chuyển đến chương 0${i + 1}`}
                       />
                     ))}
@@ -220,20 +223,20 @@ export default function AboutStory() {
               return (
                 <div
                   key={story.id}
-                  ref={cardRefs[idx]}
-                  className={`min-h-[50vh] sm:min-h-[60vh] flex flex-col justify-center transition-all duration-500 ${
-                    isActive
+                  ref={(el) => {
+                    cardRefs.current[idx] = el
+                  }}
+                  className={`min-h-[50vh] sm:min-h-[60vh] flex flex-col justify-center transition-all duration-500 ${isActive
                       ? 'opacity-100 scale-100'
                       : 'opacity-35 scale-[0.97] hover:opacity-65'
-                  }`}
+                    }`}
                 >
                   <div
                     onClick={() => scrollToChapter(idx)}
-                    className={`cursor-pointer group relative rounded-[28px] p-7 sm:p-9 transition-all duration-300 border ${
-                      isActive
+                    className={`cursor-pointer group relative rounded-[28px] p-7 sm:p-9 transition-all duration-300 border ${isActive
                         ? 'bg-white/95 dark:bg-slate-900/95 border-slate-200/90 dark:border-slate-800 shadow-[0_20px_45px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_50px_rgba(0,0,0,0.4)] backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10'
                         : 'bg-white/50 dark:bg-slate-900/50 border-transparent'
-                    }`}
+                      }`}
                   >
                     {/* Chapter Tag Header */}
                     <div className="flex items-center justify-between gap-4 mb-5">
