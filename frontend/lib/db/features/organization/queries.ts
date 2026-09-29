@@ -1,12 +1,15 @@
 import { asc, eq } from 'drizzle-orm'
 import { db } from '../../index'
 import { getManageUsersMap } from '@/lib/manage-users'
+import { getUserCvsMapQuery } from '../users/queries'
+import { userCvs } from '../users/schema'
 import { generationDepartments, generationMembers, generations } from './schema'
 import type { GenerationAlbum, SaveGenerationInput } from './types'
 
 function toAlbum(
   generation: any,
-  users: Awaited<ReturnType<typeof getManageUsersMap>>
+  users: Awaited<ReturnType<typeof getManageUsersMap>>,
+  userCvsMap: Map<number, string>
 ): GenerationAlbum {
   return {
     id: generation.id,
@@ -26,6 +29,7 @@ function toAlbum(
       display_order: department.displayOrder,
       members: department.members.map((assignment: any) => {
         const user = users.get(assignment.externalUserId)
+        const quote = userCvsMap.get(assignment.externalUserId)
         return {
           id: assignment.externalUserId,
           name: user?.name ?? 'Thành viên chưa đồng bộ',
@@ -36,6 +40,7 @@ function toAlbum(
           title: assignment.title,
           display_order: assignment.displayOrder,
           is_featured: assignment.isFeatured,
+          quote: quote || user?.quote || undefined,
         }
       }),
     })),
@@ -60,15 +65,16 @@ async function loadGenerations(publishedOnly: boolean) {
 }
 
 export async function getGenerationAlbumsQuery(options: { publishedOnly?: boolean } = {}) {
-  const [rows, users] = await Promise.all([
+  const [rows, users, userCvsMap] = await Promise.all([
     loadGenerations(options.publishedOnly ?? true),
     getManageUsersMap(),
+    getUserCvsMapQuery(),
   ])
-  return rows.map((row) => toAlbum(row, users))
+  return rows.map((row) => toAlbum(row, users, userCvsMap))
 }
 
 export async function getGenerationAlbumByIdQuery(id: number): Promise<GenerationAlbum | null> {
-  const [row, users] = await Promise.all([
+  const [row, users, userCvsMap] = await Promise.all([
     db.query.generations.findFirst({
       where: eq(generations.id, id),
       with: {
@@ -83,9 +89,10 @@ export async function getGenerationAlbumByIdQuery(id: number): Promise<Generatio
       },
     }),
     getManageUsersMap(),
+    getUserCvsMapQuery(),
   ])
 
-  return row ? toAlbum(row, users) : null
+  return row ? toAlbum(row, users, userCvsMap) : null
 }
 
 async function replaceDepartments(
@@ -122,6 +129,27 @@ async function replaceDepartments(
           isFeatured: member.is_featured ?? false,
         }))
       )
+
+      for (const member of uniqueMembers) {
+        if (typeof member.quote === 'string' && member.quote.trim()) {
+          const now = new Date()
+          await tx
+            .insert(userCvs)
+            .values({
+              userId: member.external_user_id,
+              quote: member.quote.trim(),
+              createdAt: now,
+              updatedAt: now,
+            })
+            .onConflictDoUpdate({
+              target: userCvs.userId,
+              set: {
+                quote: member.quote.trim(),
+                updatedAt: now,
+              },
+            })
+        }
+      }
     }
   }
 }

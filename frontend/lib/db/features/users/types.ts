@@ -12,6 +12,15 @@ export interface Member {
   discord_id?: string
   github?: string
   linkedin?: string
+  quote?: string
+}
+
+export interface UserCv {
+  id?: number
+  user_id: number
+  quote?: string
+  created_at?: Date
+  updated_at?: Date
 }
 
 export type MemberResponse = Member

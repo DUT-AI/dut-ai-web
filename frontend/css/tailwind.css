@@ -9,6 +9,10 @@
   --font-jakarta-var: 'Plus Jakarta Sans', sans-serif;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Core theme configuration */
 @theme {
   /* Font families */
