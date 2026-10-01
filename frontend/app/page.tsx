@@ -11,9 +11,10 @@ import CTASection from '@/components/home/CTASection'
 import { genPageMetadata } from './seo'
 
 export const metadata = genPageMetadata({
-  title: 'DUT AI Club',
+  title: 'DUT AI Club | Câu lạc bộ Trí tuệ Nhân tạo - Đại học Bách khoa Đà Nẵng',
+  absoluteTitle: true,
   description:
-    'DUT AI Club là cộng đồng sinh viên đam mê trí tuệ nhân tạo tại Đại học Bách khoa - Đại học Đà Nẵng, cùng học tập, nghiên cứu và phát triển dự án AI.',
+    'DUT AI Club - Câu lạc bộ Trí tuệ Nhân tạo tại Trường Đại học Bách khoa, Đại học Đà Nẵng. Cộng đồng sinh viên học tập, nghiên cứu và phát triển các dự án AI.',
   path: '/',
 })
 

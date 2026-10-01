@@ -74,13 +74,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       })
     }
     const authorNames = post.authors?.map((author) => author.name)
-    const keywordList = post.keywords?.map((keyword) => keyword.keyword_name)
     const socialImage = post.image_url || getBlogThumbnailUrl(siteMetadata.siteUrl, slug)
     const baseMetadata = genPageMetadata({
       title: post.title,
       description: post.summary,
       image: socialImage,
-      keywords: keywordList,
       path: `/blog/${slug}`,
     })
 

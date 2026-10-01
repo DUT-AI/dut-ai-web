@@ -37,8 +37,8 @@ export default async function AppleIcon() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoSrc}
-            width="132"
-            height="132"
+            width={132}
+            height={132}
             alt="DUT AI Logo"
             style={{
               objectFit: 'contain',
