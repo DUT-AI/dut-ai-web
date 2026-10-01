@@ -28,7 +28,7 @@ const siteMetadata = {
   phone: '0123.456.789',
   address: '54 Nguyễn Lương Bằng, Liên Chiểu, Đà Nẵng',
   slogan: 'Dreams Never Need Half Hearts',
-  googleSiteVerification: 'Yoqfyt-7MUEecx1P1IAndTmZhodH9tw0FEvwr-q_Fr0',
+  googleSiteVerification: 'LBLd_f-2lhdt5m2Tz6TbC276K1v5glUTN8csY64Cp1c',
   // set to true if you want a navbar fixed to the top
   stickyNav: true,
   analytics: {
