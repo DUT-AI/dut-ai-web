@@ -10,9 +10,10 @@ import type { GenerationAlbum as GenerationAlbumData } from '@/lib/db/features/o
 import type { Member } from '@/lib/db/features/users/types'
 
 export const metadata = genPageMetadata({
-  title: 'Về chúng mình',
+  title: 'Giới thiệu DUT AI Club | Câu lạc bộ AI - DUT',
+  absoluteTitle: true,
   description:
-    'Khám phá các thế hệ và những con người đã cùng nhau tạo nên hành trình của DUT AI Club.',
+    'Tìm hiểu về DUT AI Club, câu lạc bộ học thuật về Trí tuệ Nhân tạo tại Trường Đại học Bách khoa - Đại học Đà Nẵng.',
   path: '/about',
 })
 

@@ -69,7 +69,7 @@ services:
     environment:
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     container_name: dut-ai-web-frontend
     restart: always
     ports:

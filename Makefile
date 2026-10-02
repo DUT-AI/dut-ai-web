@@ -30,26 +30,38 @@ setup:
 	cd backend && uv sync
 	cd frontend && npm install
 
+# Helper function to run drizzle-kit: use local npx if npm exists, otherwise fallback to Docker
+define run_drizzle
+	@if command -v npm >/dev/null 2>&1; then \
+		cd frontend && npx drizzle-kit $(1); \
+	else \
+		docker run --rm --network dut-ai-web_internal \
+			--env-file .env \
+			-v $(CURDIR)/frontend:/app \
+			$(2) \
+			-w /app \
+			-e POSTGRES_HOST=db \
+			-e POSTGRES_PORT=5432 \
+			node:20-alpine npx drizzle-kit $(1) --config drizzle.config.ts; \
+	fi
+endef
+
 db-generate:
 	@read -p "Enter migration name (optional, press Enter to default): " name; \
 	if [ -n "$$name" ]; then \
-		cd frontend && npx drizzle-kit generate --name "$$name"; \
+		$(call run_drizzle,generate --name "$$name",); \
 	else \
-		cd frontend && npx drizzle-kit generate; \
+		$(call run_drizzle,generate,); \
 	fi
 
 db-migrate:
-	cd frontend && npx drizzle-kit migrate
+	$(call run_drizzle,migrate,)
 
 db-push:
-	cd frontend && npx drizzle-kit push
+	$(call run_drizzle,push,)
 
 db-studio:
-	cd frontend && npx drizzle-kit studio
-
-# Aliases for backward compatibility
-db-revision: db-generate
-db-up: db-migrate
+	$(call run_drizzle,studio --port 4983 --host 0.0.0.0,-p 4983:4983)
 
 build-be:
 	docker compose up backend -d --build

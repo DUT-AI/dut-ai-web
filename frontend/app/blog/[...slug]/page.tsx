@@ -93,7 +93,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: post.title,
       description: post.summary,
       image: socialImage,
-      keywords: keywordList,
       path: `/blog/${slug}`,
     })
 
