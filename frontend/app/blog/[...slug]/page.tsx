@@ -74,7 +74,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       })
     }
     const authorNames = post.authors?.map((author) => author.name)
+    const keywordList = post.keywords?.map((keyword) => keyword.keyword_name)
+    const usesGeneratedThumbnail = !post.image_url
     const socialImage = post.image_url || getBlogThumbnailUrl(siteMetadata.siteUrl, slug)
+    const socialImageMetadata = {
+      url: socialImage,
+      secureUrl: socialImage,
+      alt: post.title,
+      ...(usesGeneratedThumbnail
+        ? {
+            type: 'image/png',
+            width: 1200,
+            height: 630,
+          }
+        : {}),
+    }
     const baseMetadata = genPageMetadata({
       title: post.title,
       description: post.summary,
@@ -95,7 +109,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         publishedTime: post.created_at,
         modifiedTime: post.updated_at || post.created_at,
         authors: authorNames,
-        images: [socialImage],
+        images: [socialImageMetadata],
       },
       twitter: {
         card: 'summary_large_image',
