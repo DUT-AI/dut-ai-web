@@ -6,7 +6,7 @@ const siteMetadata = {
   author: 'DUT AI Club',
   headerTitle: 'DUT AI CLUB',
   description:
-    'Câu lạc bộ AI hàng đầu tại Đại học Bách Khoa - ĐHĐN (DUT), nơi kết nối đam mê nghiên cứu và ứng dụng Artificial Intelligence tại Đà Nẵng.',
+    'DUT AI Club - Câu lạc bộ Trí tuệ Nhân tạo tại Trường Đại học Bách khoa, Đại học Đà Nẵng. Cộng đồng sinh viên học tập, nghiên cứu và phát triển các dự án AI.',
   language: 'vi',
   theme: 'system', // system, dark or light
   siteUrl: SITE_URL,
@@ -28,7 +28,7 @@ const siteMetadata = {
   phone: '0123.456.789',
   address: '54 Nguyễn Lương Bằng, Liên Chiểu, Đà Nẵng',
   slogan: 'Dreams Never Need Half Hearts',
-  googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  googleSiteVerification: 'LBLd_f-2lhdt5m2Tz6TbC276K1v5glUTN8csY64Cp1c',
   // set to true if you want a navbar fixed to the top
   stickyNav: true,
   analytics: {
