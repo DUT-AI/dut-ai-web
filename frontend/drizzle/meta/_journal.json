@@ -29,6 +29,20 @@
       "when": 1790675100243,
       "tag": "0003_clean_doctor_doom",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791971555414,
+      "tag": "0004_restore_blog_content",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792011000000,
+      "tag": "0005_sync_sequences",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,4 @@
-CREATE TABLE "user_cv" (
+CREATE TABLE IF NOT EXISTS "user_cv" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"quote" text,
@@ -6,4 +6,4 @@ CREATE TABLE "user_cv" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX "ix_user_cv_user_id" ON "user_cv" USING btree ("user_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "ix_user_cv_user_id" ON "user_cv" USING btree ("user_id");

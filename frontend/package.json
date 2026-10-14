@@ -14,17 +14,20 @@
     "db:push": "drizzle-kit push",
     "db:audit-users": "node scripts/audit-external-user-ids.mjs",
     "db:studio": "drizzle-kit studio",
+    "preview:thumbnail": "tsx scripts/generate-thumbnail.ts",
     "prepare": "husky"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1111.0",
     "@headlessui/react": "2.2.9",
+    "@hookform/resolvers": "^5.9.1",
     "@next/bundle-analyzer": "15.5.12",
     "@radix-ui/react-slot": "^1.2.4",
     "@shikijs/transformers": "^4.0.0",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
+    "@types/jszip": "^3.4.0",
     "body-scroll-lock": "^3.1.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -35,6 +38,7 @@
     "gray-matter": "^4.0.3",
     "hast-util-from-html-isomorphic": "^2.0.0",
     "image-size": "2.0.2",
+    "jszip": "^3.10.2",
     "lucide-react": "^0.575.0",
     "marked": "^17.0.4",
     "motion": "^13.2.0",
@@ -48,6 +52,7 @@
     "react": "19.2.4",
     "react-countup": "^6.5.3",
     "react-dom": "19.2.4",
+    "react-hook-form": "^7.90.0",
     "react-intersection-observer": "^10.0.3",
     "react-markdown": "^10.1.0",
     "reading-time": "1.5.0",
@@ -71,7 +76,8 @@
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.1.18",
     "tailwindcss-animate": "^1.0.7",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.1.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^0.1.0",

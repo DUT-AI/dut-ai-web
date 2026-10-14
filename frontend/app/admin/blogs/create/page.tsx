@@ -17,7 +17,7 @@ export default async function CreateBlogPage() {
           Thêm Bài viết Blog Mới
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Nhập slug bài học từ quiz.dutai.site để đồng bộ nội dung tự động
+          Soạn thảo nội dung bài viết bằng Markdown và gán tác giả trực tiếp trên hệ thống DUT-AI
         </p>
       </div>
 

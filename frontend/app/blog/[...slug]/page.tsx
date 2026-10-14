@@ -8,7 +8,6 @@ import {
   getBlogBySlugCached as getBlogBySlug,
   getBlogsCached as getBlogs,
 } from '@/lib/db/cached-queries'
-import { fetchLessonBySlugFromQuiz } from '@/lib/quiz-client'
 import PostLayoutAPI from '@/layouts/PostLayoutAPI'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -75,19 +74,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
     const authorNames = post.authors?.map((author) => author.name)
     const keywordList = post.keywords?.map((keyword) => keyword.keyword_name)
-    const usesGeneratedThumbnail = !post.image_url
     const socialImage = post.image_url || getBlogThumbnailUrl(siteMetadata.siteUrl, slug)
     const socialImageMetadata = {
       url: socialImage,
       secureUrl: socialImage,
       alt: post.title,
-      ...(usesGeneratedThumbnail
-        ? {
-            type: 'image/png',
-            width: 1200,
-            height: 630,
-          }
-        : {}),
+      type: 'image/png',
+      width: 1200,
+      height: 630,
     }
     const baseMetadata = genPageMetadata({
       title: post.title,
@@ -115,7 +109,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         card: 'summary_large_image',
         title: post.title,
         description: post.summary,
-        images: [socialImage],
+        images: [
+          {
+            url: socialImage,
+            width: 1200,
+            height: 630,
+            alt: post.title,
+          },
+        ],
       },
       authors: authorNames?.map((name: string) => ({ name })),
     }
@@ -141,17 +142,11 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
   if (!post) notFound()
 
-  // Fetch live content from Quiz API
-  let markdownSource = ''
-  if (post.slug) {
-    const quizLesson = await fetchLessonBySlugFromQuiz(post.slug)
-    if (quizLesson?.content_md) {
-      markdownSource = quizLesson.content_md
-    }
-  }
+  // Native Markdown content with graceful placeholder fallback
+  const markdownSource = post.content?.trim() || '*Nội dung bài viết đang được cập nhật...*'
 
   const { content } = await compileMDX({
-    source: markdownSource || '*Nội dung bài viết đang được cập nhật...*',
+    source: markdownSource,
     options: {
       mdxOptions: {
         remarkPlugins: [remarkGfm, remarkMath],
