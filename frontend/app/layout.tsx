@@ -12,18 +12,21 @@ import { Metadata } from 'next'
 import NextTopLoader from 'nextjs-toploader'
 import { absoluteUrl, serializeJsonLd } from './seo'
 
-const inter = localFont({
-  src: '../public/fonts/Inter-Variable.woff2',
-  variable: '--font-inter-var',
+const beVietnamPro = localFont({
+  src: [
+    {
+      path: '../public/fonts/BeVietnamPro-Variable.ttf',
+      weight: '100 900',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/BeVietnamPro-Italic-Variable.ttf',
+      weight: '100 900',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-be-vietnam-pro',
   display: 'swap',
-  weight: '400 900',
-})
-
-const plusJakartaSans = localFont({
-  src: '../public/fonts/PlusJakartaSans-Variable.woff2',
-  variable: '--font-jakarta-var',
-  display: 'swap',
-  weight: '400 800',
 })
 
 export const metadata: Metadata = {
@@ -111,7 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${inter.variable} ${plusJakartaSans.variable} scroll-smooth`}
+      className={`${beVietnamPro.variable} scroll-smooth`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
