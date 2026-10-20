@@ -29,7 +29,7 @@ const stories: StoryItemData[] = [
     description:
       'DUT AI Club là câu lạc bộ học thuật trực thuộc Trường Đại học Bách Khoa — ĐHĐN. Chúng tôi tập hợp những sinh viên đam mê AI, cùng nhau khám phá, nghiên cứu và ứng dụng Trí tuệ Nhân tạo vào giải quyết các bài toán thực tiễn.',
     image:
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&auto=format&fit=crop&q=80',
+      'https://drive.google.com/file/d/15reGpMSL5pPIjHvPBMoTx0WclOzPwFR7/view',
     imageAlt: 'DUT AI Club - Chúng tôi là ai',
     actionText: 'Tìm hiểu các thế hệ',
     actionHref: '#members',
@@ -44,7 +44,7 @@ const stories: StoryItemData[] = [
     description:
       'Dù mới được thành lập gần một năm, DUT AI CLUB luôn kiên định với sứ mệnh: đồng hành và hướng dẫn các bạn sinh viên từng bước làm chủ công nghệ AI từ bản chất, tự tay lập trình từ những nền tảng cốt lõi nhất thay vì chỉ phụ thuộc vào công cụ có sẵn, để từ đó tự tin ứng dụng AI vào việc giải quyết các bài toán thiết thực trong các lĩnh vực đời sống.',
     image:
-      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&auto=format&fit=crop&q=80',
+      'https://drive.google.com/file/d/1F4euv-rV8QPyXQPf7Fo33j9OLaZ0o_o9/view?usp=drive_link',
     imageAlt: 'Sứ mệnh đào tạo AI thực chiến tại DUT AI Club',
     actionText: 'Xem lộ trình học',
     actionHref: '/#roadmap',
@@ -59,7 +59,7 @@ const stories: StoryItemData[] = [
     description:
       'Bên cạnh các hoạt động nội bộ, chúng mình hiểu rằng AI chỉ phát huy tối đa sức mạnh khi được đặt vào những lĩnh vực cụ thể và tạo ra giá trị thực tế. Vì vậy, CLB luôn hướng tới mục tiêu trở thành cầu nối học thuật, mong muốn mở rộng hợp tác cùng quý thầy cô và các bạn sinh viên từ tất cả các khoa, các chuyên ngành khác nhau để cùng phát triển các dự án liên ngành thực tế và tự tin thử sức ở những sân chơi công nghệ lớn.',
     image:
-      'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&auto=format&fit=crop&q=80',
+      'https://drive.google.com/file/d/1sRTkq7siV8LtdDzJ0f6Tn8DMKudJpzdE/view',
     imageAlt: 'Cầu nối học thuật và hợp tác dự án liên ngành',
     actionText: 'Khám phá các dự án',
     actionHref: '/projects',
@@ -74,7 +74,7 @@ const stories: StoryItemData[] = [
     description:
       'Không chỉ có những dòng code hay mô hình thuật toán, DUT AI Club còn là ngôi nhà chung với những chuyến dã ngoại, teambuilding, boardgame night và các sự kiện giao lưu sôi nổi. Tại đây, chúng mình cùng học, cùng chơi, sẻ chia kinh nghiệm và lưu giữ những kỷ niệm thanh xuân rực rỡ nhất thời sinh viên Bách Khoa.',
     image:
-      'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1200&auto=format&fit=crop&q=80',
+      'https://drive.google.com/file/d/1--CVrJE7fyY7Phz8xpIvrTdAJLua3EMx/view?usp=drive_link',
     imageAlt: 'Sự kiện, giao lưu kết nối và hoạt động dã ngoại tại DUT AI Club',
     actionText: 'Khám phá sự kiện',
     actionHref: '/events',
