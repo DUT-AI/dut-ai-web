@@ -1,6 +1,6 @@
 import { getBlogsQuery } from '@/lib/db/features/blogs/queries'
 import Link from 'next/link'
-import { Plus, Edit2, Trash2, ExternalLink, Eye, Calendar, Sparkles } from 'lucide-react'
+import { Plus, Edit2, Trash2, ExternalLink, Eye, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { deleteBlogAction } from './actions'
@@ -21,7 +21,7 @@ export default async function AdminBlogsListPage() {
             Quản lý Bài viết Blog
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Cấu hình slug bài viết đồng bộ với hệ thống Quiz API (quiz.dutai.site)
+            Quản lý, soạn thảo nội dung Markdown và phân quyền tác giả bài viết độc lập
           </p>
         </div>
 

@@ -1,25 +1,11 @@
 import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 
-// Global base keywords for all pages
-export const BASE_KEYWORDS = [
-  'DUT AI Club',
-  'Câu lạc bộ AI',
-  'Trí tuệ nhân tạo Đà Nẵng',
-  'AI Đà Nẵng',
-  'Đại học Bách khoa Đà Nẵng',
-  'Machine Learning',
-  'Deep Learning',
-  'Computer Vision',
-  'NLP',
-  'sinh viên AI',
-]
-
 interface PageSEOProps {
   title: string
+  absoluteTitle?: boolean
   description?: string
   image?: string
-  keywords?: string[]
   path?: string
   noIndex?: boolean
 }
@@ -34,23 +20,22 @@ export function serializeJsonLd(value: object) {
 
 export function genPageMetadata({
   title,
+  absoluteTitle = false,
   description = siteMetadata.description,
   image = siteMetadata.socialBanner,
-  keywords = [],
   path = '/',
   noIndex = false,
 }: PageSEOProps): Metadata {
   const canonical = absoluteUrl(path)
-  const allKeywords = Array.from(new Set([...BASE_KEYWORDS, ...keywords]))
+  const socialImage = absoluteUrl(image)
   const openGraphImage =
     image === siteMetadata.socialBanner
-      ? { url: image, width: 1920, height: 1080, alt: title }
-      : { url: image, alt: title }
+      ? { url: socialImage, width: 1920, height: 1080, alt: title }
+      : { url: socialImage, alt: title }
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
-    keywords: allKeywords,
     alternates: {
       canonical,
     },
@@ -67,7 +52,7 @@ export function genPageMetadata({
       title,
       description,
       card: 'summary_large_image',
-      images: [image],
+      images: [socialImage],
     },
     robots: noIndex
       ? {

@@ -9,10 +9,12 @@ import { Textarea } from '@/components/ui/textarea'
 import type { Member } from '@/lib/db/features/users/types'
 import type { GenerationAlbum } from '@/lib/db/features/organization/types'
 import { saveGenerationAction } from './actions'
+import MemberSearchSelect from './MemberSearchSelect'
 
 type EditorMember = {
   external_user_id: number
   title: string
+  quote?: string
   display_order: number
   is_featured: boolean
 }
@@ -65,6 +67,7 @@ export default function GenerationForm({
       members: department.members.map((member) => ({
         external_user_id: member.id,
         title: member.title,
+        quote: member.quote || '',
         display_order: member.display_order,
         is_featured: member.is_featured,
       })),
@@ -341,7 +344,7 @@ export default function GenerationForm({
         {departments.map((department, departmentIndex) => (
           <article
             key={department.key}
-            className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 shadow-sm dark:border-white/10 dark:bg-slate-900/80"
+            className="rounded-3xl border border-slate-200/80 bg-white/85 shadow-sm dark:border-white/10 dark:bg-slate-900/80"
           >
             <div className="grid gap-4 border-b border-slate-200 p-5 sm:grid-cols-[1fr_1.5fr_auto] sm:p-6 dark:border-white/10">
               <Input
@@ -380,30 +383,30 @@ export default function GenerationForm({
                 return (
                   <div
                     key={`${member.external_user_id}-${memberIndex}`}
-                    className="grid items-center gap-3 rounded-2xl bg-slate-50 p-3 md:grid-cols-[1.25fr_1fr_auto_auto] dark:bg-slate-950/60"
+                    className="grid items-center gap-3 rounded-2xl bg-slate-50 p-3 md:grid-cols-[1.2fr_1fr_1.3fr_auto_auto] dark:bg-slate-950/60"
                   >
-                    <select
-                      value={member.external_user_id}
-                      onChange={(event) =>
+                    <MemberSearchSelect
+                      selectedUserId={member.external_user_id}
+                      users={users}
+                      onSelect={(newUserId) =>
                         updateMember(departmentIndex, memberIndex, {
-                          external_user_id: Number(event.target.value),
+                          external_user_id: newUserId,
                         })
                       }
-                      className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm dark:border-slate-800 dark:bg-slate-900"
-                    >
-                      {users.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.name}
-                          {user.status !== 'active' ? ' · OFF' : ''}
-                        </option>
-                      ))}
-                    </select>
+                    />
                     <Input
                       value={member.title}
                       onChange={(event) =>
                         updateMember(departmentIndex, memberIndex, { title: event.target.value })
                       }
-                      placeholder="Chức danh trong gen"
+                      placeholder="Chức danh"
+                    />
+                    <Input
+                      value={member.quote || ''}
+                      onChange={(event) =>
+                        updateMember(departmentIndex, memberIndex, { quote: event.target.value })
+                      }
+                      placeholder="Quote / Châm ngôn"
                     />
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-bold ${selectedUser?.status === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`}

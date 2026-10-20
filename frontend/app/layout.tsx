@@ -12,35 +12,43 @@ import { Metadata } from 'next'
 import NextTopLoader from 'nextjs-toploader'
 import { absoluteUrl, serializeJsonLd } from './seo'
 
-const inter = localFont({
-  src: '../public/fonts/Inter-Variable.woff2',
-  variable: '--font-inter-var',
+const beVietnamPro = localFont({
+  src: [
+    {
+      path: '../public/fonts/BeVietnamPro-Variable.ttf',
+      weight: '100 900',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/BeVietnamPro-Italic-Variable.ttf',
+      weight: '100 900',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-be-vietnam-pro',
   display: 'swap',
-  weight: '400 900',
-})
-
-const plusJakartaSans = localFont({
-  src: '../public/fonts/PlusJakartaSans-Variable.woff2',
-  variable: '--font-jakarta-var',
-  display: 'swap',
-  weight: '400 800',
 })
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
+  applicationName: siteMetadata.title,
   title: {
     default: siteMetadata.title,
     template: `%s | ${siteMetadata.title}`,
   },
   description: siteMetadata.description,
+  creator: siteMetadata.title,
+  publisher: siteMetadata.title,
+  category: 'technology',
+  manifest: '/manifest.json',
   openGraph: {
     title: siteMetadata.title,
     description: siteMetadata.description,
-    url: '/',
+    url: absoluteUrl('/'),
     siteName: siteMetadata.title,
     images: [
       {
-        url: siteMetadata.socialBanner,
+        url: absoluteUrl(siteMetadata.socialBanner),
         width: 1920,
         height: 1080,
         alt: 'DUT AI Club',
@@ -50,27 +58,13 @@ export const metadata: Metadata = {
     type: 'website',
   },
   alternates: {
-    canonical: '/',
-    types: {
-      'application/rss+xml': `${siteMetadata.siteUrl}/feed.xml`,
-    },
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+    canonical: absoluteUrl('/'),
   },
   twitter: {
     title: siteMetadata.title,
     description: siteMetadata.description,
     card: 'summary_large_image',
-    images: [siteMetadata.socialBanner],
+    images: [absoluteUrl(siteMetadata.socialBanner)],
   },
   verification: {
     google: siteMetadata.googleSiteVerification,
@@ -78,6 +72,16 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const canonicalSiteUrl = absoluteUrl('/')
+  const officialProfiles = [
+    siteMetadata.facebook,
+    siteMetadata.github,
+    siteMetadata.youtube,
+    siteMetadata.linkedin,
+    siteMetadata.x,
+    siteMetadata.instagram,
+  ].filter(Boolean)
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -85,17 +89,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         '@type': 'Organization',
         '@id': `${siteMetadata.siteUrl}/#organization`,
         name: siteMetadata.title,
-        url: siteMetadata.siteUrl,
+        alternateName: ['DUT AI', 'Câu lạc bộ Trí tuệ Nhân tạo DUT'],
+        url: canonicalSiteUrl,
+        description: siteMetadata.description,
         logo: {
           '@type': 'ImageObject',
           url: absoluteUrl(siteMetadata.siteLogo),
         },
+        sameAs: officialProfiles,
       },
       {
         '@type': 'WebSite',
         '@id': `${siteMetadata.siteUrl}/#website`,
         name: siteMetadata.title,
-        url: siteMetadata.siteUrl,
+        alternateName: 'DUT AI',
+        url: canonicalSiteUrl,
         description: siteMetadata.description,
         inLanguage: 'vi-VN',
         publisher: { '@id': `${siteMetadata.siteUrl}/#organization` },
@@ -106,7 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${inter.variable} ${plusJakartaSans.variable} scroll-smooth`}
+      className={`${beVietnamPro.variable} scroll-smooth`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

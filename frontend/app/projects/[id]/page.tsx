@@ -43,7 +43,6 @@ export async function generateMetadata({
       description:
         project.description || 'Dự án AI và công nghệ được phát triển bởi thành viên DUT AI Club.',
       image: project.image_url || project.imgSrc,
-      keywords: ['dự án AI', 'AI project sinh viên', ...(project.tags || [])],
       path: buildProjectPath(project),
     })
   } catch {

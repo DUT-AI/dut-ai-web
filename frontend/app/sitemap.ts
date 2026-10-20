@@ -1,7 +1,12 @@
 import { MetadataRoute } from 'next'
-import { getBlogsCached as getBlogs } from '@/lib/db/cached-queries'
+import {
+  getBlogsCached as getBlogs,
+  getProjectsCached as getProjects,
+} from '@/lib/db/cached-queries'
 import type { Blog } from '@/lib/db/features/blogs/types'
+import type { Project } from '@/lib/db/features/projects/types'
 import siteMetadata from '@/data/siteMetadata'
+import { buildProjectPath } from './projects/project-route'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,5 +37,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: post.keywords?.some((k) => k.keyword_name.toLowerCase() === 'event') ? 0.85 : 0.8,
   }))
 
-  return [...staticRoutes, ...blogRoutes]
+  let projects: Project[] = []
+  try {
+    projects = await getProjects()
+  } catch (error) {
+    console.error('Failed to fetch projects for sitemap:', error)
+  }
+
+  const projectRoutes: MetadataRoute.Sitemap = projects.map((project) => ({
+    url: `${siteUrl}${buildProjectPath(project)}`,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }))
+
+  return [...staticRoutes, ...blogRoutes, ...projectRoutes]
 }

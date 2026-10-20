@@ -8,15 +8,9 @@ import { buildPastEvents } from '@/lib/db/features/events/timeline'
 import EventsListLayout from '@/layouts/EventsListLayout'
 
 export const metadata = genPageMetadata({
-  title: 'Sự kiện',
-  description: 'Tất cả sự kiện, workshop, cuộc thi và hoạt động của DUT AI Club tại Đà Nẵng.',
-  keywords: [
-    'sự kiện AI',
-    'workshop AI Đà Nẵng',
-    'Welcome Newbie DUT AI',
-    'hoạt động câu lạc bộ AI',
-    'cuộc thi AI sinh viên',
-  ],
+  title: 'Sự kiện và hoạt động AI',
+  description:
+    'Theo dõi các sự kiện, workshop, seminar, cuộc thi và hoạt động cộng đồng của DUT AI Club tại Đà Nẵng.',
   path: '/events',
 })
 

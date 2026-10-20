@@ -79,3 +79,6 @@ coverage/
 .agents
 # Local database backups
 .agent/db-backups/
+
+
+/frontend/.codex-meta-preview-proxy.mjs

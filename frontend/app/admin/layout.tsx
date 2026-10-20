@@ -20,6 +20,7 @@ import {
 import ThemeSwitch from '@/components/ThemeSwitch'
 import { logoutAdminAction } from './actions'
 import { cn } from '@/lib/utils'
+import { Toaster } from '@/components/ui/sonner'
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Tổng quan', icon: LayoutDashboard, exact: true },
@@ -211,7 +212,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content Container */}
-        <main className="mx-auto w-full max-w-7xl flex-1 p-6 sm:p-8 lg:p-10">{children}</main>
+        <main className="w-full flex-1 p-6 sm:p-8 lg:p-10">{children}</main>
+        <Toaster position="top-right" richColors />
       </div>
     </div>
   )

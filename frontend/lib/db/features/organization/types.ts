@@ -45,6 +45,7 @@ export interface SaveGenerationInput {
     members: Array<{
       external_user_id: number
       title?: string
+      quote?: string
       display_order?: number
       is_featured?: boolean
     }>

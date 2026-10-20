@@ -5,15 +5,9 @@ import ProjectsListClient from './ProjectsListClient'
 import Footer from '@/components/Footer'
 
 export const metadata = genPageMetadata({
-  title: 'Dự án',
+  title: 'Dự án AI của sinh viên',
   description:
-    'Khám phá những giới hạn giao thoa giữa học máy và sáng tạo con người. Triển lãm những dự án được phát triển bởi Câu lạc bộ DUT AI.',
-  keywords: [
-    'dự án AI',
-    'AI project sinh viên',
-    'Machine Learning project DUT',
-    'ứng dụng AI Đà Nẵng',
-  ],
+    'Khám phá các dự án Trí tuệ Nhân tạo, học máy và ứng dụng công nghệ do thành viên DUT AI Club phát triển.',
   path: '/projects',
 })
 

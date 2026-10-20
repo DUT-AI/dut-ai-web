@@ -17,6 +17,9 @@ export async function GET(
 
   return createBlogThumbnail({
     title: post.title,
-    authors: post.authors.map((author) => author.name),
+    authors: post.authors.map((author) => ({
+      name: author.name,
+      avatarUrl: author.avatar_url,
+    })),
   })
 }

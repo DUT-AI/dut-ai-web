@@ -369,6 +369,36 @@ function BlogListLayoutInner({
                                                 </p>
                                             </div>
 
+                                            {/* Authors display */}
+                                            {post.authors && post.authors.length > 0 && (
+                                                <div className="flex items-center gap-2 mb-4">
+                                                    <div className="flex -space-x-2 overflow-hidden">
+                                                        {post.authors.map((author) => (
+                                                            author.avatar_url ? (
+                                                                <Image
+                                                                    key={author.id}
+                                                                    src={author.avatar_url}
+                                                                    alt={author.name}
+                                                                    width={28}
+                                                                    height={28}
+                                                                    className="inline-block h-7 w-7 rounded-full ring-2 ring-white dark:ring-gray-900 object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div
+                                                                    key={author.id}
+                                                                    className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 ring-2 ring-white dark:ring-gray-900 text-xs font-bold"
+                                                                >
+                                                                    {author.name?.charAt(0) || 'A'}
+                                                                </div>
+                                                            )
+                                                        ))}
+                                                    </div>
+                                                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate max-w-xs">
+                                                        {post.authors.map((a) => a.name).join(', ')}
+                                                    </span>
+                                                </div>
+                                            )}
+
                                             {/* CTA */}
                                             <div className="mt-auto">
                                                 <span className="inline-flex items-center text-[15px] font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">

@@ -26,7 +26,7 @@ export default async function EditBlogPage({ params }: { params: Promise<{ id: s
           Chỉnh sửa Bài viết
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Chỉnh sửa thông tin bài viết #{blog.id} & liên kết Quiz slug
+          Chỉnh sửa thông tin, nội dung bài viết #{blog.id} và danh sách tác giả
         </p>
       </div>
 
