@@ -27,7 +27,7 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-blue-50 text-blue-600 border-blue-200/80 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-800/60",
     glowClass: "bg-blue-500/10 dark:bg-blue-500/15",
     actionColor: "text-blue-600 dark:text-blue-400",
-    image: "https://drive.google.com/file/d/16Hk3CPgAt4yM43gjhHDS1LDbW6sXyLat/view?usp=drive_link",
+    image: "https://drive.google.com/thumbnail?id=16Hk3CPgAt4yM43gjhHDS1LDbW6sXyLat&sz=w1600",
     tags: ["Production AI", "Full-Stack ML", "Mentorship"],
   },
   {
@@ -39,7 +39,7 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-pink-50 text-pink-600 border-pink-200/80 dark:bg-pink-950/60 dark:text-pink-400 dark:border-pink-800/60",
     glowClass: "bg-pink-500/10 dark:bg-pink-500/15",
     actionColor: "text-pink-600 dark:text-pink-400",
-    image: "https://drive.google.com/file/d/1boQ_0jhDU53vDawqR4iVLk9D3TVx_VUq/view?usp=drive_link",
+    image: "https://drive.google.com/thumbnail?id=1boQ_0jhDU53vDawqR4iVLk9D3TVx_VUq&sz=w1600",
     tags: ["48h Sprint", "Team Collaboration", "Problem Solving"],
   },
   {
@@ -51,7 +51,7 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-indigo-50 text-indigo-700 border-indigo-200/80 dark:bg-indigo-950/60 dark:text-indigo-400 dark:border-indigo-800/60",
     glowClass: "bg-indigo-500/10 dark:bg-indigo-500/15",
     actionColor: "text-indigo-600 dark:text-indigo-400",
-    image: "https://drive.google.com/file/d/11IibFcUFwfKDYBjOq9hfygbhAmcFVr9v/view",
+    image: "https://drive.google.com/thumbnail?id=11IibFcUFwfKDYBjOq9hfygbhAmcFVr9v&sz=w1600",
     tags: ["Research Paper", "GPU Clusters", "Novel Architecture"],
   },
   {
@@ -63,7 +63,7 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-sky-50 text-sky-600 border-sky-200/80 dark:bg-sky-950/60 dark:text-sky-400 dark:border-sky-800/60",
     glowClass: "bg-sky-500/10 dark:bg-sky-500/15",
     actionColor: "text-sky-600 dark:text-sky-400",
-    image: "https://drive.google.com/file/d/1gk39qTFFmT0HedXnld1qmNYDCQ2Brlvx/view?usp=drive_link",
+    image: "https://drive.google.com/thumbnail?id=1gk39qTFFmT0HedXnld1qmNYDCQ2Brlvx&sz=w1600",
     tags: ["Alumni Network", "Tech Sharing", "Career Pathway"],
   },
   {
@@ -75,7 +75,7 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-rose-50 text-rose-600 border-rose-200/80 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800/60",
     glowClass: "bg-rose-500/10 dark:bg-rose-500/15",
     actionColor: "text-rose-600 dark:text-rose-400",
-    image: "https://drive.google.com/file/d/1A-mEFRLLguLsthWv7SGBlp25kZ6wMt62/view",
+    image: "https://drive.google.com/thumbnail?id=1A-mEFRLLguLsthWv7SGBlp25kZ6wMt62&sz=w1600",
     tags: ["Kaggle Master", "Feature Eng", "Model Stacking"],
   },
   {
@@ -87,7 +87,7 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-blue-50 text-blue-700 border-blue-200/80 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-800/60",
     glowClass: "bg-blue-500/10 dark:bg-blue-500/15",
     actionColor: "text-blue-600 dark:text-blue-400",
-    image: "https://drive.google.com/file/d/12GRy8WsFv37Oit_-um_AT-7XxuzAKgUe/view?usp=drive_link",
+    image: "https://drive.google.com/thumbnail?id=12GRy8WsFv37Oit_-um_AT-7XxuzAKgUe&sz=w1600",
     tags: ["Monthly Talks", "Hands-on Labs", "Industry Speakers"],
   },
 ];
