@@ -74,7 +74,7 @@ const stories: StoryItemData[] = [
     description:
       'Không chỉ có những dòng code hay mô hình thuật toán, DUT AI Club còn là ngôi nhà chung với những chuyến dã ngoại, teambuilding, boardgame night và các sự kiện giao lưu sôi nổi. Tại đây, chúng mình cùng học, cùng chơi, sẻ chia kinh nghiệm và lưu giữ những kỷ niệm thanh xuân rực rỡ nhất thời sinh viên Bách Khoa.',
     image:
-      '/static/images/IMG_01.jpg',
+      '/static/images/IMG_01.JPG',
     imageAlt: 'Sự kiện, giao lưu kết nối và hoạt động dã ngoại tại DUT AI Club',
     actionText: 'Khám phá sự kiện',
     actionHref: '/events',
@@ -200,8 +200,8 @@ export default function AboutStory() {
                         key={i}
                         onClick={() => scrollToChapter(i)}
                         className={`h-2 rounded-full transition-all duration-300 ${activeChapter === i
-                            ? 'w-7 bg-white shadow-[0_0_10px_rgba(255,255,255,0.7)]'
-                            : 'w-2 bg-white/35 hover:bg-white/60'
+                          ? 'w-7 bg-white shadow-[0_0_10px_rgba(255,255,255,0.7)]'
+                          : 'w-2 bg-white/35 hover:bg-white/60'
                           }`}
                         aria-label={`Chuyển đến chương 0${i + 1}`}
                       />
@@ -227,15 +227,15 @@ export default function AboutStory() {
                     cardRefs.current[idx] = el
                   }}
                   className={`min-h-[50vh] sm:min-h-[60vh] flex flex-col justify-center transition-all duration-500 ${isActive
-                      ? 'opacity-100 scale-100'
-                      : 'opacity-35 scale-[0.97] hover:opacity-65'
+                    ? 'opacity-100 scale-100'
+                    : 'opacity-35 scale-[0.97] hover:opacity-65'
                     }`}
                 >
                   <div
                     onClick={() => scrollToChapter(idx)}
                     className={`cursor-pointer group relative rounded-[28px] p-7 sm:p-9 transition-all duration-300 border ${isActive
-                        ? 'bg-white/95 dark:bg-slate-900/95 border-slate-200/90 dark:border-slate-800 shadow-[0_20px_45px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_50px_rgba(0,0,0,0.4)] backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10'
-                        : 'bg-white/50 dark:bg-slate-900/50 border-transparent'
+                      ? 'bg-white/95 dark:bg-slate-900/95 border-slate-200/90 dark:border-slate-800 shadow-[0_20px_45px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_50px_rgba(0,0,0,0.4)] backdrop-blur-xl ring-1 ring-slate-900/5 dark:ring-white/10'
+                      : 'bg-white/50 dark:bg-slate-900/50 border-transparent'
                       }`}
                   >
                     {/* Chapter Tag Header */}

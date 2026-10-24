@@ -14,7 +14,7 @@ export const metadata = genPageMetadata({
   path: '/events',
 })
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 const EVENTS_PER_PAGE = 5
 
@@ -26,7 +26,8 @@ export default async function EventsPage() {
 
   try {
     ;[publicEvents, posts] = await Promise.all([getPublicEvents(), getPosts()])
-  } catch {
+  } catch (err) {
+    console.error('Failed to load events in EventsPage:', err)
     error = true
   }
 

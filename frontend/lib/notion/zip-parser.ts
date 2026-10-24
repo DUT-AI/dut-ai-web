@@ -130,7 +130,7 @@ export async function parseNotionZip(buffer: Buffer): Promise<ParsedNotionZip> {
   const zip = await JSZip.loadAsync(buffer)
 
   // Find all .md files (exclude internal __MACOSX and hidden files)
-  const mdEntries = Object.entries(zip.files).filter(([path, file]) => {
+  const mdEntries = Object.entries(zip.files).filter(([path, file]: [string, any]) => {
     return !file.dir && path.endsWith('.md') && !path.includes('__MACOSX') && !path.startsWith('.')
   })
 
@@ -140,7 +140,7 @@ export async function parseNotionZip(buffer: Buffer): Promise<ParsedNotionZip> {
 
   // Pick the primary markdown file (prefer shortest path or highest word count)
   let primaryPath = mdEntries[0][0]
-  let primaryFile = mdEntries[0][1]
+  let primaryFile: any = mdEntries[0][1]
 
   if (mdEntries.length > 1) {
     // Sort by path depth ascending
@@ -156,7 +156,7 @@ export async function parseNotionZip(buffer: Buffer): Promise<ParsedNotionZip> {
 
   // Find all image entries
   const images: ExtractedZipAsset[] = []
-  for (const [zipPath, file] of Object.entries(zip.files)) {
+  for (const [zipPath, file] of Object.entries(zip.files) as [string, any][]) {
     if (file.dir || zipPath.includes('__MACOSX') || zipPath.startsWith('.')) {
       continue
     }

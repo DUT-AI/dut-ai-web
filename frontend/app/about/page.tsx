@@ -95,7 +95,7 @@ export default async function AboutPage() {
 
         <div className="mx-auto max-w-7xl space-y-20 px-5 sm:px-8 md:px-12">
           <AboutStory />
-          <AboutCoreValues />
+          {/* <AboutCoreValues /> */}
           <GenerationAlbum albums={albums} />
           <Footer />
         </div>

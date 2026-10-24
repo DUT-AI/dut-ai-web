@@ -83,11 +83,10 @@ export default function GenerationAlbum({ albums }: { albums: GenerationAlbumDat
                 role="tab"
                 aria-selected={selected}
                 onClick={() => setSelectedGenerationId(album.id)}
-                className={`group flex min-w-max items-center gap-2 rounded-xl px-3.5 py-2 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none sm:px-4 ${
-                  selected
-                    ? 'bg-slate-950 text-white shadow-md dark:bg-white dark:text-slate-950'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white'
-                }`}
+                className={`group flex min-w-max items-center gap-2 rounded-xl px-3.5 py-2 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none sm:px-4 ${selected
+                  ? 'bg-slate-950 text-white shadow-md dark:bg-white dark:text-slate-950'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white'
+                  }`}
               >
                 <span
                   className="h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white/30"
@@ -125,11 +124,10 @@ export default function GenerationAlbum({ albums }: { albums: GenerationAlbumDat
               key={generation.id}
               role="tabpanel"
               aria-hidden={!isGenSelected}
-              className={`col-start-1 row-start-1 flex flex-col transition-opacity duration-200 ${
-                isGenSelected
-                  ? 'relative z-10 opacity-100'
-                  : 'pointer-events-none invisible relative -z-10 opacity-0'
-              }`}
+              className={`col-start-1 row-start-1 flex flex-col transition-opacity duration-200 ${isGenSelected
+                ? 'relative z-10 opacity-100'
+                : 'pointer-events-none invisible relative -z-10 opacity-0'
+                }`}
             >
               {/* Cover Header */}
               <div
@@ -225,11 +223,10 @@ export default function GenerationAlbum({ albums }: { albums: GenerationAlbumDat
                             [generation.id]: item.id,
                           }))
                         }
-                        className={`flex min-w-max items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
-                          selected
-                            ? 'border-slate-950 bg-slate-950 text-white shadow-lg shadow-slate-900/10 dark:border-white dark:bg-white dark:text-slate-950'
-                            : 'border-slate-200 bg-slate-50/80 text-slate-600 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white'
-                        }`}
+                        className={`flex min-w-max items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${selected
+                          ? 'border-slate-950 bg-slate-950 text-white shadow-lg shadow-slate-900/10 dark:border-white dark:bg-white dark:text-slate-950'
+                          : 'border-slate-200 bg-slate-50/80 text-slate-600 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white'
+                          }`}
                       >
                         <span
                           className="flex h-8 w-8 items-center justify-center rounded-xl text-xs font-black text-white"
@@ -267,11 +264,10 @@ export default function GenerationAlbum({ albums }: { albums: GenerationAlbumDat
                         id={`department-panel-${dept.id}`}
                         role="tabpanel"
                         aria-hidden={!isCurrent}
-                        className={`col-start-1 row-start-1 p-5 transition-opacity duration-200 sm:p-8 lg:p-10 ${
-                          isCurrent
-                            ? 'relative z-10 opacity-100'
-                            : 'pointer-events-none invisible relative -z-10 opacity-0'
-                        }`}
+                        className={`col-start-1 row-start-1 p-5 transition-opacity duration-200 sm:p-8 lg:p-10 ${isCurrent
+                          ? 'relative z-10 opacity-100'
+                          : 'pointer-events-none invisible relative -z-10 opacity-0'
+                          }`}
                       >
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                           <div>
@@ -290,9 +286,7 @@ export default function GenerationAlbum({ albums }: { albums: GenerationAlbumDat
                               </p>
                             )}
                           </div>
-                          <span className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-500 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
-                            {dept.members.length} gương mặt
-                          </span>
+
                         </div>
 
                         {dept.members.length === 0 ? (
@@ -317,9 +311,8 @@ export default function GenerationAlbum({ albums }: { albums: GenerationAlbumDat
                                       accentColor: dept.accent_color || accent,
                                     })
                                   }
-                                  className={`group cursor-pointer min-w-0 rounded-[2rem] bg-gradient-to-br p-3 ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:ring-white/10 ${
-                                    memberCardTones[index % memberCardTones.length]
-                                  }`}
+                                  className={`group cursor-pointer min-w-0 rounded-[2rem] bg-gradient-to-br p-3 ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:ring-white/10 ${memberCardTones[index % memberCardTones.length]
+                                    }`}
                                 >
                                   <div className="relative aspect-[4/5] overflow-hidden rounded-[1.4rem] bg-white/65 shadow-sm ring-1 ring-slate-200/70 dark:bg-slate-900/60 dark:ring-white/10">
                                     {member.avatar_url ? (
@@ -328,18 +321,16 @@ export default function GenerationAlbum({ albums }: { albums: GenerationAlbumDat
                                         alt={member.name}
                                         fill
                                         sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
-                                        className={`object-cover transition duration-500 group-hover:scale-105 ${
-                                          inactive ? 'grayscale-[55%]' : ''
-                                        }`}
+                                        className={`object-cover transition duration-500 group-hover:scale-105 ${inactive ? 'grayscale-[55%]' : ''
+                                          }`}
                                         unoptimized
                                       />
                                     ) : (
                                       <div
                                         className="flex h-full items-center justify-center text-3xl font-black text-white"
                                         style={{
-                                          background: `linear-gradient(145deg, ${
-                                            dept.accent_color || accent
-                                          }, #0f172a)`,
+                                          background: `linear-gradient(145deg, ${dept.accent_color || accent
+                                            }, #0f172a)`,
                                         }}
                                       >
                                         {initials(member.name)}

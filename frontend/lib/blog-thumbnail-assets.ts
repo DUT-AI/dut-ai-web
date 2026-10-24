@@ -6,15 +6,15 @@ let cachedLogoDataUri: string | null = null
 function resolveAssetPath(relativePath: string): string {
   const cwd = process.cwd()
   // Direct check relative to cwd (e.g. public/...)
-  const directPath = path.resolve(cwd, relativePath)
+  const directPath = path.resolve(/*turbopackIgnore: true*/ cwd, relativePath)
   if (fs.existsSync(directPath)) return directPath
 
   // Check if cwd is repo root and asset is under frontend/
-  const frontendPath = path.resolve(cwd, 'frontend', relativePath)
+  const frontendPath = path.resolve(/*turbopackIgnore: true*/ cwd, 'frontend', relativePath)
   if (fs.existsSync(frontendPath)) return frontendPath
 
   // Check relative to current directory (__dirname / import.meta)
-  const relativeToLib = path.resolve(__dirname, '..', relativePath)
+  const relativeToLib = path.resolve(/*turbopackIgnore: true*/ __dirname, '..', relativePath)
   if (fs.existsSync(relativeToLib)) return relativeToLib
 
   return directPath

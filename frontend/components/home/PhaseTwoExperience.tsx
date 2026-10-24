@@ -51,7 +51,7 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-indigo-50 text-indigo-700 border-indigo-200/80 dark:bg-indigo-950/60 dark:text-indigo-400 dark:border-indigo-800/60",
     glowClass: "bg-indigo-500/10 dark:bg-indigo-500/15",
     actionColor: "text-indigo-600 dark:text-indigo-400",
-    image: "/static/images/IMG_09.jpg",
+    image: "/static/images/IMG_06.jpeg",
     tags: ["Research Paper", "GPU Clusters", "Novel Architecture"],
   },
   {
@@ -63,31 +63,19 @@ const activities: ActivityCardData[] = [
     badgeClass: "bg-sky-50 text-sky-600 border-sky-200/80 dark:bg-sky-950/60 dark:text-sky-400 dark:border-sky-800/60",
     glowClass: "bg-sky-500/10 dark:bg-sky-500/15",
     actionColor: "text-sky-600 dark:text-sky-400",
-    image: "/static/images/IMG_07.jpg",
+    image: "/static/images/IMG_07.JPG",
     tags: ["Alumni Network", "Tech Sharing", "Career Pathway"],
-  },
-  {
-    title: "Đấu trường Kaggle & Competitions",
-    category: "CONTEST",
-    description:
-      "Thực chiến trên các nền tảng thi đấu dữ liệu toàn cầu như Kaggle, Grandmaster benchmarks và các kỳ thi Olympic Tin học, ICPC cấp quốc gia và khu vực.",
-    accentGradient: "from-[#DB2777] via-[#EC4899] to-[#F472B6]",
-    badgeClass: "bg-rose-50 text-rose-600 border-rose-200/80 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800/60",
-    glowClass: "bg-rose-500/10 dark:bg-rose-500/15",
-    actionColor: "text-rose-600 dark:text-rose-400",
-    image: "/static/images/IMG_06.jpeg",
-    tags: ["Kaggle Master", "Feature Eng", "Model Stacking"],
   },
   {
     title: "Workshops & Masterclasses Chuyên sâu",
     category: "WORKSHOPS",
     description:
-      "Tham gia chuỗi hội thảo kỹ thuật chuyên đề định kỳ hàng tháng về Generative AI, Large Language Models (LLM), Multi-Modal và quy trình MLOps tự động hóa.",
+      "Tổ chức các buổi sharing cho cộng đồng về các chủ đề về AI và Nghiên cứu khoa học",
     accentGradient: "from-[#1D4ED8] via-[#2563EB] to-[#0284C7]",
     badgeClass: "bg-blue-50 text-blue-700 border-blue-200/80 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-800/60",
     glowClass: "bg-blue-500/10 dark:bg-blue-500/15",
     actionColor: "text-blue-600 dark:text-blue-400",
-    image: "/static/images/IMG_05.jpg",
+    image: "/static/images/IMG_05.JPG",
     tags: ["Monthly Talks", "Hands-on Labs", "Industry Speakers"],
   },
 ];

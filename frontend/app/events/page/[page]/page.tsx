@@ -38,7 +38,8 @@ export default async function EventsPage({ params }: { params: Promise<{ page: s
 
   try {
     ;[publicEvents, posts] = await Promise.all([getPublicEvents(), getPosts()])
-  } catch {
+  } catch (err) {
+    console.error('Failed to load events in [page]/page.tsx:', err)
     error = true
   }
 

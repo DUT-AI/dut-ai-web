@@ -2,9 +2,9 @@ import { createClient } from 'redis'
 import type { Member } from '@/lib/db/features/users/types'
 
 const MANAGE_USERS_URL =
-  process.env.DUT_MANAGER_USERS_URL || 'https://manage.dutai.io.vn/api/v1/users'
-const HOT_CACHE_KEY = 'dut-ai-web:manage-users:v1'
-const STALE_CACHE_KEY = 'dut-ai-web:manage-users:stale:v1'
+  process.env.DUT_MANAGER_USERS_URL || 'https://manage.dutai.io.vn/api/v1/users/options'
+const HOT_CACHE_KEY = 'dut-ai-web:manage-users:v2'
+const STALE_CACHE_KEY = 'dut-ai-web:manage-users:stale:v2'
 const HOT_CACHE_SECONDS = 10 * 60
 const STALE_CACHE_SECONDS = 24 * 60 * 60
 
@@ -19,11 +19,10 @@ let refreshPromise: Promise<Member[]> | null = null
 let memoryCache: { users: Member[]; expiresAt: number } | null = null
 
 function normalizeStatus(status: unknown): string {
-  return (
-    String(status ?? '')
-      .trim()
-      .toLowerCase() || 'inactive'
-  )
+  if (status === undefined || status === null || status === '') {
+    return 'active'
+  }
+  return String(status).trim().toLowerCase() || 'active'
 }
 
 function normalizeUser(input: Record<string, unknown>): Member {
@@ -125,6 +124,7 @@ async function fetchManageUsers(): Promise<Member[]> {
       Accept: 'application/json',
     },
     cache: 'no-store',
+    signal: AbortSignal.timeout(8000),
   })
 
   if (!response.ok) {
