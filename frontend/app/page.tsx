@@ -18,6 +18,8 @@ export const metadata = genPageMetadata({
   path: '/',
 })
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   let data: HomePageData = {
     latest_blogs: [],
