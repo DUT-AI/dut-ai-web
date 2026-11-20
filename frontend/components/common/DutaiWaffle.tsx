@@ -29,12 +29,17 @@ declare global {
   }
 }
 
-const WAFFLE_SCRIPT_URL = 'https://workspace.dutai.io.vn/waffle.js'
+const WAFFLE_SCRIPT_URL = 'https://workspace.dutai.io.vn/waffle.js?v=2'
 
 export function DutaiWaffle({ current = 'manage' }: DutaiWaffleProps) {
   const [isDefined, setIsDefined] = useState(false)
 
   useEffect(() => {
+    // Xóa cache cũ của ecosystem apps nếu có để nhận dữ liệu và icon mới nhất
+    try {
+      sessionStorage.removeItem('dutai_ecosystem_apps')
+    } catch {}
+
     // Chờ customElements.whenDefined
     customElements.whenDefined('dutai-waffle').then(() => {
       setIsDefined(true)
