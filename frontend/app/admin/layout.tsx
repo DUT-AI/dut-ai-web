@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import ThemeSwitch from '@/components/ThemeSwitch'
 import DutaiWaffle from '@/components/common/DutaiWaffle'
+import { useSsoAuth } from '@/context/SsoAuthContext'
 import { logoutAdminAction } from './actions'
 import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/sonner'
@@ -36,57 +37,13 @@ const NAV_ITEMS = [
   { href: '/admin/introductions', label: 'Giới thiệu (Intro)', icon: Info },
 ]
 
-interface AdminUser {
-  name: string
-  email: string
-  avatar?: string
-  roles?: string[]
-}
-
-const emptySubscribe = () => () => {}
-let cachedRawCookie = ''
-let cachedUser: AdminUser | null = null
-
-function getCookieUser(): AdminUser | null {
-  if (typeof document === 'undefined') return null
-  const match = document.cookie.match(/dut_admin_user=([^;]+)/)
-  const raw = match ? match[1] : ''
-  if (raw !== cachedRawCookie) {
-    cachedRawCookie = raw
-    try {
-      cachedUser = raw ? JSON.parse(decodeURIComponent(raw)) : null
-    } catch {
-      cachedUser = null
-    }
-  }
-  return cachedUser
-}
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isLoginPage = pathname === '/admin/login'
   const [mobileOpen, setMobileOpen] = useState(false)
-  const isMounted = React.useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  )
-  const cookieUser = React.useSyncExternalStore(emptySubscribe, getCookieUser, () => null)
-  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null)
+  const { user: ssoUser, logout } = useSsoAuth()
 
-  const activeUser = currentUser ?? (isMounted ? cookieUser : null)
-
-  React.useEffect(() => {
-    // Gọi API /api/auth/me để cập nhật dữ liệu mới nhất từ server
-    fetch('/api/auth/me')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((resData) => {
-        if (resData?.is_success && resData?.data) {
-          setCurrentUser(resData.data)
-        }
-      })
-      .catch(() => {})
-  }, [pathname])
+  const activeUser = ssoUser
 
   if (isLoginPage) {
     return <>{children}</>
@@ -171,15 +128,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>
 
-          <form action={logoutAdminAction}>
-            <button
-              type="submit"
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Đăng xuất</span>
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Đăng xuất (DUT-AI SSO)</span>
+          </button>
         </div>
       </aside>
 
@@ -203,9 +159,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ThemeSwitch />
             <DutaiWaffle current="manage" />
             <div className="flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-slate-50 py-1 pr-3 pl-1.5 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
-              {activeUser?.avatar ? (
+              {activeUser?.avatar_url ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
-                  src={activeUser.avatar}
+                  src={activeUser.avatar_url}
                   alt={activeUser.name}
                   className="h-6 w-6 rounded-full border border-blue-500 object-cover"
                 />
@@ -216,9 +173,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span className="text-xs leading-none">
                   {activeUser ? activeUser.name || activeUser.email : 'User'}
                 </span>
-                {activeUser?.roles && activeUser.roles.length > 0 && (
+                {activeUser?.role_names && activeUser.role_names.length > 0 && (
                   <div className="mt-0.5 flex items-center gap-1">
-                    {activeUser.roles.map((r, i) => (
+                    {activeUser.role_names.map((r, i) => (
                       <span
                         key={i}
                         className="py-0.2 rounded bg-blue-500/10 px-1.5 text-[10px] leading-tight font-semibold text-blue-600 dark:text-blue-400"

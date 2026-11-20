@@ -8,6 +8,7 @@ import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
+import { SsoAuthProvider } from '@/context/SsoAuthContext'
 import { Metadata } from 'next'
 import NextTopLoader from 'nextjs-toploader'
 import { absoluteUrl, serializeJsonLd } from './seo'
@@ -145,12 +146,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           showAtBottom={false}
         />
         <ThemeProviders>
-          <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
-          <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
-            <Header />
-            <main className="mb-auto">{children}</main>
-          </SearchProvider>
-          {/* <Footer /> */}
+          <SsoAuthProvider>
+            <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
+            <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
+              <Header />
+              <main className="mb-auto">{children}</main>
+            </SearchProvider>
+            {/* <Footer /> */}
+          </SsoAuthProvider>
         </ThemeProviders>
       </body>
     </html>
