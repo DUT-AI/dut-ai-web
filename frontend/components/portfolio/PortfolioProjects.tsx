@@ -122,8 +122,11 @@ export default function PortfolioProjects({ projects }: PortfolioProjectsProps) 
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
-          <PortfolioProjectCard key={project.id} project={project} />
+        {projects.map((project, idx) => (
+          <PortfolioProjectCard
+            key={`${project.isClubProject ? 'club' : 'personal'}-${project.id}-${idx}`}
+            project={project}
+          />
         ))}
       </div>
     </section>

@@ -19,25 +19,48 @@ export default function AdminPortfolioPage() {
     }
   } | null>(null)
 
-  const loadData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const res = await fetch('/api/members/me/portfolio')
-      if (!res.ok) {
-        throw new Error('Không thể tải thông tin hồ sơ của bạn')
-      }
-      const json = await res.json()
-      setData(json)
-    } catch (err: any) {
-      setError(err.message || 'Lỗi khi tải dữ liệu')
-    } finally {
-      setLoading(false)
-    }
+  const refetch = () => {
+    setLoading(true)
+    setError(null)
+    fetch('/api/members/me/portfolio')
+      .then((res) => {
+        if (!res.ok) throw new Error('Không thể tải thông tin hồ sơ của bạn')
+        return res.json()
+      })
+      .then((json) => {
+        setData(json)
+        setLoading(false)
+      })
+      .catch((err) => {
+        setError(err.message || 'Lỗi khi tải dữ liệu')
+        setLoading(false)
+      })
   }
 
   useEffect(() => {
-    loadData()
+    let ignore = false
+
+    fetch('/api/members/me/portfolio')
+      .then((res) => {
+        if (!res.ok) throw new Error('Không thể tải thông tin hồ sơ của bạn')
+        return res.json()
+      })
+      .then((json) => {
+        if (!ignore) {
+          setData(json)
+          setLoading(false)
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          setError(err.message || 'Lỗi khi tải dữ liệu')
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
   }, [])
 
   if (loading) {
@@ -54,7 +77,7 @@ export default function AdminPortfolioPage() {
       <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900/60 dark:bg-red-950/30">
         <p className="text-base font-semibold text-red-600 dark:text-red-400">{error}</p>
         <button
-          onClick={loadData}
+          onClick={refetch}
           className="mt-4 inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
         >
           <RefreshCw className="h-4 w-4" />
@@ -102,10 +125,10 @@ export default function AdminPortfolioPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left 2 Cols: Form Info & Skills */}
         <div className="space-y-8 lg:col-span-2">
-          <PortfolioEditForm initialData={cv} onSaved={loadData} />
+          <PortfolioEditForm initialData={cv} onSaved={refetch} />
           <PersonalProjectsManager
             initialProjects={data.projects?.personal || []}
-            onProjectsChanged={loadData}
+            onProjectsChanged={refetch}
           />
         </div>
 
@@ -115,7 +138,7 @@ export default function AdminPortfolioPage() {
             initialCvUrl={cv.cv_file_url}
             initialFileName={cv.cv_file_name}
             initialFileSize={cv.cv_file_size}
-            onCvUpdated={loadData}
+            onCvUpdated={refetch}
           />
 
           {/* Club Projects Readonly Box */}
@@ -131,9 +154,9 @@ export default function AdminPortfolioPage() {
               {!data.projects?.club || data.projects.club.length === 0 ? (
                 <p className="text-xs text-gray-500">Chưa ghi nhận dự án CLB nào.</p>
               ) : (
-                data.projects.club.map((proj: any) => (
+                data.projects.club.map((proj: any, idx: number) => (
                   <div
-                    key={proj.id}
+                    key={`club-${proj.id}-${idx}`}
                     className="rounded-xl border border-blue-100 bg-blue-50/50 p-3.5 dark:border-blue-900/40 dark:bg-blue-950/20"
                   >
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">

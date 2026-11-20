@@ -206,17 +206,31 @@ export async function getMemberClubProjectsQuery(userId: number): Promise<Unifie
       .innerJoin(projects, eq(projectMembers.projectId, projects.id))
       .where(eq(projectMembers.externalUserId, userId))
 
-    return rows.map((r) => ({
-      id: r.id,
-      title: r.title,
-      description: r.description,
-      imageUrl: r.imageUrl,
-      demoUrl: r.demoUrl,
-      repoUrl: null,
-      technologies: r.technologies,
-      isClubProject: true,
-      clubRole: r.role,
-    }))
+    // Gom nhóm theo project.id và tổng hợp các vai trò nếu thành viên đảm nhiệm nhiều vị trí
+    const projectMap = new Map<number, UnifiedProject>()
+
+    for (const r of rows) {
+      const existing = projectMap.get(r.id)
+      if (existing) {
+        if (r.role && !existing.clubRole?.includes(r.role)) {
+          existing.clubRole = existing.clubRole ? `${existing.clubRole}, ${r.role}` : r.role
+        }
+      } else {
+        projectMap.set(r.id, {
+          id: r.id,
+          title: r.title,
+          description: r.description,
+          imageUrl: r.imageUrl,
+          demoUrl: r.demoUrl,
+          repoUrl: null,
+          technologies: r.technologies,
+          isClubProject: true,
+          clubRole: r.role || null,
+        })
+      }
+    }
+
+    return Array.from(projectMap.values())
   } catch (error) {
     console.error(`Failed to get club projects for user ${userId}:`, error)
     return []
