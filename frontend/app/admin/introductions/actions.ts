@@ -7,11 +7,15 @@ import {
   createIntroductionQuery,
 } from '@/lib/db/features/introductions/queries'
 import { getAdminSession } from '@/lib/admin-auth'
+import { hasContentAccess } from '@/lib/enums/roles'
 
 export async function saveIntroductionAction(prevState: any, formData: FormData) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
   }
 
   const idStr = formData.get('id') as string

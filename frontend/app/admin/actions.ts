@@ -2,7 +2,13 @@
 
 import { redirect } from 'next/navigation'
 import { createAdminSession, clearAdminSession, fetchCurrentUser } from '@/lib/admin-auth'
-import { DUTAI_MANAGE_API_URL, SSO_LOGIN_URL, decodeJwtPayload } from '@/lib/auth-sso'
+import {
+  DUTAI_MANAGE_API_URL,
+  SSO_LOGIN_URL,
+  decodeJwtPayload,
+  DutAiUserProfile,
+} from '@/lib/auth-sso'
+import { hasContentAccess } from '@/lib/enums/roles'
 
 const AUTH_LOGIN_URL = `${DUTAI_MANAGE_API_URL}/api/v1/auth/login`
 
@@ -10,12 +16,15 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
   const email =
     (formData.get('email') as string)?.trim() || (formData.get('username') as string)?.trim()
   const password = (formData.get('password') as string)?.trim()
+  const redirectTarget = (formData.get('redirect') as string)?.trim()
 
   if (!email || !password) {
     return {
       error: 'Vui lòng nhập đầy đủ Email và Mật khẩu',
     }
   }
+
+  let adminUser: DutAiUserProfile | null = null
 
   try {
     const res = await fetch(AUTH_LOGIN_URL, {
@@ -49,7 +58,7 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
       }
     }
 
-    let adminUser = await fetchCurrentUser(accessToken)
+    adminUser = await fetchCurrentUser(accessToken)
 
     if (!adminUser) {
       const jwtPayload = decodeJwtPayload(accessToken) || {}
@@ -76,7 +85,11 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
     }
   }
 
-  redirect('/admin')
+  let destination = redirectTarget && redirectTarget.startsWith('/') ? redirectTarget : '/admin'
+  if (destination === '/admin' && !hasContentAccess(adminUser)) {
+    destination = '/admin/portfolio'
+  }
+  redirect(destination)
 }
 
 export async function logoutAdminAction() {

@@ -10,7 +10,7 @@ interface UserMenuDropdownProps {
 }
 
 export default function UserMenuDropdown({ forceWhite }: UserMenuDropdownProps) {
-  const { user, logout, hasAnyRole } = useSsoAuth()
+  const { user, logout, isContentManager } = useSsoAuth()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -27,7 +27,6 @@ export default function UserMenuDropdown({ forceWhite }: UserMenuDropdownProps) 
 
   if (!user) return null
 
-  const isManagement = hasAnyRole(['admin', 'manager', 'editor', 'leader'])
   const primaryRole = user.role_names?.[0] || 'Member'
 
   const buttonStyle = forceWhite
@@ -82,14 +81,14 @@ export default function UserMenuDropdown({ forceWhite }: UserMenuDropdownProps) 
 
           {/* Quick links */}
           <div className="space-y-0.5 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200">
-            {isManagement && (
+            {isContentManager && (
               <Link
                 href="/admin"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <LayoutDashboard className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span>Bảng quản trị (Admin)</span>
+                <span>Quản lý nội dung (Admin)</span>
               </Link>
             )}
 

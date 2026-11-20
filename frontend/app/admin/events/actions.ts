@@ -15,6 +15,7 @@ import {
 } from '@/lib/db/features/events/queries'
 import { getAdminSession } from '@/lib/admin-auth'
 import { deleteEventImageFromMinIO } from '@/lib/minio'
+import { hasContentAccess } from '@/lib/enums/roles'
 
 function optionalText(formData: FormData, name: string): string | null {
   const value = formData.get(name)
@@ -84,8 +85,11 @@ async function cleanupUnreferencedImages(urls: Array<string | null | undefined>)
 
 export async function savePublicEventAction(_prevState: unknown, formData: FormData) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
   }
 
   const id = parseOptionalId(formData)
@@ -170,7 +174,12 @@ export async function savePublicEventAction(_prevState: unknown, formData: FormD
 
 export async function deletePublicEventAction(id: number) {
   const session = await getAdminSession()
-  if (!session.authenticated) return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
+  }
   if (!Number.isSafeInteger(id) || id <= 0) return { error: 'ID sự kiện không hợp lệ.' }
 
   try {
@@ -191,8 +200,11 @@ export async function deletePublicEventAction(id: number) {
 
 export async function savePostAction(_prevState: unknown, formData: FormData) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
   }
 
   const id = parseOptionalId(formData)
@@ -269,7 +281,12 @@ export async function savePostAction(_prevState: unknown, formData: FormData) {
 
 export async function deletePostAction(id: number) {
   const session = await getAdminSession()
-  if (!session.authenticated) return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
+  }
   if (!Number.isSafeInteger(id) || id <= 0) return { error: 'ID khoảnh khắc không hợp lệ.' }
 
   try {

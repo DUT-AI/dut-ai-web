@@ -2,21 +2,21 @@
 
 import { revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
-import {
-  createBlogQuery,
-  updateBlogQuery,
-  deleteBlogQuery,
-} from '@/lib/db/features/blogs/queries'
+import { createBlogQuery, updateBlogQuery, deleteBlogQuery } from '@/lib/db/features/blogs/queries'
 import { createKeywordQuery } from '@/lib/db/features/keywords/queries'
 import { keywords } from '@/lib/db/features/keywords/schema'
 import { db } from '@/lib/db'
 import { ilike } from 'drizzle-orm'
 import { getAdminSession } from '@/lib/admin-auth'
+import { hasContentAccess } from '@/lib/enums/roles'
 
 export async function saveBlogAction(prevState: any, formData: FormData) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
   }
 
   const idStr = formData.get('id') as string
@@ -52,7 +52,7 @@ export async function saveBlogAction(prevState: any, formData: FormData) {
         summary,
         content,
         image,
-        imageUrl: image ? undefined : (imageUrl ? imageUrl : null),
+        imageUrl: image ? undefined : imageUrl ? imageUrl : null,
         authorIds,
         keywordIds,
       })
@@ -81,8 +81,8 @@ export async function saveBlogAction(prevState: any, formData: FormData) {
 
 export async function deleteBlogAction(id: number) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    throw new Error('Unauthorized')
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    throw new Error('FORBIDDEN_CONTENT_ROLE_REQUIRED')
   }
 
   await deleteBlogQuery(id)
@@ -93,8 +93,11 @@ export async function deleteBlogAction(id: number) {
 
 export async function createKeywordInlineAction(keywordName: string) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
   }
 
   const cleanName = keywordName.trim()

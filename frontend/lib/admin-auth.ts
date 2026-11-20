@@ -8,6 +8,7 @@ import {
   DutAiUserProfile,
 } from './auth-sso'
 import { getSsoServerSession } from './auth-sso-server'
+import { hasContentAccess } from './enums/roles'
 
 /**
  * Thống nhất dùng chung DutAiUserProfile từ hệ thống SSO.
@@ -77,4 +78,25 @@ export async function getAdminSession(): Promise<AdminSession> {
     refreshToken: session.refreshToken || undefined,
     user: session.user || undefined,
   }
+}
+
+/**
+ * Server guard yêu cầu người dùng phải có quyền Quản lý nội dung (role Content hoặc admin).
+ * Dùng cho tất cả Server Actions và Mutation endpoints của blogs, projects, events,...
+ *
+ * @throws Error('UNAUTHORIZED') nếu chưa đăng nhập
+ * @throws Error('FORBIDDEN_CONTENT_ROLE_REQUIRED') nếu không có quyền Content/Admin
+ */
+export async function requireContentSession(): Promise<AdminSession> {
+  const session = await getAdminSession()
+
+  if (!session.authenticated || !session.user) {
+    throw new Error('UNAUTHORIZED')
+  }
+
+  if (!hasContentAccess(session.user)) {
+    throw new Error('FORBIDDEN_CONTENT_ROLE_REQUIRED')
+  }
+
+  return session
 }

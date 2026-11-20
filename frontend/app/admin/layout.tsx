@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
   LayoutDashboard,
   UserCircle,
@@ -23,11 +23,11 @@ import DutaiWaffle from '@/components/common/DutaiWaffle'
 import { useSsoAuth } from '@/context/SsoAuthContext'
 import { logoutAdminAction } from './actions'
 import { cn } from '@/lib/utils'
-import { Toaster } from '@/components/ui/sonner'
+import { Toaster, toast } from 'sonner'
+import { getPartitionForPath } from '@/lib/enums/roles'
 
-const NAV_ITEMS = [
+const CONTENT_NAV_ITEMS = [
   { href: '/admin', label: 'Tổng quan', icon: LayoutDashboard, exact: true },
-  { href: '/admin/portfolio', label: 'Hồ sơ cá nhân (Portfolio)', icon: UserCircle },
   { href: '/admin/blogs', label: 'Bài viết (Blogs)', icon: FileText },
   { href: '/admin/projects', label: 'Dự án (Projects)', icon: Briefcase },
   { href: '/admin/events', label: 'Sự kiện (Events)', icon: Calendar },
@@ -37,13 +37,44 @@ const NAV_ITEMS = [
   { href: '/admin/introductions', label: 'Giới thiệu (Intro)', icon: Info },
 ]
 
+const MEMBER_NAV_ITEMS = [
+  { href: '/admin/portfolio', label: 'Hồ sơ cá nhân (Portfolio)', icon: UserCircle },
+]
+
+function AdminDeniedToastHandler() {
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('denied') === 'content') {
+      toast.error('Khu vực bị giới hạn quyền truy cập', {
+        description:
+          'Chỉ vai trò Content hoặc Quản trị viên mới có quyền vào phân vùng Quản lý nội dung. Đã chuyển hướng về Hồ sơ cá nhân.',
+        id: 'denied-content-toast',
+      })
+    }
+  }, [searchParams])
+
+  return null
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const isLoginPage = pathname === '/admin/login'
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { user: ssoUser, logout } = useSsoAuth()
+  const { user: ssoUser, logout, isContentManager, isLoading } = useSsoAuth()
 
   const activeUser = ssoUser
+  const homeLink = isContentManager ? '/admin' : '/admin/portfolio'
+  const isContentRoute = getPartitionForPath(pathname) === 'CONTENT_MANAGEMENT'
+  const isUnauthorizedContent = !isLoading && isContentRoute && !isContentManager
+
+  // Client-side route guard: if user is not a content manager and attempts to view a Content zone route
+  useEffect(() => {
+    if (!isLoading && ssoUser && !isContentManager && isContentRoute) {
+      router.replace('/admin/portfolio?denied=content')
+    }
+  }, [isLoading, ssoUser, isContentManager, isContentRoute, router])
 
   if (isLoginPage) {
     return <>{children}</>
@@ -51,6 +82,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+      <Suspense fallback={null}>
+        <AdminDeniedToastHandler />
+      </Suspense>
+
       {/* Mobile Sidebar Overlay */}
       {mobileOpen && (
         <div
@@ -68,7 +103,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         {/* Logo Header */}
         <div className="flex h-16 items-center justify-between border-b border-slate-200/80 px-6 dark:border-white/10">
-          <Link href="/admin" className="flex items-center gap-3">
+          <Link href={homeLink} className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 font-black text-white shadow-md">
               AI
             </div>
@@ -87,34 +122,75 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </div>
 
-        {/* Navigation links */}
-        <nav className="flex-1 space-y-1.5 overflow-y-auto px-4 py-6">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon
-            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+        {/* Navigation links grouped by partition */}
+        <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
+          {/* Partition 1: Quản lý nội dung (Dành riêng cho Content role hoặc Admin) */}
+          {isContentManager && (
+            <div className="space-y-1.5">
+              <div className="px-3 pb-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
+                Quản lý nội dung
+              </div>
+              {CONTENT_NAV_ITEMS.map((item) => {
+                const Icon = item.icon
+                const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  'flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200',
-                  active
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-200'
-                )}
-              >
-                <Icon
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200',
+                      active
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-200'
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        'h-5 w-5',
+                        active ? 'text-white' : 'text-slate-400 dark:text-slate-500'
+                      )}
+                    />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Partition 2: Thông tin thành viên (Dành cho tất cả thành viên) */}
+          <div className="space-y-1.5">
+            <div className="px-3 pb-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
+              Thông tin thành viên
+            </div>
+            {MEMBER_NAV_ITEMS.map((item) => {
+              const Icon = item.icon
+              const active = pathname === item.href || pathname.startsWith(item.href)
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
                   className={cn(
-                    'h-5 w-5',
-                    active ? 'text-white' : 'text-slate-400 dark:text-slate-500'
+                    'flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200',
+                    active
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-200'
                   )}
-                />
-                <span>{item.label}</span>
-              </Link>
-            )
-          })}
+                >
+                  <Icon
+                    className={cn(
+                      'h-5 w-5',
+                      active ? 'text-white' : 'text-slate-400 dark:text-slate-500'
+                    )}
+                  />
+                  <span>{item.label}</span>
+                </Link>
+              )
+            })}
+          </div>
         </nav>
 
         {/* Sidebar Footer */}
@@ -191,7 +267,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content Container */}
-        <main className="w-full flex-1 p-6 sm:p-8 lg:p-10">{children}</main>
+        <main className="w-full flex-1 p-6 sm:p-8 lg:p-10">
+          {isUnauthorizedContent ? (
+            <div className="flex h-64 items-center justify-center">
+              <div className="text-center text-sm font-medium text-slate-500 dark:text-slate-400">
+                Đang chuyển hướng về Hồ sơ cá nhân...
+              </div>
+            </div>
+          ) : (
+            children
+          )}
+        </main>
         <Toaster position="top-right" richColors />
       </div>
     </div>

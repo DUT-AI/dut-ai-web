@@ -2,11 +2,13 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { DutAiUserProfile, SSO_LOGIN_URL } from '@/lib/auth-sso'
+import { hasContentAccess } from '@/lib/enums/roles'
 
 export interface SsoAuthContextValue {
   user: DutAiUserProfile | null
   isLoading: boolean
   isAuthenticated: boolean
+  isContentManager: boolean
   error: string | null
   hasRole: (role: string) => boolean
   hasAnyRole: (roles: string[]) => boolean
@@ -124,6 +126,7 @@ export function SsoAuthProvider({ children }: { children: React.ReactNode }) {
       user,
       isLoading,
       isAuthenticated: Boolean(user),
+      isContentManager: hasContentAccess(user),
       error,
       hasRole,
       hasAnyRole,

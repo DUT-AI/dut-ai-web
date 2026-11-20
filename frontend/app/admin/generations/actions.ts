@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getAdminSession } from '@/lib/admin-auth'
 import { getManageUsers } from '@/lib/manage-users'
+import { hasContentAccess } from '@/lib/enums/roles'
 import {
   createGenerationQuery,
   deleteGenerationQuery,
@@ -28,7 +29,12 @@ function parsePayload(formData: FormData): SaveGenerationInput {
 
 export async function saveGenerationAction(_previousState: unknown, formData: FormData) {
   const session = await getAdminSession()
-  if (!session.authenticated) return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
+  }
 
   try {
     const payload = parsePayload(formData)
@@ -50,7 +56,8 @@ export async function saveGenerationAction(_previousState: unknown, formData: Fo
 
 export async function deleteGenerationAction(id: number) {
   const session = await getAdminSession()
-  if (!session.authenticated) throw new Error('Unauthorized')
+  if (!session.authenticated || !hasContentAccess(session.user))
+    throw new Error('FORBIDDEN_CONTENT_ROLE_REQUIRED')
   await deleteGenerationQuery(id)
   revalidatePath('/about')
   revalidatePath('/admin/generations')
@@ -58,7 +65,8 @@ export async function deleteGenerationAction(id: number) {
 
 export async function syncManageUsersAction() {
   const session = await getAdminSession()
-  if (!session.authenticated) throw new Error('Unauthorized')
+  if (!session.authenticated || !hasContentAccess(session.user))
+    throw new Error('FORBIDDEN_CONTENT_ROLE_REQUIRED')
   await getManageUsers({ forceRefresh: true })
   revalidatePath('/admin/generations')
   redirect('/admin/generations?synced=1')

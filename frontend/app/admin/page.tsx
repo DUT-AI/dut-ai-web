@@ -18,12 +18,20 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { getAdminSession } from '@/lib/admin-auth'
+import { hasContentAccess } from '@/lib/enums/roles'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboardPage() {
+  const session = await getAdminSession()
+  if (session.authenticated && !hasContentAccess(session.user)) {
+    redirect('/admin/portfolio?denied=content')
+  }
+
   const [blogs, projects, generations, events, posts, keywords] = await Promise.all([
     getBlogsQuery().catch(() => [] as any[]),
     getProjectsQuery().catch(() => [] as any[]),

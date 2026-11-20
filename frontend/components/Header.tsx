@@ -10,17 +10,12 @@ import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
 import { usePathname } from 'next/navigation'
-import { useSsoAuth } from '@/context/SsoAuthContext'
-import UserMenuDropdown from '@/components/auth/UserMenuDropdown'
-import { SSO_LOGIN_URL } from '@/lib/auth-sso'
-import { LogIn } from 'lucide-react'
+
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
-  const { user, isAuthenticated, isLoading } = useSsoAuth()
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
@@ -41,11 +36,10 @@ const Header = () => {
   // Only force white text when on events/about page, in dark mode, and not scrolled
   const forceWhite = isEventsPage && !scrolled && isDark
 
-  let headerClass = `mx-auto flex items-center justify-between transition-all duration-300 z-50 ${
-    scrolled
-      ? 'w-full max-w-full py-3 px-4 sm:px-8 bg-white/75 dark:bg-gray-950/75 backdrop-blur-lg border-b border-gray-200/50 dark:border-white/10 shadow-sm rounded-none'
-      : 'w-[calc(100%-2rem)] max-w-[1400px] mt-4 sm:mt-6 py-2.5 px-3 sm:px-6 bg-transparent border border-transparent rounded-full'
-  }`
+  let headerClass = `mx-auto flex items-center justify-between transition-all duration-300 z-50 ${scrolled
+    ? 'w-full max-w-full py-3 px-4 sm:px-8 bg-white/75 dark:bg-gray-950/75 backdrop-blur-lg border-b border-gray-200/50 dark:border-white/10 shadow-sm rounded-none'
+    : 'w-[calc(100%-2rem)] max-w-[1400px] mt-4 sm:mt-6 py-2.5 px-3 sm:px-6 bg-transparent border border-transparent rounded-full'
+    }`
 
   if (siteMetadata.stickyNav) {
     headerClass += scrolled ? ' fixed top-0 left-0 right-0' : ' absolute top-0 left-0 right-0'
@@ -121,28 +115,7 @@ const Header = () => {
         <ThemeSwitch />
         <SearchButton />
 
-        {/* SSO Authentication status pill / button */}
-        {isLoading ? (
-          <div className="h-8 w-8 animate-pulse rounded-full bg-slate-200/50 dark:bg-slate-800/50" />
-        ) : isAuthenticated && user ? (
-          <UserMenuDropdown forceWhite={forceWhite} />
-        ) : (
-          <button
-            onClick={() => {
-              const redirect = typeof window !== 'undefined' ? window.location.href : '/'
-              // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-              window.location.assign(`${SSO_LOGIN_URL}?redirect=${encodeURIComponent(redirect)}`)
-            }}
-            className={`hidden cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition-all sm:inline-flex ${
-              forceWhite
-                ? 'border border-white/20 bg-white/20 text-white backdrop-blur-md hover:bg-white/30'
-                : 'bg-blue-600 text-white shadow-blue-500/20 hover:bg-blue-700'
-            }`}
-          >
-            <LogIn className="h-3.5 w-3.5" />
-            <span>Đăng nhập</span>
-          </button>
-        )}
+
 
         <MobileNav />
       </div>

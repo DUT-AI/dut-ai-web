@@ -8,11 +8,15 @@ import {
   deleteKeywordQuery,
 } from '@/lib/db/features/keywords/queries'
 import { getAdminSession } from '@/lib/admin-auth'
+import { hasContentAccess } from '@/lib/enums/roles'
 
 export async function saveKeywordAction(prevState: any, formData: FormData) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    return { error: 'Bạn không có quyền thực hiện hành động này.' }
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    return {
+      error:
+        'Bạn không có quyền thực hiện hành động này. Yêu cầu vai trò Content hoặc Quản trị viên.',
+    }
   }
 
   const idStr = formData.get('id') as string
@@ -41,8 +45,8 @@ export async function saveKeywordAction(prevState: any, formData: FormData) {
 
 export async function deleteKeywordAction(id: number) {
   const session = await getAdminSession()
-  if (!session.authenticated) {
-    throw new Error('Unauthorized')
+  if (!session.authenticated || !hasContentAccess(session.user)) {
+    throw new Error('FORBIDDEN_CONTENT_ROLE_REQUIRED')
   }
 
   await deleteKeywordQuery(id)

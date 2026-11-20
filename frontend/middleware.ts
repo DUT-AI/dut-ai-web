@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { isTokenValid, SSO_LOGIN_URL } from '@/lib/auth-sso'
+import { isTokenValid, decodeJwtPayload, SSO_LOGIN_URL } from '@/lib/auth-sso'
+import { hasContentAccess, getPartitionForPath } from '@/lib/enums/roles'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -32,9 +33,12 @@ export function middleware(request: NextRequest) {
 
   // 3. Handle login page visits
   if (isLoginPage) {
-    // If already authenticated with a valid token, redirect to admin home
+    // If already authenticated with a valid token, redirect to appropriate home
     if (hasValidToken) {
-      return NextResponse.redirect(new URL('/admin', request.url))
+      const payload = decodeJwtPayload(token || '')
+      const canAccessContent = hasContentAccess(payload?.role_names || payload?.roles)
+      const destination = canAccessContent ? '/admin' : '/admin/portfolio'
+      return NextResponse.redirect(new URL(destination, request.url))
     }
     // Allow request to proceed so user can see SSO login button or fallback
     return NextResponse.next()
@@ -42,11 +46,24 @@ export function middleware(request: NextRequest) {
 
   // 4. Handle protected routes
   if (isProtectedRoute) {
-    // If unauthenticated or token is expired, redirect to central SSO portal
+    // If unauthenticated or token is expired, redirect to local admin login UI
     if (!hasValidToken) {
-      const loginUrl = new URL(SSO_LOGIN_URL)
+      const loginUrl = new URL('/admin/login', request.url)
       loginUrl.searchParams.set('redirect', request.url)
       return NextResponse.redirect(loginUrl)
+    }
+
+    // Role-based partitioning guard for Content Management Zone
+    const partition = getPartitionForPath(pathname)
+    if (partition === 'CONTENT_MANAGEMENT') {
+      const payload = decodeJwtPayload(token || '')
+      const canAccessContent = hasContentAccess(payload?.role_names || payload?.roles)
+
+      if (!canAccessContent) {
+        const redirectUrl = new URL('/admin/portfolio', request.url)
+        redirectUrl.searchParams.set('denied', 'content')
+        return NextResponse.redirect(redirectUrl)
+      }
     }
   }
 
