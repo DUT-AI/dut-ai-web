@@ -19,6 +19,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import ThemeSwitch from '@/components/ThemeSwitch'
+import DutaiWaffle from '@/components/common/DutaiWaffle'
 import { logoutAdminAction } from './actions'
 import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/sonner'
@@ -44,21 +45,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     email: string
     avatar?: string
     roles?: string[]
-  } | null>(null)
-
-  React.useEffect(() => {
-    // 1. Đọc cookie trước để có data ngay lập tức
+  } | null>(() => {
     if (typeof document !== 'undefined') {
       const match = document.cookie.match(/dut_admin_user=([^;]+)/)
       if (match && match[1]) {
         try {
-          const user = JSON.parse(decodeURIComponent(match[1]))
-          setCurrentUser(user)
+          return JSON.parse(decodeURIComponent(match[1]))
         } catch {}
       }
     }
+    return null
+  })
 
-    // 2. Gọi API /api/auth/me để cập nhật dữ liệu mới nhất từ server
+  React.useEffect(() => {
+    // Gọi API /api/auth/me để cập nhật dữ liệu mới nhất từ server
     fetch('/api/auth/me')
       .then((res) => (res.ok ? res.json() : null))
       .then((resData) => {
@@ -182,6 +182,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="flex items-center gap-3">
             <ThemeSwitch />
+            <DutaiWaffle current="manage" />
             <div className="flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-slate-50 py-1 pr-3 pl-1.5 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
               {currentUser?.avatar ? (
                 <img
