@@ -36,26 +36,45 @@ const NAV_ITEMS = [
   { href: '/admin/introductions', label: 'Giới thiệu (Intro)', icon: Info },
 ]
 
+interface AdminUser {
+  name: string
+  email: string
+  avatar?: string
+  roles?: string[]
+}
+
+const emptySubscribe = () => () => {}
+let cachedRawCookie = ''
+let cachedUser: AdminUser | null = null
+
+function getCookieUser(): AdminUser | null {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.match(/dut_admin_user=([^;]+)/)
+  const raw = match ? match[1] : ''
+  if (raw !== cachedRawCookie) {
+    cachedRawCookie = raw
+    try {
+      cachedUser = raw ? JSON.parse(decodeURIComponent(raw)) : null
+    } catch {
+      cachedUser = null
+    }
+  }
+  return cachedUser
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isLoginPage = pathname === '/admin/login'
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [currentUser, setCurrentUser] = useState<{
-    name: string
-    email: string
-    avatar?: string
-    roles?: string[]
-  } | null>(() => {
-    if (typeof document !== 'undefined') {
-      const match = document.cookie.match(/dut_admin_user=([^;]+)/)
-      if (match && match[1]) {
-        try {
-          return JSON.parse(decodeURIComponent(match[1]))
-        } catch {}
-      }
-    }
-    return null
-  })
+  const isMounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
+  const cookieUser = React.useSyncExternalStore(emptySubscribe, getCookieUser, () => null)
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null)
+
+  const activeUser = currentUser ?? (isMounted ? cookieUser : null)
 
   React.useEffect(() => {
     // Gọi API /api/auth/me để cập nhật dữ liệu mới nhất từ server
@@ -182,12 +201,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="flex items-center gap-3">
             <ThemeSwitch />
-            <DutaiWaffle current="dut-ai-web" />
+            <DutaiWaffle current="manage" />
             <div className="flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-slate-50 py-1 pr-3 pl-1.5 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
-              {currentUser?.avatar ? (
+              {activeUser?.avatar ? (
                 <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
+                  src={activeUser.avatar}
+                  alt={activeUser.name}
                   className="h-6 w-6 rounded-full border border-blue-500 object-cover"
                 />
               ) : (
@@ -195,11 +214,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
               <div className="flex flex-col text-left">
                 <span className="text-xs leading-none">
-                  {currentUser?.name || currentUser?.email || 'User'}
+                  {activeUser ? activeUser.name || activeUser.email : 'User'}
                 </span>
-                {currentUser?.roles && currentUser.roles.length > 0 && (
+                {activeUser?.roles && activeUser.roles.length > 0 && (
                   <div className="mt-0.5 flex items-center gap-1">
-                    {currentUser.roles.map((r, i) => (
+                    {activeUser.roles.map((r, i) => (
                       <span
                         key={i}
                         className="py-0.2 rounded bg-blue-500/10 px-1.5 text-[10px] leading-tight font-semibold text-blue-600 dark:text-blue-400"
