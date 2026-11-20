@@ -30,7 +30,7 @@ export function PortfolioProjectCard({ project }: { project: UnifiedProject }) {
 
         {/* Club Verified Badge */}
         {project.isClubProject && (
-          <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-600/90 px-3 py-1 text-xs font-semibold text-white shadow backdrop-blur-sm dark:border-blue-400">
+          <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-600/90 px-3 py-1 text-xs font-semibold text-white shadow backdrop-blur-sm dark:border-blue-400">
             <Sparkles className="h-3 w-3" />
             DUT AI Project
           </div>

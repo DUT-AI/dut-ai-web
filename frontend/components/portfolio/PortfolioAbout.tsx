@@ -22,7 +22,7 @@ export default function PortfolioAbout({ bio, quote, clubRole }: PortfolioAboutP
         </h2>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-8">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-gray-800 dark:bg-gray-900">
         {clubRole && (
           <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-blue-400">
             <Award className="h-4 w-4" />
@@ -31,15 +31,15 @@ export default function PortfolioAbout({ bio, quote, clubRole }: PortfolioAboutP
         )}
 
         {bio && (
-          <div className="prose max-w-none text-gray-700 dark:prose-invert dark:text-gray-300">
-            <p className="whitespace-pre-line leading-relaxed">{bio}</p>
+          <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+            <p className="leading-relaxed whitespace-pre-line">{bio}</p>
           </div>
         )}
 
         {quote && (
           <div className="mt-6 flex items-start gap-3 rounded-xl bg-gray-50 p-4 dark:bg-gray-800/50">
             <Quote className="h-5 w-5 flex-shrink-0 text-blue-500" />
-            <p className="italic text-gray-600 dark:text-gray-300">&ldquo;{quote}&rdquo;</p>
+            <p className="text-gray-600 italic dark:text-gray-300">&ldquo;{quote}&rdquo;</p>
           </div>
         )}
       </div>

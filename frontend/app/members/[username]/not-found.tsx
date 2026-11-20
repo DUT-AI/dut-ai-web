@@ -8,7 +8,7 @@ export default function MemberNotFound() {
         <UserX className="h-10 w-10" />
       </div>
 
-      <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+      <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
         Không tìm thấy thành viên
       </h1>
 

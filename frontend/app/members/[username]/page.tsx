@@ -67,11 +67,7 @@ export default async function MemberPortfolioPage({ params }: MemberPortfolioPag
         />
 
         {/* About Section */}
-        <PortfolioAbout
-          bio={profile.bio}
-          quote={profile.quote}
-          clubRole={profile.clubRole}
-        />
+        <PortfolioAbout bio={profile.bio} quote={profile.quote} clubRole={profile.clubRole} />
 
         {/* Skills Section */}
         <PortfolioSkills skills={profile.skills} />

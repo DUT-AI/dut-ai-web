@@ -21,10 +21,7 @@ const updateProjectSchema = z.object({
   display_order: z.number().int().optional(),
 })
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession()
     if (!session.authenticated || !session.user?.id) {

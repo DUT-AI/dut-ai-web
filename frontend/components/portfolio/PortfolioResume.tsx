@@ -51,7 +51,7 @@ export default function PortfolioResume({ cvUrl, fileName, fileSize }: Portfolio
             href={cvUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 sm:inline-flex"
+            className="hidden items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 sm:inline-flex dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             <ExternalLink className="h-4 w-4" />
             Mở tab mới
@@ -61,7 +61,7 @@ export default function PortfolioResume({ cvUrl, fileName, fileSize }: Portfolio
 
       {/* Embedded PDF Viewer on Desktop */}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div className="relative aspect-[3/4] w-full min-h-[600px] sm:min-h-[850px]">
+        <div className="relative aspect-[3/4] min-h-[600px] w-full sm:min-h-[850px]">
           <object
             data={`${cvUrl}#toolbar=0`}
             type="application/pdf"

@@ -1,18 +1,12 @@
-import typescriptEslint from '@typescript-eslint/eslint-plugin'
-import globals from 'globals'
-import tsParser from '@typescript-eslint/parser'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import js from '@eslint/js'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
+import prettierPluginRecommended from 'eslint-plugin-prettier/recommended'
 
 export default [
   {
     ignores: [
       '.next/**',
       'node_modules/**',
+      '.yarn/**',
       'drizzle/**',
       'public/**',
       'my-cv/**',
@@ -20,48 +14,26 @@ export default [
       'next.config.js',
     ],
   },
-  js.configs.recommended,
-  ...typescriptEslint.configs['flat/recommended'],
+  ...nextCoreWebVitals,
+  prettierPluginRecommended,
   {
-    linterOptions: {
-      reportUnusedDisableDirectives: 'off',
-    },
-    plugins: {
-      '@typescript-eslint': typescriptEslint,
-      '@next/next': {
-        rules: {
-          'no-img-element': { create: () => ({}) },
-        },
-      },
-      'jsx-a11y': {
-        rules: {
-          'anchor-has-content': { create: () => ({}) },
-        },
-      },
-    },
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.amd,
-        ...globals.node,
-      },
-      parser: tsParser,
-      parserOptions: {
-        tsconfigRootDir: __dirname,
-      },
-    },
+    files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
     rules: {
       'react/react-in-jsx-scope': 'off',
+      'jsx-a11y/anchor-is-valid': [
+        'error',
+        {
+          components: ['Link'],
+          specialLink: ['hrefLeft', 'hrefRight'],
+          aspects: ['invalidHref', 'preferButton'],
+        },
+      ],
       'react/prop-types': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'react/no-unescaped-entities': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-empty-object-type': 'off',
-      'no-empty': 'off',
-      'prefer-const': 'warn',
     },
   },
 ]

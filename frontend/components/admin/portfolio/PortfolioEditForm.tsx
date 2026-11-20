@@ -168,8 +168,8 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
                 {!isUsernameValid
                   ? '⚠️ Yêu cầu: 3-30 ký tự, chữ thường, số, - hoặc _'
                   : isReserved
-                  ? '❌ Tên này thuộc từ khóa hệ thống, vui lòng chọn tên khác'
-                  : '✓ Định dạng hợp lệ'}
+                    ? '❌ Tên này thuộc từ khóa hệ thống, vui lòng chọn tên khác'
+                    : '✓ Định dạng hợp lệ'}
               </p>
             )}
           </div>
@@ -331,9 +331,7 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
                 <input
                   type="text"
                   value={newSkillText[catIdx] || ''}
-                  onChange={(e) =>
-                    setNewSkillText({ ...newSkillText, [catIdx]: e.target.value })
-                  }
+                  onChange={(e) => setNewSkillText({ ...newSkillText, [catIdx]: e.target.value })}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault()
@@ -377,7 +375,7 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
 
       {/* 4. Visibility Toggle & Save Button */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <label className="flex items-center gap-3 cursor-pointer">
+        <label className="flex cursor-pointer items-center gap-3">
           <input
             type="checkbox"
             checked={isPublic}

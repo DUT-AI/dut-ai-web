@@ -2,15 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  Github,
-  Linkedin,
-  Facebook,
-  Globe,
-  FileText,
-  Briefcase,
-  Sparkles,
-} from 'lucide-react'
+import { Github, Linkedin, Facebook, Globe, FileText, Briefcase, Sparkles } from 'lucide-react'
 
 export interface PortfolioHeroProps {
   name: string
@@ -39,7 +31,7 @@ export default function PortfolioHero({
   const defaultAvatar = '/static/images/avatar.png'
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-b from-blue-50/50 via-white to-white p-8 dark:border-gray-800 dark:from-blue-950/20 dark:via-gray-950 dark:to-gray-950 sm:p-12">
+    <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-b from-blue-50/50 via-white to-white p-8 sm:p-12 dark:border-gray-800 dark:from-blue-950/20 dark:via-gray-950 dark:to-gray-950">
       <div className="flex flex-col-reverse items-center justify-between gap-8 md:flex-row md:items-start">
         {/* Left Information */}
         <div className="flex flex-1 flex-col items-center text-center md:items-start md:text-left">
@@ -52,19 +44,19 @@ export default function PortfolioHero({
             </div>
           )}
 
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl md:text-5xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl md:text-5xl dark:text-white">
             Hi, I'm <span className="text-blue-600 dark:text-blue-400">{name}</span>{' '}
-            <span className="inline-block origin-[70%_70%] animate-wave">👋</span>
+            <span className="animate-wave inline-block origin-[70%_70%]">👋</span>
           </h1>
 
           {headline && (
-            <p className="mt-3 text-lg font-medium text-gray-700 dark:text-gray-300 sm:text-xl">
+            <p className="mt-3 text-lg font-medium text-gray-700 sm:text-xl dark:text-gray-300">
               {headline}
             </p>
           )}
 
           {quote && (
-            <blockquote className="mt-4 border-l-2 border-blue-500 pl-4 text-sm italic text-gray-600 dark:text-gray-400">
+            <blockquote className="mt-4 border-l-2 border-blue-500 pl-4 text-sm text-gray-600 italic dark:text-gray-400">
               &ldquo;{quote}&rdquo;
             </blockquote>
           )}
@@ -140,7 +132,7 @@ export default function PortfolioHero({
 
         {/* Right Avatar */}
         <div className="relative flex-shrink-0">
-          <div className="relative h-36 w-36 overflow-hidden rounded-full border-4 border-white shadow-xl dark:border-gray-900 sm:h-44 sm:w-44">
+          <div className="relative h-36 w-36 overflow-hidden rounded-full border-4 border-white shadow-xl sm:h-44 sm:w-44 dark:border-gray-900">
             <Image
               src={avatarUrl || defaultAvatar}
               alt={name}
