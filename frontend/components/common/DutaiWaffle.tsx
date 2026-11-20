@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useSyncExternalStore } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface DutaiWaffleProps {
   current?: 'manage' | 'lms' | 'meetly' | 'data' | string
@@ -30,18 +30,19 @@ declare global {
 }
 
 const WAFFLE_SCRIPT_URL = 'https://workspace.dutai.io.vn/waffle.js'
-const emptySubscribe = () => () => {}
 
 export function DutaiWaffle({ current = 'manage' }: DutaiWaffleProps) {
-  const isMounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  )
+  const [isDefined, setIsDefined] = useState(false)
 
   useEffect(() => {
-    // Inject script only once if not already present in document.head
-    const existing = document.querySelector(`script[src="${WAFFLE_SCRIPT_URL}"]`)
+    // Chờ customElements.whenDefined
+    customElements.whenDefined('dutai-waffle').then(() => {
+      setIsDefined(true)
+    })
+
+    // Nạp script nếu chưa có
+    const scriptSelector = `script[src="${WAFFLE_SCRIPT_URL}"]`
+    const existing = document.querySelector(scriptSelector) as HTMLScriptElement | null
     if (!existing) {
       const script = document.createElement('script')
       script.src = WAFFLE_SCRIPT_URL
@@ -50,14 +51,27 @@ export function DutaiWaffle({ current = 'manage' }: DutaiWaffleProps) {
     }
   }, [])
 
-  if (!isMounted) {
-    return <div className="h-9 w-9" aria-hidden="true" />
-  }
-
   return (
-    <div className="flex items-center">
-      {/* @ts-ignore Custom Web Component */}
-      <dutai-waffle current={current} />
+    <div className="relative flex h-9 w-9 items-center justify-center">
+      {/* Fallback nút 9 chấm hiển thị ngay lập tức trong lúc script đang tải */}
+      {!isDefined && (
+        <div
+          className="flex h-[38px] w-[38px] items-center justify-center rounded-xl text-slate-600 transition-colors dark:text-slate-300"
+          title="Ứng dụng DUT-AI"
+        >
+          <div className="grid grid-cols-3 gap-[3px]">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="h-1 w-1 rounded-[1px] bg-current" />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Web Component chính */}
+      <div className={!isDefined ? 'hidden' : 'block'}>
+        {/* @ts-ignore Custom Web Component */}
+        <dutai-waffle current={current} />
+      </div>
     </div>
   )
 }
