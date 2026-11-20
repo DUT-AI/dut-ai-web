@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react'
 import Image from 'next/image'
-import { X } from 'lucide-react'
+import Link from 'next/link'
+import { X, ExternalLink } from 'lucide-react'
 import type { GenerationMember } from '@/lib/db/features/organization/types'
 
 interface MemberDetailModalProps {
@@ -108,6 +109,18 @@ export default function MemberDetailModal({
           <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 font-normal">
             {member.quote || 'Một mảnh ghép nhiệt huyết trên hành trình trưởng thành và cống hiến cùng DUT AI.'}
           </p>
+
+          {member.username && (
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/10">
+              <Link
+                href={`/members/${member.username}`}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Xem trang Portfolio cá nhân
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

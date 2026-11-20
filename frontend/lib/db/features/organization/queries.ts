@@ -1,7 +1,8 @@
 import { asc, eq } from 'drizzle-orm'
 import { db } from '../../index'
 import { getManageUsersMap } from '@/lib/manage-users'
-import { getUserCvsMapQuery } from '../users/queries'
+import { getUserCvsMapQuery, getUserCvsUsernameMapQuery } from '../users/queries'
+import { generateInitialUsername } from '@/lib/portfolio/username-generator'
 import { userCvs } from '../users/schema'
 import { generationDepartments, generationMembers, generations } from './schema'
 import type { GenerationAlbum, SaveGenerationInput } from './types'
@@ -9,7 +10,8 @@ import type { GenerationAlbum, SaveGenerationInput } from './types'
 function toAlbum(
   generation: any,
   users: Awaited<ReturnType<typeof getManageUsersMap>>,
-  userCvsMap: Map<number, string>
+  userCvsMap: Map<number, string>,
+  userCvsUsernameMap: Map<number, string>
 ): GenerationAlbum {
   return {
     id: generation.id,
@@ -30,6 +32,10 @@ function toAlbum(
       members: department.members.map((assignment: any) => {
         const user = users.get(assignment.externalUserId)
         const quote = userCvsMap.get(assignment.externalUserId)
+        const username =
+          userCvsUsernameMap.get(assignment.externalUserId) ||
+          (user ? generateInitialUsername(user.name, user.email, user.id) : undefined)
+
         return {
           id: assignment.externalUserId,
           name: user?.name ?? 'Thành viên chưa đồng bộ',
@@ -41,6 +47,7 @@ function toAlbum(
           display_order: assignment.displayOrder,
           is_featured: assignment.isFeatured,
           quote: quote || user?.quote || undefined,
+          username,
         }
       }),
     })),
@@ -65,16 +72,17 @@ async function loadGenerations(publishedOnly: boolean) {
 }
 
 export async function getGenerationAlbumsQuery(options: { publishedOnly?: boolean } = {}) {
-  const [rows, users, userCvsMap] = await Promise.all([
+  const [rows, users, userCvsMap, userCvsUsernameMap] = await Promise.all([
     loadGenerations(options.publishedOnly ?? true),
     getManageUsersMap(),
     getUserCvsMapQuery(),
+    getUserCvsUsernameMapQuery(),
   ])
-  return rows.map((row) => toAlbum(row, users, userCvsMap))
+  return rows.map((row) => toAlbum(row, users, userCvsMap, userCvsUsernameMap))
 }
 
 export async function getGenerationAlbumByIdQuery(id: number): Promise<GenerationAlbum | null> {
-  const [row, users, userCvsMap] = await Promise.all([
+  const [row, users, userCvsMap, userCvsUsernameMap] = await Promise.all([
     db.query.generations.findFirst({
       where: eq(generations.id, id),
       with: {
@@ -90,9 +98,10 @@ export async function getGenerationAlbumByIdQuery(id: number): Promise<Generatio
     }),
     getManageUsersMap(),
     getUserCvsMapQuery(),
+    getUserCvsUsernameMapQuery(),
   ])
 
-  return row ? toAlbum(row, users, userCvsMap) : null
+  return row ? toAlbum(row, users, userCvsMap, userCvsUsernameMap) : null
 }
 
 async function replaceDepartments(

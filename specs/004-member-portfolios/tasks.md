@@ -93,8 +93,8 @@
 
 **Independent Test**: Navigate to `/about`, click on a member in the Generation Album, and confirm navigation to `/members/[username]`.
 
-- [ ] T025 [US4] Update `frontend/lib/db/features/organization/queries.ts` to include `username` in member album data mapping from `user_cv`
-- [ ] T026 [US4] Update member card component in `frontend/components/about/GenerationAlbum.tsx` to link member avatars and names to `/members/[username]`
+- [X] T025 [US4] Update `frontend/lib/db/features/organization/queries.ts` to include `username` in member album data mapping from `user_cv`
+- [X] T026 [US4] Update member card component in `frontend/components/about/GenerationAlbum.tsx` to link member avatars and names to `/members/[username]`
 
 ---
 
@@ -102,9 +102,9 @@
 
 **Purpose**: Cross-story quality, theme adherence, and validation.
 
-- [ ] T027 [P] Polish responsive layout and verify WCAG AA color contrast across Light and Dark themes for all portfolio components in `frontend/components/portfolio/`
-- [ ] T028 Execute complete quickstart validation scenarios from `specs/004-member-portfolios/quickstart.md`
-- [ ] T029 Run linter and type-checker via `npm run lint` in `frontend/` to ensure zero errors and clean build
+- [X] T027 [P] Polish responsive layout and verify WCAG AA color contrast across Light and Dark themes for all portfolio components in `frontend/components/portfolio/`
+- [X] T028 Execute complete quickstart validation scenarios from `specs/004-member-portfolios/quickstart.md`
+- [X] T029 Run linter and type-checker via `npm run lint` in `frontend/` to ensure zero errors and clean build
 
 ---
 

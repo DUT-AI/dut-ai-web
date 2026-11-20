@@ -6,6 +6,7 @@ import AboutCoreValues from '@/components/about/AboutCoreValues'
 import GenerationAlbum from '@/components/about/GenerationAlbum'
 import { getGenerationAlbumsQuery } from '@/lib/db/features/organization/queries'
 import { getManageUsers } from '@/lib/manage-users'
+import { generateInitialUsername } from '@/lib/portfolio/username-generator'
 import type { GenerationAlbum as GenerationAlbumData } from '@/lib/db/features/organization/types'
 import type { Member } from '@/lib/db/features/users/types'
 
@@ -55,6 +56,7 @@ function fallbackAlbum(users: Member[]): GenerationAlbumData {
         )
         .map((user, memberIndex) => ({
           ...user,
+          username: user.username || generateInitialUsername(user.name, user.email, user.id),
           title:
             (user.role_names || [user.role_name])
               .filter((role) => role.toLowerCase() !== 'teammate')
