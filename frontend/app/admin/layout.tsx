@@ -182,7 +182,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="flex items-center gap-3">
             <ThemeSwitch />
-            <DutaiWaffle current="manage" />
+            <DutaiWaffle current="dut-ai-web" />
             <div className="flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-slate-50 py-1 pr-3 pl-1.5 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300">
               {currentUser?.avatar ? (
                 <img

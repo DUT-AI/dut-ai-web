@@ -1,7 +1,6 @@
 'use client'
 
-import React from 'react'
-import Script from 'next/script'
+import React, { useEffect, useSyncExternalStore } from 'react'
 
 interface DutaiWaffleProps {
   current?: 'manage' | 'lms' | 'meetly' | 'data' | string
@@ -30,10 +29,33 @@ declare global {
   }
 }
 
+const WAFFLE_SCRIPT_URL = 'https://workspace.dutai.io.vn/waffle.js'
+const emptySubscribe = () => () => {}
+
 export function DutaiWaffle({ current = 'manage' }: DutaiWaffleProps) {
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
+
+  useEffect(() => {
+    // Inject script only once if not already present in document.head
+    const existing = document.querySelector(`script[src="${WAFFLE_SCRIPT_URL}"]`)
+    if (!existing) {
+      const script = document.createElement('script')
+      script.src = WAFFLE_SCRIPT_URL
+      script.async = true
+      document.head.appendChild(script)
+    }
+  }, [])
+
+  if (!isMounted) {
+    return <div className="h-9 w-9" aria-hidden="true" />
+  }
+
   return (
     <div className="flex items-center">
-      <Script src="https://workspace.dutai.io.vn/waffle.js" strategy="lazyOnload" />
       {/* @ts-ignore Custom Web Component */}
       <dutai-waffle current={current} />
     </div>
