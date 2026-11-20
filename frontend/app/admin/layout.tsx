@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
+  UserCircle,
   FileText,
   Briefcase,
   Calendar,
@@ -24,6 +25,7 @@ import { Toaster } from '@/components/ui/sonner'
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Tổng quan', icon: LayoutDashboard, exact: true },
+  { href: '/admin/portfolio', label: 'Hồ sơ cá nhân (Portfolio)', icon: UserCircle },
   { href: '/admin/blogs', label: 'Bài viết (Blogs)', icon: FileText },
   { href: '/admin/projects', label: 'Dự án (Projects)', icon: Briefcase },
   { href: '/admin/events', label: 'Sự kiện (Events)', icon: Calendar },

@@ -85,6 +85,22 @@ function getManagedEventImageKey(url: string): string | null {
   }
 }
 
+export async function deleteFileFromMinIO(key: string): Promise<boolean> {
+  try {
+    const s3 = getS3Client()
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: getBucketName(),
+        Key: key,
+      })
+    )
+    return true
+  } catch (err) {
+    console.error('Failed to delete object from MinIO:', err)
+    return false
+  }
+}
+
 export async function deleteEventImageFromMinIO(url: string): Promise<boolean> {
   const key = getManagedEventImageKey(url)
   if (!key) return false
