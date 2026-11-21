@@ -1,8 +1,8 @@
 import { getProjectsCached as getProjects } from '@/lib/db/cached-queries'
-import type { Project } from '@/lib/db/features/projects/types'
+import type { Project } from '@/features/projects/db/types'
 import { genPageMetadata } from 'app/seo'
-import ProjectsListClient from './ProjectsListClient'
-import Footer from '@/components/Footer'
+import ProjectsListClient from '@/features/projects/components/ProjectsListClient'
+import Footer from '@/components/layout/Footer'
 
 export const metadata = genPageMetadata({
   title: 'Dự án AI của sinh viên',

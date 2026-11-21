@@ -1,10 +1,11 @@
-import { getProjectsQuery } from '@/lib/db/features/projects/queries'
+import { getProjectsQuery } from '@/features/projects/db/queries'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Plus, Edit2, Trash2, ExternalLink, Users, Code, Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { deleteProjectAction } from './actions'
-import type { Project } from '@/lib/db/features/projects/types'
+import type { Project } from '@/features/projects/db/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,9 +22,9 @@ export default async function AdminProjectsListPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white">
             Quản lý Dự án (Projects)
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -43,7 +44,7 @@ export default async function AdminProjectsListPage() {
       <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-100 bg-slate-50/75 text-xs font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
+            <thead className="border-b border-slate-100 bg-slate-50/75 text-xs font-bold tracking-wider text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
               <tr>
                 <th className="px-6 py-4">ID</th>
                 <th className="px-6 py-4">Dự án</th>
@@ -55,29 +56,36 @@ export default async function AdminProjectsListPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {projects.map((proj) => (
-                <tr key={proj.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                <tr
+                  key={proj.id}
+                  className="transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                >
                   <td className="px-6 py-4 font-mono text-xs text-slate-400">#{proj.id}</td>
-                  <td className="px-6 py-4 max-w-xs">
+                  <td className="max-w-xs px-6 py-4">
                     <div className="flex items-center gap-3">
                       {proj.image_url && (
-                        <img
-                          src={proj.image_url.split('\n')[0]}
-                          alt={proj.title}
-                          className="h-10 w-14 rounded-lg object-cover border border-slate-200 dark:border-slate-800"
-                        />
+                        <div className="relative h-10 w-14 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
+                          <Image
+                            src={proj.image_url.split('\n')[0]}
+                            alt={proj.title}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+                        </div>
                       )}
                       <div>
-                        <div className="font-bold text-slate-900 dark:text-white text-sm">
+                        <div className="text-sm font-bold text-slate-900 dark:text-white">
                           {proj.title}
                         </div>
-                        <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
+                        <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">
                           {proj.description}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1 max-w-xs">
+                    <div className="flex max-w-xs flex-wrap gap-1">
                       {proj.technologies ? (
                         proj.technologies.split(/[\n,]+/).map((tech, idx) => (
                           <span
@@ -93,7 +101,7 @@ export default async function AdminProjectsListPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1.5 max-w-xs">
+                    <div className="flex max-w-xs flex-wrap gap-1.5">
                       {proj.members?.map((m) => (
                         <Badge key={m.id} variant="secondary" className="text-xs">
                           {m.name} ({m.role})
@@ -110,7 +118,7 @@ export default async function AdminProjectsListPage() {
                         <Link
                           href={proj.demo_url}
                           target="_blank"
-                          className="text-blue-600 hover:underline flex items-center gap-1"
+                          className="flex items-center gap-1 text-blue-600 hover:underline"
                         >
                           <span>Demo</span>
                           <ExternalLink className="h-3 w-3" />
@@ -120,7 +128,7 @@ export default async function AdminProjectsListPage() {
                         <Link
                           href={proj.video_url}
                           target="_blank"
-                          className="text-pink-600 hover:underline flex items-center gap-1"
+                          className="flex items-center gap-1 text-pink-600 hover:underline"
                         >
                           <Video className="h-3 w-3" />
                           <span>Video</span>

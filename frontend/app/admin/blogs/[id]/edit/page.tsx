@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getBlogByIdQuery } from '@/lib/db/features/blogs/queries'
+import { getBlogByIdQuery } from '@/features/blog/db/queries'
 import { getBlogKeywordsQuery } from '@/lib/db/queries'
 import { getManageUsers } from '@/lib/manage-users'
 import BlogForm from '@/app/admin/blogs/BlogForm'

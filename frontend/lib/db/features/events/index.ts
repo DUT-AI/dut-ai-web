@@ -1,4 +1,1 @@
-export * from './schema'
-export * from './types'
-export * from './queries'
-export * from './timeline'
+export * from '@/features/events/db'

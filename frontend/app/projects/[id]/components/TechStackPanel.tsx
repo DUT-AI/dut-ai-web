@@ -6,10 +6,14 @@ interface TechStackPanelProps {
 }
 
 export default function TechStackPanel({ project }: TechStackPanelProps) {
-  const hasDynamicTechnologies = Boolean(project.technologies && project.technologies.trim().length > 0)
+  const hasDynamicTechnologies = Boolean(
+    project.technologies && project.technologies.trim().length > 0
+  )
 
   return (
-    <div className={`${glassClass} relative overflow-y-auto h-[700px] lg:h-[800px] rounded-[40px] p-8 sm:p-10 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent`}>
+    <div
+      className={`${glassClass} scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent relative h-[700px] overflow-y-auto rounded-[40px] p-8 sm:p-10 lg:h-[800px]`}
+    >
       {/* Left gradient accent */}
       <div
         className="absolute inset-y-0 left-0 w-1.5 rounded-l-[40px]"
@@ -23,20 +27,20 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
       </div>
 
       <h3
-        className="mb-6 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl"
+        className="mb-6 text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white"
         style={{ lineHeight: '1.111em' }}
       >
         Tech Stack – Công nghệ sử dụng
       </h3>
 
       {hasDynamicTechnologies ? (
-        <div className="whitespace-pre-wrap text-sm leading-7 text-slate-600 dark:text-[#F1F5F9] sm:text-base">
+        <div className="text-sm leading-7 whitespace-pre-wrap text-slate-600 sm:text-base dark:text-[#F1F5F9]">
           {project.technologies}
         </div>
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
           <div>
-            <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl">
+            <h4 className="mb-3 text-lg font-bold text-slate-800 sm:text-xl dark:text-white">
               01. FrontEnd
             </h4>
             <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]">
@@ -51,7 +55,7 @@ export default function TechStackPanel({ project }: TechStackPanelProps) {
           </div>
 
           <div>
-            <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl">
+            <h4 className="mb-3 text-lg font-bold text-slate-800 sm:text-xl dark:text-white">
               02. BackEnd
             </h4>
             <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]">

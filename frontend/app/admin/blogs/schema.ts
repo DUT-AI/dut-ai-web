@@ -1,10 +1,7 @@
 import { z } from 'zod'
 
 export const blogFormSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, 'Tiêu đề bài viết không được để trống.'),
+  title: z.string().trim().min(1, 'Tiêu đề bài viết không được để trống.'),
   slug: z
     .string()
     .trim()

@@ -12,7 +12,7 @@ import {
   isEventImageUrlReferencedQuery,
   updatePostQuery,
   updatePublicEventQuery,
-} from '@/lib/db/features/events/queries'
+} from '@/features/events/db/queries'
 import { getAdminSession } from '@/lib/admin-auth'
 import { deleteEventImageFromMinIO } from '@/lib/minio'
 import { hasContentAccess } from '@/lib/enums/roles'

@@ -2,12 +2,12 @@ import {
   getProjectByIdCached as getProject,
   getMembersCached as getMembers,
 } from '@/lib/db/cached-queries'
-import type { Project } from '@/lib/db/features/projects/types'
-import type { Member } from '@/lib/db/features/users/types'
+import type { Project } from '@/features/projects/db/types'
+import type { Member } from '@/features/users/db/types'
 import { absoluteUrl, genPageMetadata, serializeJsonLd } from 'app/seo'
 import NextImage from 'next/image'
 import ProjectsClient from './ProjectsClient'
-import Footer from '@/components/Footer'
+import Footer from '@/components/layout/Footer'
 import { notFound } from 'next/navigation'
 import { buildProjectPath, parseProjectIdFromParam } from '../project-route'
 import type { Metadata } from 'next'

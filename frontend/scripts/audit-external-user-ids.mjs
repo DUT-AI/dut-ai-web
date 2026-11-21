@@ -11,8 +11,10 @@ const databaseUrl =
 const sql = postgres(databaseUrl, { connect_timeout: 5 })
 
 try {
-  const projectRefs = await sql`select distinct external_user_id as id from project_members order by external_user_id`
-  const blogRefs = await sql`select distinct external_user_id as id from blog_authors order by external_user_id`
+  const projectRefs =
+    await sql`select distinct external_user_id as id from project_members order by external_user_id`
+  const blogRefs =
+    await sql`select distinct external_user_id as id from blog_authors order by external_user_id`
   const response = await fetch(
     process.env.DUT_MANAGER_USERS_URL || 'https://manage.dutai.io.vn/api/v1/users/options',
     { headers: { Authorization: `Bearer ${process.env.DUT_MANAGER_API_KEY}` } }

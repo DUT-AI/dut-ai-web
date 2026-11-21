@@ -1,5 +1,5 @@
 import type { Project } from 'app/api-client'
-import Image from '@/components/Image'
+import Image from '@/components/common/Image'
 
 interface ThumbCardProps {
   project: Project
@@ -14,10 +14,11 @@ export default function ThumbCard({ project, active, onClick, cardW = 280 }: Thu
   return (
     <button
       onClick={onClick}
-      className={`group relative flex-shrink-0 overflow-hidden rounded-[40px] transition-all duration-500 focus:outline-none ${active
-        ? 'ring-2 ring-white/50 ring-offset-2 ring-offset-transparent'
-        : 'opacity-75 hover:opacity-100'
-        }`}
+      className={`group relative flex-shrink-0 overflow-hidden rounded-[40px] transition-all duration-500 focus:outline-none ${
+        active
+          ? 'ring-2 ring-white/50 ring-offset-2 ring-offset-transparent'
+          : 'opacity-75 hover:opacity-100'
+      }`}
       style={{ width: cardW, height: Math.round(cardW * (213 / 280)) }}
     >
       {/* BG */}
@@ -43,16 +44,11 @@ export default function ThumbCard({ project, active, onClick, cardW = 280 }: Thu
       />
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 text-left">
-        <h3
-          className="text-[22px] font-bold leading-[1.2] text-white sm:text-[26px] lg:text-[30px]"
-        >
+      <div className="absolute right-0 bottom-0 left-0 p-5 text-left">
+        <h3 className="text-[22px] leading-[1.2] font-bold text-white sm:text-[26px] lg:text-[30px]">
           {project.title}
         </h3>
-        <p
-          className="mt-0.5 text-sm text-[#CBD5E1] lg:text-base"
-          style={{ lineHeight: '1.55em' }}
-        >
+        <p className="mt-0.5 text-sm text-[#CBD5E1] lg:text-base" style={{ lineHeight: '1.55em' }}>
           {project.description && project.description.length > 50
             ? project.description.slice(0, 50) + '…'
             : project.description}

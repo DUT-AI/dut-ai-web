@@ -1,5 +1,5 @@
-import Link from '@/components/Link'
-import SparkleIcon from '@/components/SparkleIcon'
+import Link from '@/components/common/Link'
+import SparkleIcon from '@/components/common/SparkleIcon'
 import Image from 'next/image'
 import StatCounter from '@/components/home/StatCounter'
 

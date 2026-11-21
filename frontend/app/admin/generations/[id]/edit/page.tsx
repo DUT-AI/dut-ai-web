@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import GenerationForm from '../../GenerationForm'
 import { getManageUsers } from '@/lib/manage-users'
-import { getGenerationAlbumByIdQuery } from '@/lib/db/features/organization/queries'
+import { getGenerationAlbumByIdQuery } from '@/features/generations/db/queries'
 
 export const dynamic = 'force-dynamic'
 

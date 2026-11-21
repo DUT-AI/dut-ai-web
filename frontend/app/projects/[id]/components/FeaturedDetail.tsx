@@ -1,6 +1,6 @@
 import type { Project, Member } from 'app/api-client'
-import Image from '@/components/Image'
-import Link from '@/components/Link'
+import Image from '@/components/common/Image'
+import Link from '@/components/common/Link'
 import { glassClass } from './styles'
 
 interface FeaturedDetailProps {
@@ -36,8 +36,9 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
                   />
                 ) : (
                   <div
-                    className={`h-full w-full ${['bg-slate-700', 'bg-emerald-700', 'bg-amber-600'][i % 3]
-                      }`}
+                    className={`h-full w-full ${
+                      ['bg-slate-700', 'bg-emerald-700', 'bg-amber-600'][i % 3]
+                    }`}
                   />
                 )}
               </div>
@@ -46,7 +47,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
 
           {/* Title */}
           <h2
-            className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl lg:text-[36px]"
+            className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-[36px] dark:text-white"
             style={{ lineHeight: '1.1em' }}
           >
             {project.href ? (
@@ -65,7 +66,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
 
         {/* Description */}
         <p
-          className="mt-8 text-base text-slate-600 dark:text-[#F1F5F9] sm:text-lg lg:mt-auto lg:text-[20px]"
+          className="mt-8 text-base text-slate-600 sm:text-lg lg:mt-auto lg:text-[20px] dark:text-[#F1F5F9]"
           style={{ lineHeight: '2em' }}
         >
           {project.description}
@@ -73,7 +74,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
       </div>
 
       {/* Right — Image card */}
-      <div className="relative min-h-[260px] flex-1 overflow-hidden rounded-b-[40px] border border-black/20 dark:border-black/40 lg:rounded-r-[40px] lg:rounded-bl-none">
+      <div className="relative min-h-[260px] flex-1 overflow-hidden rounded-b-[40px] border border-black/20 lg:rounded-r-[40px] lg:rounded-bl-none dark:border-black/40">
         {imgSrc ? (
           <Image alt={project.title} src={imgSrc} fill className="object-cover" unoptimized />
         ) : (
@@ -88,7 +89,7 @@ export default function FeaturedDetail({ project, members }: FeaturedDetailProps
           }}
         />
         {/* Overlay info */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+        <div className="absolute right-0 bottom-0 left-0 p-6 sm:p-8">
           <div className="mb-2 flex -space-x-1.5">
             {members.slice(0, 1).map((m) => (
               <div

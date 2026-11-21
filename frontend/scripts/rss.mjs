@@ -51,33 +51,37 @@ async function generateRSS(config, page = 'feed.xml') {
       return
     }
     const apiBlogs = await res.json()
-    
-    const allBlogs = await Promise.all(apiBlogs.map(async (blog) => {
-      let content = ''
-      try {
-        const detailRes = await fetch(`${API_URL}/blogs/${blog.id}`)
-        if (detailRes.ok) {
-          const detailBlog = await detailRes.json()
-          if (detailBlog.content) {
-            content = marked.parse(detailBlog.content)
+
+    const allBlogs = await Promise.all(
+      apiBlogs.map(async (blog) => {
+        let content = ''
+        try {
+          const detailRes = await fetch(`${API_URL}/blogs/${blog.id}`)
+          if (detailRes.ok) {
+            const detailBlog = await detailRes.json()
+            if (detailBlog.content) {
+              content = marked.parse(detailBlog.content)
+            }
           }
+        } catch (err) {
+          console.warn(`Could not fetch detail for blog ${blog.id}:`, err.message)
         }
-      } catch (err) {
-        console.warn(`Could not fetch detail for blog ${blog.id}:`, err.message)
-      }
 
-      return {
-        slug: blog.slug || blog.id.toString(),
-        date: blog.created_at,
-        title: blog.title,
-        summary: blog.summary || '',
-        content: content,
-        tags: blog.keywords ? blog.keywords.map(k => k.keyword_name) : []
-      }
-    }))
+        return {
+          slug: blog.slug || blog.id.toString(),
+          date: blog.created_at,
+          title: blog.title,
+          summary: blog.summary || '',
+          content: content,
+          tags: blog.keywords ? blog.keywords.map((k) => k.keyword_name) : [],
+        }
+      })
+    )
 
-    const publishPosts = allBlogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    
+    const publishPosts = allBlogs.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+
     // RSS for blog post
     if (publishPosts.length > 0) {
       const rss = generateRss(config, publishPosts)

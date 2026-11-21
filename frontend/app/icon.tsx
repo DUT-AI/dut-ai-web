@@ -15,37 +15,33 @@ export const contentType = 'image/png'
 // Image generation
 export default async function Icon() {
   try {
-    const logoData = await readFile(
-      join(process.cwd(), 'public/static/images/logo.png')
-    )
+    const logoData = await readFile(join(process.cwd(), 'public/static/images/logo.png'))
     const logoSrc = `data:image/png;base64,${logoData.toString('base64')}`
 
     return new ImageResponse(
-      (
-        <div
+      <div
+        style={{
+          background: 'white',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '20%', // The requested border radius
+          padding: '2px',
+        }}
+      >
+        {}
+        <img
+          src={logoSrc}
+          width={28}
+          height={28}
+          alt="DUT AI Logo"
           style={{
-            background: 'white',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '20%', // The requested border radius
-            padding: '2px',
+            objectFit: 'contain',
           }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={logoSrc}
-            width={28}
-            height={28}
-            alt="DUT AI Logo"
-            style={{
-              objectFit: 'contain',
-            }}
-          />
-        </div>
-      ),
+        />
+      </div>,
       {
         ...size,
       }
@@ -53,24 +49,22 @@ export default async function Icon() {
   } catch (error) {
     // Fallback in case of error
     return new ImageResponse(
-      (
-        <div
-          style={{
-            background: 'white',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '20%',
-            color: '#1e3a8a',
-            fontSize: 20,
-            fontWeight: 'bold',
-          }}
-        >
-          AI
-        </div>
-      ),
+      <div
+        style={{
+          background: 'white',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '20%',
+          color: '#1e3a8a',
+          fontSize: 20,
+          fontWeight: 'bold',
+        }}
+      >
+        AI
+      </div>,
       { ...size }
     )
   }

@@ -3,8 +3,8 @@ import {
   getBlogsCached as getBlogs,
   getProjectsCached as getProjects,
 } from '@/lib/db/cached-queries'
-import type { Blog } from '@/lib/db/features/blogs/types'
-import type { Project } from '@/lib/db/features/projects/types'
+import type { Blog } from '@/features/blog/db/types'
+import type { Project } from '@/features/projects/db/types'
 import siteMetadata from '@/data/siteMetadata'
 import { buildProjectPath } from './projects/project-route'
 

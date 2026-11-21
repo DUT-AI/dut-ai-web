@@ -2,10 +2,7 @@ import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { getAdminSession } from '@/lib/admin-auth'
 import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
-import {
-  updatePersonalProjectQuery,
-  deletePersonalProjectQuery,
-} from '@/lib/db/features/users/queries'
+import { updatePersonalProjectQuery, deletePersonalProjectQuery } from '@/features/users/db/queries'
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: corsHeaders() })

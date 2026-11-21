@@ -1,14 +1,15 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, Trash2, Upload, Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { saveProjectAction } from './actions'
-import type { Project } from '@/lib/db/features/projects/types'
-import type { Member } from '@/lib/db/features/users/types'
+import type { Project } from '@/features/projects/db/types'
+import type { Member } from '@/features/users/db/types'
 
 const AVAILABLE_ROLES = [
   'Project Manager',
@@ -112,7 +113,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
+    <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
       {/* Top action bar */}
       <div className="flex items-center justify-between">
         <Link
@@ -138,11 +139,11 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
       {initialProject?.id && <input type="hidden" name="id" value={initialProject.id} />}
 
       {/* Main Info Card */}
-      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 sm:p-8 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl sm:p-8 dark:border-white/10 dark:bg-slate-900/80">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Thông tin dự án</h2>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Tên dự án <span className="text-red-500">*</span>
           </label>
           <Input
@@ -156,7 +157,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Mô tả dự án
           </label>
           <Textarea
@@ -171,10 +172,10 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
 
         {/* Image Upload (MinIO S3) */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Ảnh đại diện dự án (MinIO S3)
           </label>
-          <div className="mt-2 flex flex-col sm:flex-row gap-3">
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <Input
               name="imageUrl"
               value={imageUrl}
@@ -199,15 +200,21 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
             </label>
           </div>
           {imageUrl && (
-            <div className="mt-3 relative h-36 w-64 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
-              <img src={imageUrl} alt="Project preview" className="h-full w-full object-cover" />
+            <div className="relative mt-3 h-36 w-64 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+              <Image
+                src={imageUrl}
+                alt="Project preview"
+                fill
+                unoptimized
+                className="h-full w-full object-cover"
+              />
             </div>
           )}
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Tính năng nổi bật (Features)
             </label>
             <Textarea
@@ -221,7 +228,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Công nghệ sử dụng (Technologies)
             </label>
             <Textarea
@@ -237,7 +244,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Demo URL / Website Link
             </label>
             <Input
@@ -250,7 +257,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Video Showcase URL (Youtube/Drive)
             </label>
             <Input
@@ -265,18 +272,24 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
       </div>
 
       {/* Project Members Role Assignment */}
-      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 sm:p-8 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl sm:p-8 dark:border-white/10 dark:bg-slate-900/80">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">
               Thành viên tham gia dự án
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="mt-0.5 text-xs text-slate-500">
               Gán thành viên và vai trò tương ứng trong dự án
             </p>
           </div>
 
-          <Button type="button" variant="outline" size="sm" onClick={addMemberRow} className="gap-1 text-xs">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addMemberRow}
+            className="gap-1 text-xs"
+          >
             <Plus className="h-3.5 w-3.5" />
             <span>Thêm thành viên</span>
           </Button>
@@ -284,7 +297,10 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
 
         <div className="space-y-3">
           {membersList.map((row, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
+            <div
+              key={idx}
+              className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-3 dark:border-slate-800 dark:bg-slate-950/50"
+            >
               <select
                 value={row.userId}
                 onChange={(e) => updateMemberRow(idx, 'userId', parseInt(e.target.value, 10))}
@@ -312,7 +328,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
               <button
                 type="button"
                 onClick={() => removeMemberRow(idx)}
-                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition"
+                className="rounded-lg p-2 text-red-500 transition hover:bg-red-50 dark:hover:bg-red-950/30"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -320,7 +336,7 @@ export default function ProjectForm({ initialProject, allMembers }: ProjectFormP
           ))}
 
           {membersList.length === 0 && (
-            <div className="text-center py-6 text-sm text-slate-400">
+            <div className="py-6 text-center text-sm text-slate-400">
               Chưa gán thành viên nào. Bấm &quot;Thêm thành viên&quot; để gán thành viên vào dự án.
             </div>
           )}

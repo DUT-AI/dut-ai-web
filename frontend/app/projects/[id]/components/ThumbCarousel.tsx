@@ -43,10 +43,7 @@ export default function ThumbCarousel({ projects, selected, onSelect }: ThumbCar
   }
 
   return (
-    <div
-      className="space-y-6"
-      style={{ opacity: 0, animation: 'fadeInUp 0.6s ease forwards' }}
-    >
+    <div className="space-y-6" style={{ opacity: 0, animation: 'fadeInUp 0.6s ease forwards' }}>
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(28px); }
@@ -70,7 +67,12 @@ export default function ThumbCarousel({ projects, selected, onSelect }: ThumbCar
                 animationDelay: `${0.1 + i * 0.08}s`,
               }}
             >
-              <ThumbCard project={p} active={i === selected} onClick={() => onSelect(i)} cardW={cardW} />
+              <ThumbCard
+                project={p}
+                active={i === selected}
+                onClick={() => onSelect(i)}
+                cardW={cardW}
+              />
             </div>
           ))}
         </div>
@@ -82,14 +84,10 @@ export default function ThumbCarousel({ projects, selected, onSelect }: ThumbCar
         style={{ opacity: 0, animation: 'fadeInUp 0.55s ease forwards', animationDelay: '0.45s' }}
       >
         <p>
-          <span
-            className="proj-counter text-[48px] font-bold leading-none sm:text-[60px] lg:text-[72px]"
-          >
+          <span className="proj-counter text-[48px] leading-none font-bold sm:text-[60px] lg:text-[72px]">
             {String(selected + 1).padStart(2, '0')}
           </span>
-          <span
-            className="proj-counter ml-1 text-lg font-bold sm:text-2xl lg:text-[30px]"
-          >
+          <span className="proj-counter ml-1 text-lg font-bold sm:text-2xl lg:text-[30px]">
             /{total}
           </span>
         </p>

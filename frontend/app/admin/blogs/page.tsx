@@ -1,4 +1,4 @@
-import { getBlogsQuery } from '@/lib/db/features/blogs/queries'
+import { getBlogsQuery } from '@/features/blog/db/queries'
 import Link from 'next/link'
 import { Plus, Edit2, Trash2, ExternalLink, Eye, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,9 +15,9 @@ export default async function AdminBlogsListPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white">
             Quản lý Bài viết Blog
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -37,7 +37,7 @@ export default async function AdminBlogsListPage() {
       <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-100 bg-slate-50/75 text-xs font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
+            <thead className="border-b border-slate-100 bg-slate-50/75 text-xs font-bold tracking-wider text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
               <tr>
                 <th className="px-6 py-4">ID</th>
                 <th className="px-6 py-4">Ảnh</th>
@@ -50,7 +50,10 @@ export default async function AdminBlogsListPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {blogs.map((blog) => (
-                <tr key={blog.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+                <tr
+                  key={blog.id}
+                  className="transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                >
                   <td className="px-6 py-4 font-mono text-xs text-slate-400">#{blog.id}</td>
                   <td className="px-6 py-4">
                     <div className="relative aspect-[1200/630] w-24 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
@@ -64,14 +67,17 @@ export default async function AdminBlogsListPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="font-bold text-slate-900 dark:text-white text-base">
+                    <span className="text-base font-bold text-slate-900 dark:text-white">
                       {blog.title}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-0.5">
                       {blog.authors?.map((author) => (
-                        <span key={author.id} className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        <span
+                          key={author.id}
+                          className="text-sm font-semibold text-slate-800 dark:text-slate-200"
+                        >
                           {author.name}
                         </span>
                       ))}

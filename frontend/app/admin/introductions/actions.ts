@@ -2,10 +2,7 @@
 
 import { revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
-import {
-  updateIntroductionQuery,
-  createIntroductionQuery,
-} from '@/lib/db/features/introductions/queries'
+import { updateIntroductionQuery, createIntroductionQuery } from '@/features/about/db/queries'
 import { getAdminSession } from '@/lib/admin-auth'
 import { hasContentAccess } from '@/lib/enums/roles'
 

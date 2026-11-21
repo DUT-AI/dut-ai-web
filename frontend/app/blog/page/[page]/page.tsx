@@ -1,5 +1,5 @@
 import { getBlogs, getFeaturedBlogs, getTopAuthors, getBlogKeywords } from 'app/api-client'
-import BlogListLayout from '@/layouts/BlogListLayout'
+import BlogListLayout from '@/features/blog/components/BlogListLayout'
 import { notFound } from 'next/navigation'
 import { genPageMetadata } from 'app/seo'
 

@@ -23,22 +23,21 @@ export default function CategoryTabs({ activeTab, onTabChange }: CategoryTabsPro
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className={`${glassClass} group flex items-center gap-3 overflow-hidden rounded-[40px] px-6 py-6 text-left transition-all duration-300 hover:scale-[1.02] sm:gap-4 sm:px-8 sm:py-7 ${isActive ? 'ring-2 ring-indigo-400/50 dark:ring-white/40' : ''
-              }`}
+            className={`${glassClass} group flex items-center gap-3 overflow-hidden rounded-[40px] px-6 py-6 text-left transition-all duration-300 hover:scale-[1.02] sm:gap-4 sm:px-8 sm:py-7 ${
+              isActive ? 'ring-2 ring-indigo-400/50 dark:ring-white/40' : ''
+            }`}
           >
-            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100/60 dark:bg-white/10 text-lg backdrop-blur-sm sm:h-11 sm:w-11">
+            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100/60 text-lg backdrop-blur-sm sm:h-11 sm:w-11 dark:bg-white/10">
               {tab.icon}
             </span>
             <div>
               <p
-                className="whitespace-pre-line text-sm font-bold leading-tight text-slate-800 dark:text-white sm:text-base"
+                className="text-sm leading-tight font-bold whitespace-pre-line text-slate-800 sm:text-base dark:text-white"
                 style={{ lineHeight: '1.25em' }}
               >
                 {tab.label}
               </p>
-              <p className="mt-1 text-xs text-slate-500 dark:text-[#F1F5F9] sm:text-sm">
-                Chi tiết
-              </p>
+              <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-[#F1F5F9]">Chi tiết</p>
             </div>
           </button>
         )

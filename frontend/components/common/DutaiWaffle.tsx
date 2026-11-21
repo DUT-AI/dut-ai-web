@@ -38,7 +38,7 @@ export function DutaiWaffle({ current = 'manage' }: DutaiWaffleProps) {
     // Xóa cache cũ của ecosystem apps nếu có để nhận dữ liệu và icon mới nhất
     try {
       sessionStorage.removeItem('dutai_ecosystem_apps')
-    } catch {}
+    } catch { }
 
     // Chờ customElements.whenDefined
     customElements.whenDefined('dutai-waffle').then(() => {

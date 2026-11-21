@@ -1,14 +1,14 @@
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { notFound } from 'next/navigation'
-import Link from '@/components/Link'
-import Image from '@/components/Image'
-import TableWrapper from '@/components/TableWrapper'
-import Pre from '@/components/Pre'
+import Link from '@/components/common/Link'
+import Image from '@/components/common/Image'
+import TableWrapper from '@/features/blog/components/TableWrapper'
+import Pre from '@/features/blog/components/Pre'
 import {
   getBlogBySlugCached as getBlogBySlug,
   getBlogsCached as getBlogs,
 } from '@/lib/db/cached-queries'
-import PostLayoutAPI from '@/layouts/PostLayoutAPI'
+import PostLayoutAPI from '@/features/blog/components/PostLayoutAPI'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeSlug from 'rehype-slug'

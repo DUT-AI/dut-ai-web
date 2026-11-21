@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getPostByIdQuery } from '@/lib/db/features/events/queries'
+import { getPostByIdQuery } from '@/features/events/db/queries'
 import PostForm from '@/app/admin/posts/PostForm'
 
 export const dynamic = 'force-dynamic'
@@ -15,7 +15,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white">
           Chỉnh sửa Khoảnh khắc
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

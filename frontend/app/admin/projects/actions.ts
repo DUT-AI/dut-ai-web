@@ -6,7 +6,7 @@ import {
   createProjectQuery,
   updateProjectQuery,
   deleteProjectQuery,
-} from '@/lib/db/features/projects/queries'
+} from '@/features/projects/db/queries'
 import { getAdminSession } from '@/lib/admin-auth'
 import { hasContentAccess } from '@/lib/enums/roles'
 

@@ -16,9 +16,7 @@ export async function getSsoServerSession(): Promise<SsoSession> {
   const cookieStore = await cookies()
   const accessToken =
     cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ||
-    (process.env.NODE_ENV !== 'production'
-      ? process.env.DEV_FALLBACK_ACCESS_TOKEN
-      : undefined) ||
+    (process.env.NODE_ENV !== 'production' ? process.env.DEV_FALLBACK_ACCESS_TOKEN : undefined) ||
     null
 
   const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value || null

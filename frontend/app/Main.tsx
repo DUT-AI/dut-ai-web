@@ -1,4 +1,4 @@
-import Link from '@/components/Link'
+import Link from '@/components/common/Link'
 import siteMetadata from '@/data/siteMetadata'
 import { formatDate } from 'pliny/utils/formatDate'
 
@@ -14,18 +14,18 @@ export default function Home({ posts }) {
         return (
           <article
             key={slug}
-            className="group flex flex-col rounded-[2rem] border border-white dark:border-gray-700/50 bg-white/70 dark:bg-gray-800/80 backdrop-blur-md p-6 shadow-[0_15px_40px_-10px_rgb(0,0,0,0.05)] transition-transform duration-300 hover:-translate-y-1 relative overflow-hidden"
+            className="group relative flex flex-col overflow-hidden rounded-[2rem] border border-white bg-white/70 p-6 shadow-[0_15px_40px_-10px_rgb(0,0,0,0.05)] backdrop-blur-md transition-transform duration-300 hover:-translate-y-1 dark:border-gray-700/50 dark:bg-gray-800/80"
           >
             {/* Date */}
             <time
               dateTime={date}
-              className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary-400 dark:text-primary-300"
+              className="text-primary-400 dark:text-primary-300 mb-2 text-xs font-semibold tracking-widest uppercase"
             >
               {formatDate(date, siteMetadata.locale)}
             </time>
 
             {/* Title */}
-            <h3 className="mb-3 text-base font-bold leading-snug text-primary-900 dark:text-white">
+            <h3 className="text-primary-900 mb-3 text-base leading-snug font-bold dark:text-white">
               <Link href={`/blog/${slug}`} className="hover:underline">
                 {title}
               </Link>
@@ -37,7 +37,7 @@ export default function Home({ posts }) {
                 {tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full bg-rose-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-800 dark:bg-rose-900/40 dark:text-rose-300"
+                    className="rounded-full bg-rose-100 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-rose-800 uppercase dark:bg-rose-900/40 dark:text-rose-300"
                   >
                     {tag}
                   </span>
@@ -46,7 +46,7 @@ export default function Home({ posts }) {
             )}
 
             {/* Summary */}
-            <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-primary-600 dark:text-gray-400">
+            <p className="text-primary-600 line-clamp-3 flex-1 text-sm leading-relaxed dark:text-gray-400">
               {summary}
             </p>
 

@@ -6,7 +6,7 @@ import {
   createKeywordQuery,
   updateKeywordQuery,
   deleteKeywordQuery,
-} from '@/lib/db/features/keywords/queries'
+} from '@/features/blog/keywords/queries'
 import { getAdminSession } from '@/lib/admin-auth'
 import { hasContentAccess } from '@/lib/enums/roles'
 

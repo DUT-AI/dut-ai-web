@@ -2,9 +2,9 @@
 
 import { revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createBlogQuery, updateBlogQuery, deleteBlogQuery } from '@/lib/db/features/blogs/queries'
-import { createKeywordQuery } from '@/lib/db/features/keywords/queries'
-import { keywords } from '@/lib/db/features/keywords/schema'
+import { createBlogQuery, updateBlogQuery, deleteBlogQuery } from '@/features/blog/db/queries'
+import { createKeywordQuery } from '@/features/blog/keywords/queries'
+import { keywords } from '@/features/blog/keywords/schema'
 import { db } from '@/lib/db'
 import { ilike } from 'drizzle-orm'
 import { getAdminSession } from '@/lib/admin-auth'

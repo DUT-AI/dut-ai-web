@@ -201,6 +201,7 @@ export function createBlogThumbnail({
                 padding: 4,
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={logoDataUri}
                 alt="DUT AI Club Logo"
@@ -323,6 +324,7 @@ export function createBlogThumbnail({
                     }}
                   >
                     {author.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={author.avatarUrl}
                         alt={author.name}
@@ -374,7 +376,7 @@ export function createBlogThumbnail({
               fontSize: 22,
               fontWeight: 800,
               letterSpacing: 0.5,
-              position: "relative",
+              position: 'relative',
               bottom: -40,
             }}
           >
@@ -387,13 +389,13 @@ export function createBlogThumbnail({
       ...BLOG_THUMBNAIL_SIZE,
       fonts: fontData
         ? [
-          {
-            name: 'Be Vietnam Pro',
-            data: fontData,
-            weight: 700,
-            style: 'normal',
-          },
-        ]
+            {
+              name: 'Be Vietnam Pro',
+              data: fontData,
+              weight: 700,
+              style: 'normal',
+            },
+          ]
         : undefined,
       headers: {
         'Cache-Control': 'public, max-age=31536000, immutable',

@@ -1,5 +1,5 @@
 import type { Project, Member } from 'app/api-client'
-import Image from '@/components/Image'
+import Image from '@/components/common/Image'
 import { glassClass } from './styles'
 
 interface DemoPanelProps {
@@ -14,9 +14,11 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
   const total = projects.length
 
   return (
-    <div className={`${glassClass} flex flex-col gap-0 overflow-hidden rounded-[40px] lg:flex-row h-[700px] lg:h-[800px]`}>
+    <div
+      className={`${glassClass} flex h-[700px] flex-col gap-0 overflow-hidden rounded-[40px] lg:h-[800px] lg:flex-row`}
+    >
       {/* Left — Text info */}
-      <div className="flex flex-col p-8 sm:p-10 lg:w-[45%] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+      <div className="scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent flex flex-col overflow-y-auto p-8 sm:p-10 lg:w-[45%]">
         <div>
           {/* Mini avatars */}
           <div className="mb-4 flex -space-x-2">
@@ -42,7 +44,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
           </div>
 
           <h3
-            className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl lg:text-[36px]"
+            className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-[36px] dark:text-white"
             style={{ lineHeight: '1.111em' }}
           >
             Demo
@@ -57,7 +59,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
 
         <div className="mt-6">
           <p
-            className="text-sm leading-relaxed text-slate-600 dark:text-[#F1F5F9] sm:text-base"
+            className="text-sm leading-relaxed text-slate-600 sm:text-base dark:text-[#F1F5F9]"
             style={{ lineHeight: '1.8em' }}
           >
             {project.description || 'Xem trước giao diện và trải nghiệm thực tế của dự án.'}
@@ -93,8 +95,9 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
             {projects.slice(0, Math.min(5, total)).map((_, i) => (
               <div
                 key={i}
-                className={`h-2.5 rounded-full transition-all ${i === selected ? 'w-8 bg-orange-500' : 'w-2.5 bg-indigo-200/50 dark:bg-white/20'
-                  }`}
+                className={`h-2.5 rounded-full transition-all ${
+                  i === selected ? 'w-8 bg-orange-500' : 'w-2.5 bg-indigo-200/50 dark:bg-white/20'
+                }`}
               />
             ))}
           </div>
@@ -117,10 +120,10 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
           }}
         />
         {/* Overlay info */}
-        <div className="absolute bottom-0 left-0 right-0 flex items-end gap-4 p-6 sm:p-8">
+        <div className="absolute right-0 bottom-0 left-0 flex items-end gap-4 p-6 sm:p-8">
           {/* Lead avatar */}
           {members[0] && (
-            <div className="absolute right-6 top-6 h-14 w-14 overflow-hidden rounded-full border-2 border-white/30 sm:right-8 sm:top-8">
+            <div className="absolute top-6 right-6 h-14 w-14 overflow-hidden rounded-full border-2 border-white/30 sm:top-8 sm:right-8">
               {members[0].avatar_url ? (
                 <Image
                   alt={members[0].name}
@@ -149,7 +152,7 @@ export default function DemoPanel({ project, members, projects, selected }: Demo
             </p>
           </div>
           {/* Status dot */}
-          <span className="ml-auto mb-1 h-3 w-3 rounded-full bg-emerald-400" />
+          <span className="mb-1 ml-auto h-3 w-3 rounded-full bg-emerald-400" />
         </div>
       </div>
     </div>

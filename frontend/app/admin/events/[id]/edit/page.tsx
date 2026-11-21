@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getPublicEventByIdQuery } from '@/lib/db/features/events/queries'
+import { getPublicEventByIdQuery } from '@/features/events/db/queries'
 import PublicEventForm from '@/app/admin/events/PublicEventForm'
 
 export const dynamic = 'force-dynamic'
@@ -15,7 +15,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white">
           Chỉnh sửa Sự kiện
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

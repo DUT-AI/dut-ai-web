@@ -11,16 +11,16 @@ import Link from 'next/link'
 import { slug as slugify } from 'github-slugger'
 import { saveBlogAction } from './actions'
 import { blogFormSchema, type BlogFormValues } from './schema'
-import MarkdownEditor from '@/components/admin/MarkdownEditor'
+import MarkdownEditor from '@/features/blog/components/MarkdownEditor'
 import NotionZipImportDialog, {
   type NotionImportSuccessPayload,
-} from '@/components/admin/NotionZipImportDialog'
+} from '@/features/blog/components/NotionZipImportDialog'
 import BlogCoverImageSection from './components/BlogCoverImageSection'
 import BlogAuthorsSection from './components/BlogAuthorsSection'
 import BlogKeywordsSection from './components/BlogKeywordsSection'
-import type { Blog } from '@/lib/db/features/blogs/types'
-import type { Member } from '@/lib/db/features/users/types'
-import type { BlogKeyword } from '@/lib/db/features/keywords/types'
+import type { Blog } from '@/features/blog/db/types'
+import type { Member } from '@/features/users/db/types'
+import type { BlogKeyword } from '@/features/blog/keywords/types'
 
 interface BlogFormProps {
   initialBlog?: Blog | null
@@ -203,8 +203,8 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
                   ? 'Đang tải ảnh & lưu...'
                   : 'Đang lưu bài viết...'
                 : initialBlog
-                ? 'Cập nhật bài viết'
-                : 'Lưu bài viết'}
+                  ? 'Cập nhật bài viết'
+                  : 'Lưu bài viết'}
             </span>
           </Button>
         </div>
@@ -303,7 +303,8 @@ export default function BlogForm({ initialBlog, authors, keywords }: BlogFormPro
               Nội dung bài viết (Markdown)
             </h2>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Soạn thảo bằng cú pháp Markdown với thanh công cụ định dạng và chế độ xem trước trực tiếp.
+              Soạn thảo bằng cú pháp Markdown với thanh công cụ định dạng và chế độ xem trước trực
+              tiếp.
             </p>
           </div>
         </div>

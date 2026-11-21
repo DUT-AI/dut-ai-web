@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Search, Plus, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { BlogKeyword } from '@/lib/db/features/keywords/types'
+import type { BlogKeyword } from '@/features/blog/keywords/types'
 import { createKeywordInlineAction } from '../actions'
 
 interface BlogKeywordsSectionProps {
@@ -105,7 +105,7 @@ export default function BlogKeywordsSection({
             type="button"
             onClick={handleCreateKeyword}
             disabled={isCreatingKeyword}
-            className="absolute top-1/2 right-2 -translate-y-1/2 inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 text-[11px] font-semibold text-white shadow-xs transition-all disabled:opacity-50"
+            className="absolute top-1/2 right-2 inline-flex -translate-y-1/2 items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-xs transition-all hover:bg-emerald-700 disabled:opacity-50"
             title={`Tạo từ khóa "${cleanKeywordSearch}"`}
           >
             {isCreatingKeyword ? (
@@ -125,7 +125,7 @@ export default function BlogKeywordsSection({
             type="button"
             onClick={handleCreateKeyword}
             disabled={isCreatingKeyword}
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-dashed border-emerald-500/60 bg-emerald-50/80 px-3 py-1 text-xs font-bold text-emerald-700 shadow-xs transition-all hover:bg-emerald-100 hover:border-emerald-600 dark:border-emerald-500/40 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
+            className="inline-flex items-center gap-1.5 rounded-full border-2 border-dashed border-emerald-500/60 bg-emerald-50/80 px-3 py-1 text-xs font-bold text-emerald-700 shadow-xs transition-all hover:border-emerald-600 hover:bg-emerald-100 dark:border-emerald-500/40 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
           >
             {isCreatingKeyword ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

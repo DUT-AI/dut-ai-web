@@ -12,23 +12,23 @@ export default function FeaturesPanel({ project }: FeaturesPanelProps) {
 
   return (
     <div
-      className={`${glassClass} overflow-y-auto h-[700px] lg:h-[800px] rounded-[40px] p-8 sm:p-10 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent`}
+      className={`${glassClass} scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent h-[700px] overflow-y-auto rounded-[40px] p-8 sm:p-10 lg:h-[800px]`}
     >
       <h3
-        className="mb-6 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl"
+        className="mb-6 text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white"
         style={{ lineHeight: '1.111em' }}
       >
         Key Features
       </h3>
 
       {hasDynamicFeatures ? (
-        <div className="whitespace-pre-wrap text-sm leading-7 text-slate-600 dark:text-[#F1F5F9] sm:text-base">
+        <div className="text-sm leading-7 whitespace-pre-wrap text-slate-600 sm:text-base dark:text-[#F1F5F9]">
           {project.features}
         </div>
       ) : (
         <div className="space-y-6">
           <div>
-            <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl">
+            <h4 className="mb-3 text-lg font-bold text-slate-800 sm:text-xl dark:text-white">
               01. AI Speech Recognition
             </h4>
             <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]">
@@ -41,7 +41,7 @@ export default function FeaturesPanel({ project }: FeaturesPanelProps) {
           </div>
 
           <div>
-            <h4 className="mb-3 text-lg font-bold text-slate-800 dark:text-white sm:text-xl">
+            <h4 className="mb-3 text-lg font-bold text-slate-800 sm:text-xl dark:text-white">
               02. Instant AI Feedback
             </h4>
             <ul className="list-inside list-disc space-y-1.5 text-slate-600 dark:text-[#F1F5F9]">

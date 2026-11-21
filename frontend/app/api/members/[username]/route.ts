@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getMemberPortfolioByUsername } from '@/lib/db/features/users/queries'
+import { getMemberPortfolioByUsername } from '@/features/users/db/queries'
 import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 
 export async function OPTIONS() {

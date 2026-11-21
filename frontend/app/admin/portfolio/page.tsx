@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { Loader2, UserCircle, ExternalLink, RefreshCw } from 'lucide-react'
-import PortfolioEditForm from '@/components/admin/portfolio/PortfolioEditForm'
-import CvUploader from '@/components/admin/portfolio/CvUploader'
-import PersonalProjectsManager from '@/components/admin/portfolio/PersonalProjectsManager'
-import type { UserCv, UserPortfolioProjectModel } from '@/lib/db/features/users/types'
+import PortfolioEditForm from '@/features/portfolio/components/admin/PortfolioEditForm'
+import CvUploader from '@/features/portfolio/components/admin/CvUploader'
+import PersonalProjectsManager from '@/features/portfolio/components/admin/PersonalProjectsManager'
+import type { UserCv, UserPortfolioProjectModel } from '@/features/users/db/types'
 
 export default function AdminPortfolioPage() {
   const [loading, setLoading] = useState(true)

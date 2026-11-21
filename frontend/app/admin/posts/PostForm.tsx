@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Upload, Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { savePostAction } from '../events/actions'
-import type { Post } from '@/lib/db/features/events/types'
+import type { Post } from '@/features/events/db/types'
 
 interface PostFormProps {
   initialPost?: Post | null
@@ -59,7 +60,10 @@ export default function PostForm({ initialPost }: PostFormProps) {
 
     if (uploadedUrls.length > 0) {
       setImgUrls((previous) => {
-        const urls = previous.split('\n').map((url) => url.trim()).filter(Boolean)
+        const urls = previous
+          .split('\n')
+          .map((url) => url.trim())
+          .filter(Boolean)
         return [...new Set([...urls, ...uploadedUrls])].join('\n')
       })
     }
@@ -83,10 +87,13 @@ export default function PostForm({ initialPost }: PostFormProps) {
     })
   }
 
-  const urlList = imgUrls.split('\n').map((u) => u.trim()).filter(Boolean)
+  const urlList = imgUrls
+    .split('\n')
+    .map((u) => u.trim())
+    .filter(Boolean)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
+    <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
       <div className="flex items-center justify-between">
         <Link
           href="/admin/posts"
@@ -110,11 +117,11 @@ export default function PostForm({ initialPost }: PostFormProps) {
 
       {initialPost?.id && <input type="hidden" name="id" value={initialPost.id} />}
 
-      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 sm:p-8 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl sm:p-8 dark:border-white/10 dark:bg-slate-900/80">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Thông tin khoảnh khắc</h2>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Tiêu đề khoảnh khắc <span className="text-red-500">*</span>
           </label>
           <Input
@@ -129,7 +136,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Mô tả chi tiết
           </label>
           <Textarea
@@ -143,7 +150,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Mô tả / Tóm tắt
           </label>
           <Textarea
@@ -159,7 +166,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
         {/* Multiple Images Upload (MinIO S3) */}
         <div>
           <div className="flex items-center justify-between">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Danh sách URLs ảnh (Mỗi link một dòng)
             </label>
             <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900">
@@ -189,10 +196,19 @@ export default function PostForm({ initialPost }: PostFormProps) {
           />
 
           {urlList.length > 0 && (
-            <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
               {urlList.map((url, idx) => (
-                <div key={idx} className="relative h-20 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
-                  <img src={url} alt={`Photo ${idx + 1}`} className="h-full w-full object-cover" />
+                <div
+                  key={idx}
+                  className="relative h-20 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800"
+                >
+                  <Image
+                    src={url}
+                    alt={`Photo ${idx + 1}`}
+                    fill
+                    unoptimized
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -201,7 +217,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Thời gian
             </label>
             <Input
@@ -214,7 +230,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Hashtag (#)
             </label>
             <Input
@@ -229,7 +245,7 @@ export default function PostForm({ initialPost }: PostFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Link Facebook Post
           </label>
           <Input

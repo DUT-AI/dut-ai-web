@@ -9,8 +9,8 @@ import {
   createGenerationQuery,
   deleteGenerationQuery,
   updateGenerationQuery,
-} from '@/lib/db/features/organization/queries'
-import type { SaveGenerationInput } from '@/lib/db/features/organization/types'
+} from '@/features/generations/db/queries'
+import type { SaveGenerationInput } from '@/features/generations/db/types'
 
 function parsePayload(formData: FormData): SaveGenerationInput {
   const raw = formData.get('payload')

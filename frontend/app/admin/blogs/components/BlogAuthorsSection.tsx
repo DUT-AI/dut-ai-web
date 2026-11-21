@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { Search } from 'lucide-react'
-import type { Member } from '@/lib/db/features/users/types'
+import type { Member } from '@/features/users/db/types'
 
 interface BlogAuthorsSectionProps {
   authors: Member[]
@@ -63,9 +64,12 @@ export default function BlogAuthorsSection({
                 }`}
               >
                 {author.avatar_url ? (
-                  <img
+                  <Image
                     src={author.avatar_url}
-                    alt=""
+                    alt={author.name || ''}
+                    width={16}
+                    height={16}
+                    unoptimized
                     className="h-4 w-4 rounded-full object-cover"
                   />
                 ) : null}

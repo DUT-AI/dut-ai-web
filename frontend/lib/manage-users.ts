@@ -1,5 +1,5 @@
 import { createClient } from 'redis'
-import type { Member } from '@/lib/db/features/users/types'
+import type { Member } from '@/features/users/db/types'
 
 const MANAGE_USERS_URL =
   process.env.DUT_MANAGER_USERS_URL || 'https://manage.dutai.io.vn/api/v1/users/options'
@@ -11,7 +11,6 @@ const STALE_CACHE_SECONDS = 24 * 60 * 60
 type RedisClient = ReturnType<typeof createClient>
 
 declare global {
-  // eslint-disable-next-line no-var
   var manageUsersRedis: RedisClient | undefined
 }
 

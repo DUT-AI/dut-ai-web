@@ -5,7 +5,10 @@ import { createBlogThumbnail } from '../../lib/blog-thumbnail'
 
 test('getClubLogoDataUri loads logo.png as base64 data URI', () => {
   const logoUri = getClubLogoDataUri()
-  assert.ok(logoUri.startsWith('data:image/png;base64,'), 'Logo URI must start with data:image/png;base64,')
+  assert.ok(
+    logoUri.startsWith('data:image/png;base64,'),
+    'Logo URI must start with data:image/png;base64,'
+  )
   assert.ok(logoUri.length > 500, 'Logo data URI must contain substantial base64 data')
 })
 

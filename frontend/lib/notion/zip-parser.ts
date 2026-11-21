@@ -201,33 +201,39 @@ export function rewriteMarkdownImageUrls(
   let result = markdown
 
   // 1. Rewrite Markdown image syntax: ![alt](url "title")
-  result = result.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (match, alt, rawUrl, titleAttr) => {
-    if (/^(?:https?:|\/\/|data:)/i.test(rawUrl)) {
-      return match
-    }
+  result = result.replace(
+    /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g,
+    (match, alt, rawUrl, titleAttr) => {
+      if (/^(?:https?:|\/\/|data:)/i.test(rawUrl)) {
+        return match
+      }
 
-    const matchedUrl = findMatchingMinIOUrl(rawUrl, urlMapping)
-    if (!matchedUrl) {
-      return match
-    }
+      const matchedUrl = findMatchingMinIOUrl(rawUrl, urlMapping)
+      if (!matchedUrl) {
+        return match
+      }
 
-    const titlePart = titleAttr ? ` "${titleAttr}"` : ''
-    return `![${alt}](${matchedUrl}${titlePart})`
-  })
+      const titlePart = titleAttr ? ` "${titleAttr}"` : ''
+      return `![${alt}](${matchedUrl}${titlePart})`
+    }
+  )
 
   // 2. Rewrite HTML <img> tags
-  result = result.replace(/<img\s+([^>]*?)src=["']([^"']+)["']([^>]*?)>/gi, (match, before, rawUrl, after) => {
-    if (/^(?:https?:|\/\/|data:)/i.test(rawUrl)) {
-      return match
-    }
+  result = result.replace(
+    /<img\s+([^>]*?)src=["']([^"']+)["']([^>]*?)>/gi,
+    (match, before, rawUrl, after) => {
+      if (/^(?:https?:|\/\/|data:)/i.test(rawUrl)) {
+        return match
+      }
 
-    const matchedUrl = findMatchingMinIOUrl(rawUrl, urlMapping)
-    if (!matchedUrl) {
-      return match
-    }
+      const matchedUrl = findMatchingMinIOUrl(rawUrl, urlMapping)
+      if (!matchedUrl) {
+        return match
+      }
 
-    return `<img ${before}src="${matchedUrl}"${after}>`
-  })
+      return `<img ${before}src="${matchedUrl}"${after}>`
+    }
+  )
 
   return result
 }

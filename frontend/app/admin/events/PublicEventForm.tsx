@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Upload, Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { savePublicEventAction } from './actions'
-import type { PublicEvent } from '@/lib/db/features/events/types'
+import type { PublicEvent } from '@/features/events/db/types'
 
 interface PublicEventFormProps {
   initialEvent?: PublicEvent | null
@@ -75,7 +76,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
+    <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
       <div className="flex items-center justify-between">
         <Link
           href="/admin/events"
@@ -99,11 +100,11 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
 
       {initialEvent?.id && <input type="hidden" name="id" value={initialEvent.id} />}
 
-      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 sm:p-8 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+      <div className="space-y-6 rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl sm:p-8 dark:border-white/10 dark:bg-slate-900/80">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Thông tin sự kiện</h2>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Tên sự kiện <span className="text-red-500">*</span>
           </label>
           <Input
@@ -118,7 +119,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Tóm tắt ngắn (Summary)
           </label>
           <Textarea
@@ -132,7 +133,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Mô tả chi tiết
           </label>
           <Textarea
@@ -147,10 +148,10 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
 
         {/* Image Upload (MinIO S3) */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Ảnh sự kiện (MinIO S3)
           </label>
-          <div className="mt-2 flex flex-col sm:flex-row gap-3">
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <Input
               name="imgUrl"
               type="url"
@@ -176,15 +177,21 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
             </label>
           </div>
           {imgUrl && (
-            <div className="mt-3 relative h-36 w-64 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
-              <img src={imgUrl} alt="Event preview" className="h-full w-full object-cover" />
+            <div className="relative mt-3 h-36 w-64 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+              <Image
+                src={imgUrl}
+                alt="Event preview"
+                fill
+                unoptimized
+                className="h-full w-full object-cover"
+              />
             </div>
           )}
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Thời gian diễn ra
             </label>
             <Input
@@ -197,7 +204,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Địa điểm tổ chức
             </label>
             <Input
@@ -213,7 +220,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Link đăng ký tham gia (Form)
             </label>
             <Input
@@ -227,7 +234,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
               Link bài viết Facebook
             </label>
             <Input
@@ -242,7 +249,7 @@ export default function PublicEventForm({ initialEvent }: PublicEventFormProps) 
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <label className="block text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
             Tags (Phân cách bởi dấu phẩy)
           </label>
           <Input

@@ -5,7 +5,7 @@ import {
   getPostsQuery,
   getBlogKeywordsQuery,
 } from '@/lib/db/queries'
-import { getGenerationAlbumsQuery } from '@/lib/db/features/organization/queries'
+import { getGenerationAlbumsQuery } from '@/features/generations/db/queries'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import {
   FileText,

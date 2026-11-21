@@ -18,9 +18,9 @@ import {
   X,
   ExternalLink,
 } from 'lucide-react'
-import ThemeSwitch from '@/components/ThemeSwitch'
+import ThemeSwitch from '@/components/layout/ThemeSwitch'
 import DutaiWaffle from '@/components/common/DutaiWaffle'
-import { useSsoAuth } from '@/context/SsoAuthContext'
+import { useSsoAuth } from '@/features/auth/context/SsoAuthContext'
 import { logoutAdminAction } from './actions'
 import { cn } from '@/lib/utils'
 import { Toaster, toast } from 'sonner'

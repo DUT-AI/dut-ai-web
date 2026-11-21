@@ -11,8 +11,7 @@ const port = process.env.POSTGRES_PORT || '5432'
 const database = process.env.POSTGRES_DB || 'dut-ai-web'
 
 const url =
-  process.env.DATABASE_URL ||
-  `postgresql://${user}:${password}@${host}:${port}/${database}`
+  process.env.DATABASE_URL || `postgresql://${user}:${password}@${host}:${port}/${database}`
 
 export default defineConfig({
   schema: './lib/db/schema.ts',

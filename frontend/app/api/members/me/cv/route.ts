@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { getAdminSession } from '@/lib/admin-auth'
 import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 import { uploadToMinIO } from '@/lib/minio'
-import { upsertMemberPortfolioQuery, getUserCvByUserIdQuery } from '@/lib/db/features/users/queries'
+import { upsertMemberPortfolioQuery, getUserCvByUserIdQuery } from '@/features/users/db/queries'
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: corsHeaders() })

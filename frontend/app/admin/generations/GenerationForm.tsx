@@ -6,8 +6,8 @@ import { ArrowLeft, ImagePlus, Loader2, Plus, Trash2, UsersRound } from 'lucide-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import type { Member } from '@/lib/db/features/users/types'
-import type { GenerationAlbum } from '@/lib/db/features/organization/types'
+import type { Member } from '@/features/users/db/types'
+import type { GenerationAlbum } from '@/features/generations/db/types'
 import { saveGenerationAction } from './actions'
 import MemberSearchSelect from './MemberSearchSelect'
 

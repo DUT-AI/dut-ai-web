@@ -1,8 +1,1 @@
-export interface Introduction {
-  id: number
-  title?: string
-  content: string
-  order?: number
-}
-
-export type IntroductionResponse = Introduction
+export * from '@/features/about/db/types'

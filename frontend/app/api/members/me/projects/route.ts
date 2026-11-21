@@ -5,7 +5,7 @@ import { jsonResponse, errorResponse, corsHeaders } from '@/lib/cors'
 import {
   getUserPortfolioProjectsQuery,
   createPersonalProjectQuery,
-} from '@/lib/db/features/users/queries'
+} from '@/features/users/db/queries'
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: corsHeaders() })

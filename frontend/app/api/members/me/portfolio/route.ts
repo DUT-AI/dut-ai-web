@@ -7,11 +7,11 @@ import {
   upsertMemberPortfolioQuery,
   getUserPortfolioProjectsQuery,
   getMemberClubProjectsQuery,
-} from '@/lib/db/features/users/queries'
+} from '@/features/users/db/queries'
 import { isReservedUsername } from '@/lib/portfolio/reserved-usernames'
 import { isValidUsernameFormat } from '@/lib/portfolio/username-generator'
 import { db } from '@/lib/db'
-import { userCvs } from '@/lib/db/features/users/schema'
+import { userCvs } from '@/features/users/db/schema'
 import { eq, and, ne } from 'drizzle-orm'
 
 export async function OPTIONS() {

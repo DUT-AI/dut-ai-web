@@ -5,7 +5,7 @@ import {
   getTopAuthorsCached as getTopAuthors,
   getBlogKeywordsCached as getBlogKeywords,
 } from '@/lib/db/cached-queries'
-import BlogListLayout from '@/layouts/BlogListLayout'
+import BlogListLayout from '@/features/blog/components/BlogListLayout'
 
 export const dynamic = 'force-dynamic'
 

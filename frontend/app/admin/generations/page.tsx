@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { BookOpen, Edit2, Plus, RefreshCw, Trash2, UsersRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { getGenerationAlbumsQuery } from '@/lib/db/features/organization/queries'
+import { getGenerationAlbumsQuery } from '@/features/generations/db/queries'
 import { deleteGenerationAction, syncManageUsersAction } from './actions'
 
 export const dynamic = 'force-dynamic'

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Check, ChevronsUpDown, Search, User, X } from 'lucide-react'
-import type { Member } from '@/lib/db/features/users/types'
+import type { Member } from '@/features/users/db/types'
 
 interface MemberSearchSelectProps {
   selectedUserId: number
@@ -56,22 +56,6 @@ export default function MemberSearchSelect({
     })
   }, [users, searchQuery])
 
-  // Reset active index when search changes
-  useEffect(() => {
-    setActiveIndex(0)
-  }, [searchQuery])
-
-  // Focus search input when dropdown opens
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        searchInputRef.current?.focus()
-      }, 50)
-    } else {
-      setSearchQuery('')
-    }
-  }, [isOpen])
-
   // Scroll active item into view
   useEffect(() => {
     if (isOpen && listRef.current) {
@@ -81,6 +65,16 @@ export default function MemberSearchSelect({
       }
     }
   }, [activeIndex, isOpen])
+
+  // Focus search input when dropdown opens
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus()
+      }, 50)
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen])
 
   // Handle outside click
   useEffect(() => {
@@ -131,9 +125,15 @@ export default function MemberSearchSelect({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (isOpen) {
+            setSearchQuery('')
+            setActiveIndex(0)
+          }
+          setIsOpen(!isOpen)
+        }}
         onKeyDown={handleKeyDown}
-        className="flex h-10 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-left text-sm transition-colors hover:border-slate-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:focus:border-blue-400"
+        className="flex h-10 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-left text-sm transition-colors hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:focus:border-blue-400"
       >
         <div className="flex min-w-0 items-center gap-2">
           {selectedUser ? (
@@ -147,7 +147,11 @@ export default function MemberSearchSelect({
                 />
               ) : (
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600 dark:bg-blue-950 dark:text-blue-300">
-                  {selectedUser.name ? selectedUser.name.charAt(0).toUpperCase() : <User className="h-3 w-3" />}
+                  {selectedUser.name ? (
+                    selectedUser.name.charAt(0).toUpperCase()
+                  ) : (
+                    <User className="h-3 w-3" />
+                  )}
                 </div>
               )}
               <span className="truncate font-medium text-slate-800 dark:text-slate-200">
@@ -168,7 +172,7 @@ export default function MemberSearchSelect({
 
       {/* Popover / Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-1.5 w-full min-w-[260px] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl animate-in fade-in-0 zoom-in-95 dark:border-slate-800 dark:bg-slate-900">
+        <div className="animate-in fade-in-0 zoom-in-95 absolute top-full left-0 z-50 mt-1.5 w-full min-w-[260px] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-900">
           {/* Search Header */}
           <div className="relative mb-2 flex items-center">
             <Search className="absolute left-3 h-4 w-4 text-slate-400 dark:text-slate-500" />
@@ -176,10 +180,13 @@ export default function MemberSearchSelect({
               ref={searchInputRef}
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setActiveIndex(0)
+              }}
               onKeyDown={handleKeyDown}
               placeholder="Tìm theo tên, email, chức vụ..."
-              className="h-9 w-full rounded-xl bg-slate-100 pr-8 pl-9 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500"
+              className="h-9 w-full rounded-xl bg-slate-100 pr-8 pl-9 text-xs text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500"
             />
             {searchQuery && (
               <button
@@ -196,7 +203,7 @@ export default function MemberSearchSelect({
           <ul
             ref={listRef}
             role="listbox"
-            className="max-h-56 overflow-y-auto overflow-x-hidden space-y-0.5 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700"
+            className="scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 max-h-56 space-y-0.5 overflow-x-hidden overflow-y-auto"
           >
             {filteredUsers.length === 0 ? (
               <li className="px-3 py-4 text-center text-xs text-slate-500 dark:text-slate-400">
@@ -235,7 +242,11 @@ export default function MemberSearchSelect({
                         />
                       ) : (
                         <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                          {user.name ? user.name.charAt(0).toUpperCase() : <User className="h-3 w-3" />}
+                          {user.name ? (
+                            user.name.charAt(0).toUpperCase()
+                          ) : (
+                            <User className="h-3 w-3" />
+                          )}
                         </div>
                       )}
                       <div className="min-w-0">
@@ -250,7 +261,7 @@ export default function MemberSearchSelect({
 
                     <div className="flex shrink-0 items-center gap-1.5">
                       <span
-                        className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                        className={`rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase ${
                           user.status === 'active'
                             ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                             : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
@@ -258,7 +269,9 @@ export default function MemberSearchSelect({
                       >
                         {user.status === 'active' ? 'Active' : 'Off'}
                       </span>
-                      {isSelected && <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />}
+                      {isSelected && (
+                        <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                      )}
                     </div>
                   </li>
                 )

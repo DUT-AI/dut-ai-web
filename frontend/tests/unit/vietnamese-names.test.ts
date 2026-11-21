@@ -1,6 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getVietnameseInitial, getAvatarColor, AVATAR_COLOR_PALETTE } from '../../lib/vietnamese-names'
+import {
+  getVietnameseInitial,
+  getAvatarColor,
+  AVATAR_COLOR_PALETTE,
+} from '../../lib/vietnamese-names'
 
 test('getVietnameseInitial extracts the initial of the Vietnamese first name (tên gọi)', () => {
   // Standard Vietnamese full names: Họ + Tên đệm + Tên gọi -> Initial of Tên gọi

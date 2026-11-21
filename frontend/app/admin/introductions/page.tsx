@@ -1,4 +1,4 @@
-import { getIntroductionsQuery } from '@/lib/db/features/introductions/queries'
+import { getIntroductionsQuery } from '@/features/about/db/queries'
 import { Edit2, Save, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -10,9 +10,9 @@ export default async function AdminIntroductionsPage() {
   const intros = await getIntroductionsQuery().catch(() => [])
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="max-w-4xl space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white">
           Quản lý Giới thiệu CLB (Introductions)
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -24,13 +24,13 @@ export default async function AdminIntroductionsPage() {
         {intros.map((item, idx) => (
           <div
             key={item.id}
-            className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 space-y-4"
+            className="space-y-4 rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+              <span className="text-xs font-bold tracking-wider text-blue-600 uppercase dark:text-blue-400">
                 Đoạn giới thiệu #{item.id}
               </span>
-              <span className="text-xs font-mono text-slate-400">ID: {item.id}</span>
+              <span className="font-mono text-xs text-slate-400">ID: {item.id}</span>
             </div>
 
             <form action={saveIntroductionAction.bind(null, null)} className="space-y-4">
@@ -53,7 +53,7 @@ export default async function AdminIntroductionsPage() {
         ))}
 
         {/* Add new introduction section */}
-        <div className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 space-y-4">
+        <div className="space-y-4 rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
           <h2 className="text-base font-bold text-slate-900 dark:text-white">
             Thêm đoạn giới thiệu mới
           </h2>

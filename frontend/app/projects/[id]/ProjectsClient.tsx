@@ -23,21 +23,25 @@ export default function ProjectsClient({
   const [activeTab, setActiveTab] = useState<TabKey>('features')
   const current = projects[selected]
 
-  const projectMembers: Member[] = project.members?.map((member) => ({
-    id: member.id,
-    name: member.user_name || 'Member',
-    role_name: member.role || 'Member',
-    avatar_url: member.user_avatar_url || undefined,
-  })) || []
+  const projectMembers: Member[] =
+    project.members?.map((member) => ({
+      id: member.id,
+      name: member.user_name || 'Member',
+      role_name: member.role || 'Member',
+      avatar_url: member.user_avatar_url || undefined,
+    })) || []
 
   const effectiveMembers = projectMembers.length > 0 ? projectMembers : members
 
-  const groupedMembers = effectiveMembers.reduce((acc, m) => {
-    const role = m.role_name || 'Khác'
-    if (!acc[role]) acc[role] = []
-    acc[role].push(m)
-    return acc
-  }, {} as Record<string, Member[]>)
+  const groupedMembers = effectiveMembers.reduce(
+    (acc, m) => {
+      const role = m.role_name || 'Khác'
+      if (!acc[role]) acc[role] = []
+      acc[role].push(m)
+      return acc
+    },
+    {} as Record<string, Member[]>
+  )
 
   /* ── Panel transition state ── */
   const [visible, setVisible] = useState(true)
@@ -45,12 +49,12 @@ export default function ProjectsClient({
 
   const handleTabChange = (tab: TabKey) => {
     if (tab === activeTab) return
-    setVisible(false)                       // fade-out current panel
+    setVisible(false) // fade-out current panel
     setTimeout(() => {
       prevTab.current = tab
-      setActiveTab(tab)                     // swap content
-      setVisible(true)                      // fade-in new panel
-    }, 200)                                 // matches CSS transition duration
+      setActiveTab(tab) // swap content
+      setVisible(true) // fade-in new panel
+    }, 200) // matches CSS transition duration
   }
 
   if (!current) return null

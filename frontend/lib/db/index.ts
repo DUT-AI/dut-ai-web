@@ -18,9 +18,8 @@ function getDatabaseUrl(): string {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var globalDb: PostgresJsDatabase<typeof schema> | undefined
-  // eslint-disable-next-line no-var
+
   var globalSql: postgres.Sql | undefined
 }
 

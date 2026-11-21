@@ -1,6 +1,6 @@
 import { getHomePageDataCached as getHomePageData } from '@/lib/db/cached-queries'
 import type { HomePageData } from '@/lib/db/features/homepage/types'
-import Footer from '@/components/Footer'
+import Footer from '@/components/layout/Footer'
 import HeroSection from '@/components/home/HeroSection'
 import RoadmapSection from '@/components/home/RoadmapSection'
 import PortfolioSection from '@/components/home/PortfolioSection'

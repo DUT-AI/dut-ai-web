@@ -3,9 +3,9 @@ import {
   getPublicEventsCached as getPublicEvents,
   getPostsCached as getPosts,
 } from '@/lib/db/cached-queries'
-import type { PublicEvent, Post } from '@/lib/db/features/events/types'
-import { buildPastEvents } from '@/lib/db/features/events/timeline'
-import EventsListLayout from '@/layouts/EventsListLayout'
+import type { PublicEvent, Post } from '@/features/events/db/types'
+import { buildPastEvents } from '@/features/events/db/timeline'
+import EventsListLayout from '@/features/events/components/EventsListLayout'
 
 export const metadata = genPageMetadata({
   title: 'Sự kiện và hoạt động AI',

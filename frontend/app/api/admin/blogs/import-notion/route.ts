@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminSession } from '@/lib/admin-auth'
 import { uploadToMinIO } from '@/lib/minio'
-import { getBlogBySlugQuery } from '@/lib/db/features/blogs/queries'
+import { getBlogBySlugQuery } from '@/features/blog/db/queries'
 import { parseNotionZip, rewriteMarkdownImageUrls } from '@/lib/notion/zip-parser'
 
 export const dynamic = 'force-dynamic'
@@ -19,10 +19,7 @@ export async function POST(req: NextRequest) {
     const file = formData.get('file') as File | null
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'Vui lòng chọn tệp ZIP xuất từ Notion.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Vui lòng chọn tệp ZIP xuất từ Notion.' }, { status: 400 })
     }
 
     // Check size limit
@@ -57,12 +54,7 @@ export async function POST(req: NextRequest) {
 
     const uploadPromises = parsed.images.map(async (img) => {
       try {
-        const uploadResult = await uploadToMinIO(
-          img.buffer,
-          img.fileName,
-          img.mimeType,
-          'blogs'
-        )
+        const uploadResult = await uploadToMinIO(img.buffer, img.fileName, img.mimeType, 'blogs')
         urlMapping.set(img.zipPath, uploadResult.url)
         urlMapping.set(img.normalizedPath, uploadResult.url)
       } catch (uploadErr: any) {
@@ -74,10 +66,7 @@ export async function POST(req: NextRequest) {
     await Promise.all(uploadPromises)
 
     // 3. Rewrite Markdown image URLs to public MinIO URLs
-    const rewrittenContent = rewriteMarkdownImageUrls(
-      parsed.markdownContent,
-      urlMapping
-    )
+    const rewrittenContent = rewriteMarkdownImageUrls(parsed.markdownContent, urlMapping)
 
     // 4. Check if the generated slug already exists
     let isSlugDuplicate = false
@@ -109,9 +98,7 @@ export async function POST(req: NextRequest) {
     console.error('Notion ZIP import error:', error)
     return NextResponse.json(
       {
-        error:
-          error?.message ||
-          'Không thể xử lý tệp ZIP hoặc tải ảnh lên bộ lưu trữ MinIO.',
+        error: error?.message || 'Không thể xử lý tệp ZIP hoặc tải ảnh lên bộ lưu trữ MinIO.',
       },
       { status: 500 }
     )

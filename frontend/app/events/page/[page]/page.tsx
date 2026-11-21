@@ -3,9 +3,9 @@ import {
   getPostsCached as getPosts,
   getPublicEventsCached as getPublicEvents,
 } from '@/lib/db/cached-queries'
-import { buildPastEvents } from '@/lib/db/features/events/timeline'
-import type { Post, PublicEvent } from '@/lib/db/features/events/types'
-import EventsListLayout from '@/layouts/EventsListLayout'
+import { buildPastEvents } from '@/features/events/db/timeline'
+import type { Post, PublicEvent } from '@/features/events/db/types'
+import EventsListLayout from '@/features/events/components/EventsListLayout'
 import { genPageMetadata } from 'app/seo'
 
 const EVENTS_PER_PAGE = 5

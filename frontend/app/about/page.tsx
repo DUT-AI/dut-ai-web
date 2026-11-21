@@ -1,14 +1,14 @@
 import { genPageMetadata } from 'app/seo'
-import Footer from '@/components/Footer'
+import Footer from '@/components/layout/Footer'
 import AboutHero from '@/components/about/AboutHero'
 import AboutStory from '@/components/about/AboutStory'
 import AboutCoreValues from '@/components/about/AboutCoreValues'
-import GenerationAlbum from '@/components/about/GenerationAlbum'
-import { getGenerationAlbumsQuery } from '@/lib/db/features/organization/queries'
+import GenerationAlbum from '@/features/generations/components/GenerationAlbum'
+import { getGenerationAlbumsQuery } from '@/features/generations/db/queries'
 import { getManageUsers } from '@/lib/manage-users'
 import { generateInitialUsername } from '@/lib/portfolio/username-generator'
-import type { GenerationAlbum as GenerationAlbumData } from '@/lib/db/features/organization/types'
-import type { Member } from '@/lib/db/features/users/types'
+import type { GenerationAlbum as GenerationAlbumData } from '@/features/generations/db/types'
+import type { Member } from '@/features/users/db/types'
 
 export const metadata = genPageMetadata({
   title: 'Giới thiệu DUT AI Club | Câu lạc bộ AI - DUT',

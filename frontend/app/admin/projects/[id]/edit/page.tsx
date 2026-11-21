@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getProjectByIdQuery } from '@/lib/db/features/projects/queries'
+import { getProjectByIdQuery } from '@/features/projects/db/queries'
 import { getManageUsers } from '@/lib/manage-users'
 import ProjectForm from '@/app/admin/projects/ProjectForm'
 

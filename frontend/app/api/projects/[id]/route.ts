@@ -8,10 +8,7 @@ export async function OPTIONS() {
   return new Response(null, { status: 204, headers: corsHeaders() })
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const projectId = parseInt(id, 10)
