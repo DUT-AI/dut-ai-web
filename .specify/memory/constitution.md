@@ -1,50 +1,70 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: [CONSTITUTION_VERSION] (uninitialized template) -> 1.0.0
+- List of modified principles:
+  * [PRINCIPLE_1_NAME] -> I. Architecture & Separation of Concerns (Full-Stack Decoupled)
+  * [PRINCIPLE_2_NAME] -> II. RBAC & Identity-First Security (Single Source of Truth)
+  * [PRINCIPLE_3_NAME] -> III. Clean Code & Modern Standards (Vercel & Clean Code)
+  * [PRINCIPLE_4_NAME] -> IV. Verification, Testing & Quality Gates
+  * [PRINCIPLE_5_NAME] -> V. Resilience, Observability & Performance
+- Added sections:
+  * Additional Constraints & Security Requirements
+  * Development Workflow & Quality Gates
+- Removed sections: None
+- Follow-up TODOs: None
+-->
+
+# DUT-AI Web Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Architecture & Separation of Concerns (Full-Stack Decoupled)
+- The system MUST adhere to a clean decoupled architecture: **Next.js (React)** for presentation & user experience, and **Wagtail CMS (Django) / Python API** for headless backend & content management.
+- Backend services MUST expose stateless, structured REST/GraphQL APIs. Database operations MUST remain encapsulated within backend service layers.
+- Frontend MUST consume backend endpoints through typed API wrappers and handle optimistic updates, errors, and fallbacks gracefully without exposing backend internals.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. RBAC & Identity-First Security (Single Source of Truth)
+- Authentication and authorization MUST rely strictly on the authoritative Identity Provider (IdP) and centralized session management (`/api/v1/auth/me`). Local unverified decoding of JWT signatures without keys for privilege determination is STRICTLY FORBIDDEN.
+- Role-based Access Control (RBAC) MUST enforce strict zoning:
+  - **Content Zone**: Routes under `/admin` (except member portfolio) are restricted to accounts holding the `Content` (or `Admin`) role.
+  - **Member Profile Zone**: Non-content members MUST be partitioned strictly to their personal portfolio (`/admin/portfolio`).
+- Both Server-Side guards (Next.js middleware / server actions / backend views) and Client-Side UI guards MUST enforce permissions defense-in-depth.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Clean Code & Modern Standards (Pragmatic & Maintainable)
+- All code MUST adhere to clean code principles: concise, direct, self-documenting, and free from speculative over-engineering (YAGNI).
+- Modern web engineering guidelines MUST be respected:
+  - Adhere to React Server/Client Component boundaries to minimize client bundle footprints.
+  - Comply with Core Web Vitals standards (LCP, INP, CLS) and modern semantic accessibility (a11y).
+  - TypeScript types MUST be strictly defined and validated at runtime boundaries where user input enters the system.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Verification, Testing & Quality Gates (NON-NEGOTIABLE)
+- Code changes MUST be accompanied by verification: unit tests for business logic, contract tests for APIs, and end-to-end smoke checks for critical user authentication and partitioned workflows.
+- No task is complete until automated quality gates (`tsc --noEmit`, linters, formatters, and static checks) succeed cleanly with zero critical regressions.
+- Socratic Gate protocol: Ambiguous specifications or breaking edge cases MUST be surfaced, clarified, and resolved before irreversible architectural changes are committed.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Resilience, Observability & Performance
+- All asynchronous calls and external network interactions MUST enforce explicit timeouts (e.g., `AbortSignal.timeout`) and deterministic error boundaries to prevent infinite blocking or unhandled UI freezes.
+- State transitions, route navigations, and session mutations (Login, Logout, Role Switch) MUST execute with clear visual feedback, deterministic client cache invalidation, and seamless fallback routing.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Additional Constraints & Security Requirements
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **Secret & Credential Management**: No private keys, service credentials, or production tokens may be committed to version control. Environment configurations (`.env.local`, `.env`) MUST use strict validation patterns.
+- **Session Lifecycle**: Logout MUST deterministically invalidate local cookies/session state across all endpoints (`/api/auth/logout`, `SsoAuthContext`, `actions.ts`) and navigate to the dedicated login route (`/admin/login`).
+- **UI/UX Guidelines**: Avoid generic clichés. Maintain cohesive design tokens and user feedback patterns across admin consoles and public portals.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow & Quality Gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- **Pre-Commit Verification**: Run type checking (`tsc --noEmit`), code style formatting (Prettier), and linting (ESLint) before merging or finalizing any feature.
+- **Spec-Kit Workflow**: Features follow structured lifecycle stages: Specification (`/speckit-specify`), Architecture & Planning (`/speckit-plan`), Task Breakdown (`/speckit-tasks`), and Implementation (`/speckit-implement`).
+- **Review & Audit**: High-impact security and permission modifications require automated regression analysis and explicit architectural sign-off.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- The **DUT-AI Web Constitution** supersedes ad-hoc implementation habits and establishes the foundational technical law for the repository.
+- Amendments to this constitution must be documented, versioned semantically, and approved by project maintainers.
+- Versioning Policy:
+  - **MAJOR**: Incompatible governance shifts, architectural paradigms, or principle deprecations.
+  - **MINOR**: Addition of new principles, significant expansion of development standards or security requirements.
+  - **PATCH**: Non-semantic refinements, typographical fixes, and clarification updates.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-11-21 | **Last Amended**: 2026-11-21

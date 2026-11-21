@@ -67,7 +67,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const activeUser = ssoUser
   const homeLink = isContentManager ? '/admin' : '/admin/portfolio'
   const isContentRoute = getPartitionForPath(pathname) === 'CONTENT_MANAGEMENT'
-  const isUnauthorizedContent = !isLoading && isContentRoute && !isContentManager
+  // Chỉ coi là không có quyền nếu đã load xong user và user đó chắc chắn KHÔNG có role Content
+  const isUnauthorizedContent =
+    !isLoading && Boolean(ssoUser) && isContentRoute && !isContentManager
 
   // Client-side route guard: if user is not a content manager and attempts to view a Content zone route
   useEffect(() => {

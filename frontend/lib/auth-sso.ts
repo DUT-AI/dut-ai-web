@@ -158,9 +158,11 @@ export const fetchCurrentSsoUser = cache(
           Accept: 'application/json',
         },
         cache: 'no-store',
+        signal: AbortSignal.timeout(6000),
       })
 
       if (!res.ok) {
+        console.warn(`[SSO] IdP responded with status ${res.status} for /api/v1/auth/me`)
         return null
       }
 
@@ -192,7 +194,7 @@ export const fetchCurrentSsoUser = cache(
 
       return profile
     } catch (error) {
-      console.error('[SSO] Error fetching user profile from IdP:', error)
+      console.error('[SSO] Error verifying session with IdP (/api/v1/auth/me):', error)
       return null
     }
   }

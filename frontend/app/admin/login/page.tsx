@@ -32,6 +32,9 @@ function LoginForm() {
       const res = await loginAdminAction(null, formData)
       if (res?.error) {
         setState({ error: res.error })
+      } else if (res?.redirect) {
+        // Thực hiện điều hướng toàn trang để đảm bảo nạp lại phiên mới sạch sẽ, không lưu cache cũ
+        window.location.assign(res.redirect)
       }
     })
   }

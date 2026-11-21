@@ -61,15 +61,8 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
     adminUser = await fetchCurrentUser(accessToken)
 
     if (!adminUser) {
-      const jwtPayload = decodeJwtPayload(accessToken) || {}
-      adminUser = {
-        id: Number(jwtPayload.sub) || 1,
-        name: jwtPayload.name || email,
-        email: jwtPayload.email || email,
-        role_names: jwtPayload.role_names || jwtPayload.roles || ['admin'],
-        permissions: jwtPayload.permissions || [],
-        avatar_url: jwtPayload.avatar_url || jwtPayload.avatar || '',
-        status: 'ACTIVE',
+      return {
+        error: 'Không thể xác thực thông tin tài khoản với máy chủ quản trị DUT-AI',
       }
     }
 
@@ -89,10 +82,10 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
   if (destination === '/admin' && !hasContentAccess(adminUser)) {
     destination = '/admin/portfolio'
   }
-  redirect(destination)
+  return { success: true, redirect: destination }
 }
 
 export async function logoutAdminAction() {
   await clearAdminSession()
-  redirect(SSO_LOGIN_URL)
+  redirect('/admin/login')
 }

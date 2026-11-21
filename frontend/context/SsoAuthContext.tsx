@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { usePathname } from 'next/navigation'
 import { DutAiUserProfile, SSO_LOGIN_URL } from '@/lib/auth-sso'
 import { hasContentAccess } from '@/lib/enums/roles'
 
@@ -20,6 +21,7 @@ export interface SsoAuthContextValue {
 const SsoAuthContext = createContext<SsoAuthContextValue | null>(null)
 
 export function SsoAuthProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
   const [user, setUser] = useState<DutAiUserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -55,11 +57,14 @@ export function SsoAuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    initializeSession()
+    if (!user) {
+      initializeSession()
+    }
+
     return () => {
       isCancelled = true
     }
-  }, [])
+  }, [pathname, user])
 
   const refresh = useCallback(async () => {
     try {
@@ -117,7 +122,7 @@ export function SsoAuthProvider({ children }: { children: React.ReactNode }) {
       console.error('[SSO] Logout API error:', err)
     } finally {
       setUser(null)
-      window.location.assign(SSO_LOGIN_URL)
+      window.location.assign('/admin/login')
     }
   }, [])
 
