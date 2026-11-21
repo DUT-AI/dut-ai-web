@@ -66,6 +66,16 @@ export interface UnifiedProject {
   displayOrder?: number
 }
 
+export interface MemberPortfolioBlog {
+  id: number
+  title: string
+  slug: string | null
+  summary?: string | null
+  imageUrl?: string | null
+  views?: number | null
+  createdAt?: Date | null
+}
+
 export interface MemberPortfolioData {
   userId: number
   name: string
@@ -83,6 +93,7 @@ export interface MemberPortfolioData {
   }
   skills: SkillCategory[]
   projects: UnifiedProject[]
+  blogs?: MemberPortfolioBlog[]
   cv?: {
     fileUrl: string
     fileName?: string | null

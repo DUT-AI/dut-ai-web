@@ -28,7 +28,9 @@ const Header = () => {
   const isAdminPage = pathname?.startsWith('/admin')
   const isEventsPage = pathname?.startsWith('/events')
 
-  if (isAdminPage) {
+  const isMembersPage = pathname?.startsWith('/members')
+
+  if (isAdminPage || isMembersPage) {
     return null
   }
 

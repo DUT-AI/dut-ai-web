@@ -1,12 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { genPageMetadata } from 'app/seo'
-import Footer from '@/components/layout/Footer'
-import PortfolioHero from '@/features/portfolio/components/PortfolioHero'
-import PortfolioAbout from '@/features/portfolio/components/PortfolioAbout'
-import PortfolioSkills from '@/features/portfolio/components/PortfolioSkills'
-import PortfolioProjects from '@/features/portfolio/components/PortfolioProjects'
-import PortfolioResume from '@/features/portfolio/components/PortfolioResume'
+import PortfolioContainer from '@/features/portfolio/components/PortfolioContainer'
 import { getMemberPortfolioByUsername } from '@/features/users/db/queries'
 
 export const dynamic = 'force-dynamic'
@@ -52,40 +47,5 @@ export default async function MemberPortfolioPage({ params }: MemberPortfolioPag
     notFound()
   }
 
-  return (
-    <>
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Hero Section */}
-        <PortfolioHero
-          name={profile.name}
-          headline={profile.headline}
-          quote={profile.quote}
-          avatarUrl={profile.avatarUrl}
-          cvUrl={profile.cv?.fileUrl}
-          clubRole={profile.clubRole}
-          socialLinks={profile.socialLinks}
-        />
-
-        {/* About Section */}
-        <PortfolioAbout bio={profile.bio} quote={profile.quote} clubRole={profile.clubRole} />
-
-        {/* Skills Section */}
-        <PortfolioSkills skills={profile.skills} />
-
-        {/* Projects Section (Unified Club + Personal) */}
-        <PortfolioProjects projects={profile.projects} />
-
-        {/* Resume / CV Section */}
-        {profile.cv && (
-          <PortfolioResume
-            cvUrl={profile.cv.fileUrl}
-            fileName={profile.cv.fileName}
-            fileSize={profile.cv.fileSize}
-          />
-        )}
-      </div>
-
-      <Footer />
-    </>
-  )
+  return <PortfolioContainer profile={profile} />
 }

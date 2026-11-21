@@ -1,0 +1,38 @@
+/* Styling tokens for My-CV Portfolio Experience */
+
+.cosmosBackground {
+  background-color: #0c0513;
+  background-image: radial-gradient(circle at 50% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(30, 64, 175, 0.08) 0%, transparent 50%),
+    linear-gradient(to bottom, #0c0513, #07030a);
+  min-height: 100vh;
+  color: #f8fafc;
+}
+
+.brandGlow {
+  box-shadow: 0 0 25px -5px rgba(37, 99, 235, 0.4);
+}
+
+.cardGlow:hover {
+  box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.35);
+  border-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+.waveEmoji {
+  animation-name: waveAnimation;
+  animation-duration: 2.1s;
+  animation-iteration-count: infinite;
+  transform-origin: 70% 70%;
+  display: inline-block;
+}
+
+@keyframes waveAnimation {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}

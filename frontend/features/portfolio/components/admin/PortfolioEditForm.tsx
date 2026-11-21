@@ -1,9 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, AlertCircle, Loader2, Plus, X, Globe, Eye } from 'lucide-react'
+import {
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Plus,
+  X,
+  Globe,
+  Eye,
+  Check,
+  Cpu,
+  Wrench,
+} from 'lucide-react'
 import { isValidUsernameFormat } from '@/lib/portfolio/username-generator'
 import { isReservedUsername } from '@/lib/portfolio/reserved-usernames'
+import {
+  PREDEFINED_TECHSTACK,
+  PREDEFINED_TOOLSTACK,
+} from '@/features/portfolio/constants/predefined-skills'
+import TechIcon from '@/features/portfolio/components/TechIcons'
 import type { SkillCategory, UserCv } from '@/features/users/db/types'
 
 export interface PortfolioEditFormProps {
@@ -21,12 +37,33 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
   const [linkedinUrl, setLinkedinUrl] = useState(initialData.linkedin_url || '')
   const [facebookUrl, setFacebookUrl] = useState(initialData.facebook_url || '')
   const [websiteUrl, setWebsiteUrl] = useState(initialData.website_url || '')
-  const [skills, setSkills] = useState<SkillCategory[]>(initialData.skills || [])
   const [isPublic, setIsPublic] = useState(initialData.is_public ?? true)
 
-  // Skill category state
-  const [newCatName, setNewCatName] = useState('')
-  const [newSkillText, setNewSkillText] = useState<{ [catIdx: number]: string }>({})
+  // Parse initial skills into selected tech items & tool items
+  const initialSkills = initialData.skills || []
+  const initialTech: string[] = []
+  const initialTools: string[] = []
+
+  initialSkills.forEach((cat) => {
+    const isTool = /tool|công cụ|ide|platform|os|devops/i.test(cat.category)
+    if (isTool) {
+      initialTools.push(...cat.items)
+    } else {
+      initialTech.push(...cat.items)
+    }
+  })
+
+  // Selected tech & tools states
+  const [selectedTech, setSelectedTech] = useState<string[]>(
+    Array.from(
+      new Set(initialTech.length > 0 ? initialTech : ['Python', 'TypeScript', 'React', 'Node.js'])
+    )
+  )
+  const [selectedTools, setSelectedTools] = useState<string[]>(
+    Array.from(
+      new Set(initialTools.length > 0 ? initialTools : ['VS Code', 'Postman', 'Git', 'Docker'])
+    )
+  )
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -37,31 +74,20 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
   const isUsernameValid = isValidUsernameFormat(usernameClean)
   const isReserved = isReservedUsername(usernameClean)
 
-  const handleAddCategory = () => {
-    if (!newCatName.trim()) return
-    setSkills([...skills, { category: newCatName.trim(), items: [] }])
-    setNewCatName('')
-  }
-
-  const handleRemoveCategory = (catIdx: number) => {
-    setSkills(skills.filter((_, idx) => idx !== catIdx))
-  }
-
-  const handleAddSkill = (catIdx: number) => {
-    const text = (newSkillText[catIdx] || '').trim()
-    if (!text) return
-    const updated = [...skills]
-    if (!updated[catIdx].items.includes(text)) {
-      updated[catIdx].items.push(text)
+  const toggleTech = (name: string) => {
+    if (selectedTech.includes(name)) {
+      setSelectedTech(selectedTech.filter((t) => t !== name))
+    } else {
+      setSelectedTech([...selectedTech, name])
     }
-    setSkills(updated)
-    setNewSkillText({ ...newSkillText, [catIdx]: '' })
   }
 
-  const handleRemoveSkill = (catIdx: number, skillIdx: number) => {
-    const updated = [...skills]
-    updated[catIdx].items = updated[catIdx].items.filter((_, idx) => idx !== skillIdx)
-    setSkills(updated)
+  const toggleTool = (name: string) => {
+    if (selectedTools.includes(name)) {
+      setSelectedTools(selectedTools.filter((t) => t !== name))
+    } else {
+      setSelectedTools([...selectedTools, name])
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,46 +96,61 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
     setSuccess(null)
 
     if (!isUsernameValid) {
-      setError('Username phải từ 3-30 ký tự, chỉ gồm chữ thường, số, dấu _ hoặc -')
+      setError(
+        'Tên người dùng không hợp lệ. Chỉ chấp nhận chữ thường, số, dấu - hoặc _ (3-30 ký tự).'
+      )
       return
     }
 
     if (isReserved) {
-      setError('Username này thuộc danh sách từ khóa hệ thống, vui lòng chọn tên khác')
+      setError(
+        `Tên người dùng "${usernameClean}" bị giới hạn bởi hệ thống. Vui lòng chọn tên khác.`
+      )
       return
     }
 
-    setIsSaving(true)
+    // Format skills back to category structure for database
+    const formattedSkills: SkillCategory[] = [
+      {
+        category: 'Professional Skillset',
+        items: selectedTech,
+      },
+      {
+        category: 'Tools I Use',
+        items: selectedTools,
+      },
+    ]
 
     try {
+      setIsSaving(true)
       const res = await fetch('/api/members/me/portfolio', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: usernameClean,
-          headline: headline || null,
-          quote: quote || null,
-          bio: bio || null,
-          avatar_url: avatarUrl || null,
-          github_url: githubUrl || null,
-          linkedin_url: linkedinUrl || null,
-          facebook_url: facebookUrl || null,
-          website_url: websiteUrl || null,
-          skills,
-          is_public: isPublic,
+          headline: headline.trim() || null,
+          quote: quote.trim() || null,
+          bio: bio.trim() || null,
+          avatarUrl: avatarUrl.trim() || null,
+          githubUrl: githubUrl.trim() || null,
+          linkedinUrl: linkedinUrl.trim() || null,
+          facebookUrl: facebookUrl.trim() || null,
+          websiteUrl: websiteUrl.trim() || null,
+          skills: formattedSkills,
+          isPublic,
         }),
       })
 
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Cập nhật hồ sơ thất bại')
+        throw new Error(data.error || 'Cập nhật hồ sơ thất bại.')
       }
 
-      setSuccess('Cập nhật hồ sơ portfolio thành công!')
+      setSuccess('Cập nhật hồ sơ thành công!')
       if (onSaved) onSaved()
     } catch (err: any) {
-      setError(err.message || 'Lỗi khi lưu hồ sơ')
+      setError(err.message || 'Có lỗi xảy ra, vui lòng thử lại.')
     } finally {
       setIsSaving(false)
     }
@@ -228,13 +269,13 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400">
-              GitHub URL
+              GitHub URL / Username
             </label>
             <input
-              type="url"
+              type="text"
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
-              placeholder="https://github.com/username"
+              placeholder="https://github.com/phuocnguyen2412"
               className="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
@@ -280,134 +321,127 @@ export default function PortfolioEditForm({ initialData, onSaved }: PortfolioEdi
         </div>
       </div>
 
-      {/* 3. Skills Manager */}
+      {/* 3. Predefined Skills & Tools Selector */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Kỹ năng chuyên môn</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+          Kỹ năng & Công cụ lập trình (Skillset & Tools)
+        </h3>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Nhóm kỹ năng theo danh mục (ví dụ: Languages, Frameworks, Tools).
+          Chọn trực tiếp từ danh mục công nghệ có sẵn chuẩn hệ thống (tự động hiển thị icon tương
+          ứng trên trang cá nhân).
         </p>
 
-        {/* Existing Categories */}
-        <div className="mt-6 space-y-6">
-          {skills.map((cat, catIdx) => (
-            <div
-              key={catIdx}
-              className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/40"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-800 dark:text-gray-200">
-                  {cat.category}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveCategory(catIdx)}
-                  className="text-xs text-red-500 hover:text-red-700"
-                >
-                  Xóa nhóm
-                </button>
-              </div>
-
-              {/* Tag Badges */}
-              <div className="mt-3 flex flex-wrap gap-2">
-                {cat.items.map((skill, sIdx) => (
-                  <span
-                    key={sIdx}
-                    className="inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm dark:bg-gray-900 dark:text-gray-300"
-                  >
-                    {skill}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSkill(catIdx, sIdx)}
-                      className="ml-1 text-gray-400 hover:text-red-500"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-
-              {/* Add Skill to category */}
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  value={newSkillText[catIdx] || ''}
-                  onChange={(e) => setNewSkillText({ ...newSkillText, [catIdx]: e.target.value })}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      handleAddSkill(catIdx)
-                    }
-                  }}
-                  placeholder="Thêm kỹ năng (nhấn Enter)..."
-                  className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAddSkill(catIdx)}
-                  className="rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300"
-                >
-                  Thêm
-                </button>
-              </div>
+        {/* Section A: Professional Skillset */}
+        <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50/70 p-5 dark:border-gray-800 dark:bg-gray-800/40">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white">
+              <Cpu className="h-4 w-4 text-blue-500" />
+              <span>Professional Skillset (Ngôn ngữ, Framework, AI, DB)</span>
             </div>
-          ))}
+            <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+              Đã chọn: {selectedTech.length}
+            </span>
+          </div>
 
-          {/* Create new category */}
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={newCatName}
-              onChange={(e) => setNewCatName(e.target.value)}
-              placeholder="Tên nhóm kỹ năng mới (VD: AI / Machine Learning)"
-              className="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            />
-            <button
-              type="button"
-              onClick={handleAddCategory}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-400"
-            >
-              <Plus className="h-4 w-4" />
-              Tạo nhóm
-            </button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {PREDEFINED_TECHSTACK.map((tech) => {
+              const isSelected = selectedTech.includes(tech.name)
+              return (
+                <button
+                  key={tech.id}
+                  type="button"
+                  onClick={() => toggleTech(tech.name)}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                    isSelected
+                      ? 'border border-blue-500 bg-blue-600 text-white shadow-sm shadow-blue-500/30'
+                      : 'border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-blue-500/50'
+                  }`}
+                >
+                  <TechIcon
+                    name={tech.name}
+                    mini
+                    className={isSelected ? 'text-white' : 'text-slate-600 dark:text-slate-300'}
+                  />
+                  <span>{tech.name}</span>
+                  {isSelected && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Section B: Tools I Use */}
+        <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50/70 p-5 dark:border-gray-800 dark:bg-gray-800/40">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white">
+              <Wrench className="h-4 w-4 text-blue-500" />
+              <span>Tools I Use (IDE, Môi trường, Nền tảng, OS)</span>
+            </div>
+            <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+              Đã chọn: {selectedTools.length}
+            </span>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {PREDEFINED_TOOLSTACK.map((tool) => {
+              const isSelected = selectedTools.includes(tool.name)
+              return (
+                <button
+                  key={tool.id}
+                  type="button"
+                  onClick={() => toggleTool(tool.name)}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                    isSelected
+                      ? 'border border-blue-500 bg-blue-600 text-white shadow-sm shadow-blue-500/30'
+                      : 'border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-blue-500/50'
+                  }`}
+                >
+                  <TechIcon
+                    name={tool.name}
+                    mini
+                    className={isSelected ? 'text-white' : 'text-slate-600 dark:text-slate-300'}
+                  />
+                  <span>{tool.name}</span>
+                  {isSelected && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
 
-      {/* 4. Visibility Toggle & Save Button */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <label className="flex cursor-pointer items-center gap-3">
+      {/* 4. Privacy & Save */}
+      <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex items-center gap-3">
           <input
             type="checkbox"
+            id="isPublic"
             checked={isPublic}
             onChange={(e) => setIsPublic(e.target.checked)}
             className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-            Công khai trang portfolio này cho mọi người xem
-          </span>
-        </label>
-
-        <div className="flex items-center gap-3">
-          {usernameClean && isUsernameValid && (
-            <a
-              href={`/members/${usernameClean}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
-            >
-              <Eye className="h-4 w-4" />
-              Xem trang
-            </a>
-          )}
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+          <label
+            htmlFor="isPublic"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
-          </button>
+            Công khai trang hồ sơ cá nhân ra bên ngoài (Public Portfolio)
+          </label>
         </div>
+
+        <button
+          type="submit"
+          disabled={isSaving}
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Đang lưu...</span>
+            </>
+          ) : (
+            <span>Lưu thay đổi</span>
+          )}
+        </button>
       </div>
     </form>
   )

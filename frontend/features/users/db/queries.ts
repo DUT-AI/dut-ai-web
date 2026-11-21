@@ -1,13 +1,15 @@
-import { eq, asc } from 'drizzle-orm'
+import { eq, asc, desc } from 'drizzle-orm'
 import { db } from '@/lib/db/index'
 import { userCvs, userPortfolioProjects } from './schema'
 import { projects, projectMembers } from '@/features/projects/db/schema'
+import { blogs, blogAuthors } from '@/features/blog/db/schema'
 import { getManageUsers } from '@/lib/manage-users'
 import { generateInitialUsername } from '@/lib/portfolio/username-generator'
 import type {
   UserCv,
   MemberPortfolioData,
   UnifiedProject,
+  MemberPortfolioBlog,
   UserPortfolioProjectModel,
   InsertUserPortfolioProject,
 } from './types'
@@ -307,6 +309,29 @@ export async function getMemberPortfolioByUsername(
     // Unified projects list: Club verified projects first, then personal projects
     const allProjects: UnifiedProject[] = [...clubProjects, ...formattedPersonalProjects]
 
+    // 6. Fetch published blogs authored by this user
+    let userBlogs: MemberPortfolioBlog[] = []
+    try {
+      const blogRows = await db
+        .select({
+          id: blogs.id,
+          title: blogs.title,
+          slug: blogs.slug,
+          summary: blogs.summary,
+          imageUrl: blogs.imageUrl,
+          views: blogs.views,
+          createdAt: blogs.createdAt,
+        })
+        .from(blogAuthors)
+        .innerJoin(blogs, eq(blogAuthors.blogId, blogs.id))
+        .where(eq(blogAuthors.externalUserId, userId))
+        .orderBy(desc(blogs.createdAt))
+
+      userBlogs = blogRows
+    } catch (bErr) {
+      console.error(`Failed to fetch blogs for user ${userId}:`, bErr)
+    }
+
     return {
       userId,
       name: targetMember.name,
@@ -324,6 +349,7 @@ export async function getMemberPortfolioByUsername(
       },
       skills: (cvRecord?.skills as any) || [],
       projects: allProjects,
+      blogs: userBlogs,
       cv: cvRecord?.cvFileUrl
         ? {
             fileUrl: cvRecord.cvFileUrl,

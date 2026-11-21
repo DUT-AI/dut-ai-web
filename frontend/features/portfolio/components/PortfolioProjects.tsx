@@ -1,6 +1,8 @@
+'use client'
+
+import React from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { Briefcase, ExternalLink, Github, Sparkles } from 'lucide-react'
+import { Github, Globe, Sparkles, FolderGit2 } from 'lucide-react'
 import type { UnifiedProject } from '@/features/users/db/types'
 
 export interface PortfolioProjectsProps {
@@ -8,96 +10,75 @@ export interface PortfolioProjectsProps {
 }
 
 export function PortfolioProjectCard({ project }: { project: UnifiedProject }) {
-  const defaultThumbnail = '/static/images/project-placeholder.png'
-
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-900/60">
-      {/* Thumbnail */}
-      <div className="relative aspect-video w-full bg-gray-100 dark:bg-gray-800">
-        {project.imageUrl ? (
-          <Image
-            src={project.imageUrl}
-            alt={project.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-gray-400 dark:text-gray-600">
-            <Briefcase className="h-10 w-10" />
-          </div>
-        )}
+    <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-blue-500/30 bg-slate-900/40 shadow-[0_4px_15px_rgba(37,99,235,0.25)] backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/70 hover:shadow-[0_8px_30px_rgba(37,99,235,0.4)]">
+      {/* 1. Image Thumbnail */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950 p-2 sm:p-3">
+        <div className="relative h-full w-full overflow-hidden rounded-lg">
+          {project.imageUrl ? (
+            <Image
+              src={project.imageUrl}
+              alt={project.title}
+              fill
+              className="object-cover object-top"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-slate-900 text-blue-400">
+              <FolderGit2 className="h-12 w-12 opacity-60" />
+            </div>
+          )}
 
-        {/* Club Verified Badge */}
-        {project.isClubProject && (
-          <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-600/90 px-3 py-1 text-xs font-semibold text-white shadow backdrop-blur-sm dark:border-blue-400">
-            <Sparkles className="h-3 w-3" />
-            DUT AI Project
-          </div>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="flex flex-1 flex-col p-6">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{project.title}</h3>
-          {project.clubRole && (
-            <span className="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
-              {project.clubRole}
-            </span>
+          {/* Club Verified Badge */}
+          {project.isClubProject && (
+            <div className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full border border-blue-400/40 bg-blue-600/90 px-2.5 py-0.5 text-[11px] font-bold text-white shadow-md backdrop-blur-md">
+              <Sparkles className="h-3 w-3 text-amber-300" />
+              <span>DUT AI Project</span>
+            </div>
           )}
         </div>
+      </div>
 
+      {/* 2. Body: Only Title, Description & Action Buttons (Exact my-cv layout) */}
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        {/* Title */}
+        <h4 className="text-center text-xl font-bold tracking-tight text-white transition-colors group-hover:text-blue-400">
+          {project.title}
+        </h4>
+
+        {/* Short & Clean Description */}
         {project.description && (
-          <p className="mt-2 line-clamp-3 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-3 line-clamp-4 text-justify text-sm leading-relaxed text-slate-300">
             {project.description}
           </p>
         )}
 
-        {project.technologies && (
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {project.technologies.split(',').map((tech, i) => (
-              <span
-                key={i}
-                className="rounded-md bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-              >
-                {tech.trim()}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex-1" />
 
-        {/* Action Links */}
-        <div className="mt-auto flex items-center gap-3 pt-6">
-          {project.demoUrl && (
-            <a
-              href={project.demoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Demo
-            </a>
-          )}
+        {/* Action Buttons: Centered (GitHub / Live Demo) */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           {project.repoUrl && (
             <a
               href={project.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition-all hover:bg-blue-500 hover:shadow-blue-500/50"
             >
-              <Github className="h-4 w-4" />
-              Source Code
+              <Github className="h-3.5 w-3.5" />
+              <span>GitHub</span>
             </a>
           )}
-          {project.isClubProject && (
-            <Link
-              href={`/projects/${project.id}`}
-              className="ml-auto text-xs font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+
+          {project.demoUrl && (
+            <a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition-all hover:bg-blue-500 hover:shadow-blue-500/50"
             >
-              Chi tiết →
-            </Link>
+              <Globe className="h-3.5 w-3.5" />
+              <span>Demo</span>
+            </a>
           )}
         </div>
       </div>
@@ -106,29 +87,31 @@ export function PortfolioProjectCard({ project }: { project: UnifiedProject }) {
 }
 
 export default function PortfolioProjects({ projects }: PortfolioProjectsProps) {
-  if (!projects || projects.length === 0) {
-    return null
-  }
-
   return (
-    <section id="projects" className="mt-12">
-      <div className="mb-6 flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
-          <Briefcase className="h-5 w-5" />
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-          Dự án nổi bật
+    <div className="relative z-10 py-12">
+      <div className="text-center">
+        <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          My Recent <span className="text-blue-500">Works</span>
         </h2>
+        <p className="mt-2 text-sm text-slate-400">
+          Here are a few projects I've worked on recently.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project, idx) => (
-          <PortfolioProjectCard
-            key={`${project.isClubProject ? 'club' : 'personal'}-${project.id}-${idx}`}
-            project={project}
-          />
-        ))}
-      </div>
-    </section>
+      {projects.length === 0 ? (
+        <div className="mt-12 rounded-2xl border border-blue-500/20 bg-slate-900/50 p-12 text-center text-slate-400">
+          Chưa có dự án nào được công khai trong hồ sơ này.
+        </div>
+      ) : (
+        <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((proj, idx) => (
+            <PortfolioProjectCard
+              key={`${proj.isClubProject ? 'club' : 'p'}-${proj.id}-${idx}`}
+              project={proj}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
