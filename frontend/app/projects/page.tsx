@@ -49,15 +49,18 @@ export default async function ProjectsPage() {
           AI Innovations
         </h1>
 
-        <p className="mx-auto max-w-[700px] px-4 text-[17px] leading-[1.7] font-medium text-gray-600 md:text-[19px] dark:text-slate-300">
+        <p className="mx-auto max-w-[800px] px-4 text-[17px] leading-[1.7] font-medium text-gray-600 md:text-[19px] dark:text-slate-300">
           Khám phá những giới hạn giao thoa giữa học máy và sáng tạo con người.
           <br className="hidden md:block" />
           Triển lãm những dự án được phát triển bởi Câu lạc bộ DUT AI.
         </p>
       </section>
-
+      <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+        <span className="mb-4 text-6xl">📦</span>
+        <p className="text-lg font-semibold">Coming Soon!</p>
+      </div>
       {/* Error */}
-      {error && (
+      {/* {error && (
         <div className="mx-auto max-w-[1220px] px-6 md:px-8">
           <div className="mb-8 overflow-hidden rounded-[40px] border border-white/20 bg-white/10 p-8 text-center backdrop-blur-xl">
             <p className="text-lg text-slate-200">
@@ -65,17 +68,17 @@ export default async function ProjectsPage() {
             </p>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Interactive content */}
-      {!error && projects.length === 0 ? (
+      {/* {!error && projects.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-slate-400">
           <span className="mb-4 text-6xl">📦</span>
           <p className="text-lg font-semibold">Chưa có dự án nào.</p>
         </div>
       ) : (
         !error && <ProjectsListClient initialProjects={projects} />
-      )}
+      )} */}
       <Footer />
     </div>
   )
