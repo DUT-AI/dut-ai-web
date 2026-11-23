@@ -28,6 +28,15 @@ import {
   FileText,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import type { Components } from 'react-markdown'
+import MermaidBlock from './MermaidBlock'
+import rehypeMermaid from '../lib/rehype-mermaid'
+
+const previewComponents = {
+  'mermaid-block': MermaidBlock,
+} as Components
+
+const previewRehypePlugins = [rehypeMermaid]
 
 interface MarkdownEditorProps {
   value: string
@@ -377,7 +386,9 @@ export default function MarkdownEditor({
             </div>
             {value.trim() ? (
               <div className="prose dark:prose-invert prose-sm sm:prose-base max-w-none leading-relaxed break-words">
-                <ReactMarkdown>{value}</ReactMarkdown>
+                <ReactMarkdown rehypePlugins={previewRehypePlugins} components={previewComponents}>
+                  {value}
+                </ReactMarkdown>
               </div>
             ) : (
               <div className="flex h-48 items-center justify-center text-sm text-gray-400 italic dark:text-gray-600">
