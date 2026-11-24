@@ -4,6 +4,8 @@ import Link from '@/components/common/Link'
 import Image from '@/components/common/Image'
 import TableWrapper from '@/features/blog/components/TableWrapper'
 import Pre from '@/features/blog/components/Pre'
+import MermaidBlock from '@/features/blog/components/MermaidBlock'
+import rehypeMermaid from '@/features/blog/lib/rehype-mermaid'
 import {
   getBlogBySlugCached as getBlogBySlug,
   getBlogsCached as getBlogs,
@@ -43,6 +45,7 @@ const mdxComponents = {
   },
   table: TableWrapper,
   pre: Pre,
+  'mermaid-block': MermaidBlock,
 }
 
 interface PageProps {
@@ -154,6 +157,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
           rehypeSlug,
           [rehypeAutolinkHeadings],
           rehypeKatex,
+          rehypeMermaid,
           [rehypePrettyCode as any, prettyCodeOptions],
         ],
       },
